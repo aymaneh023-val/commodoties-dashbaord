@@ -9,11 +9,11 @@ const TICKER_UNITS = {
   zim:   ' $',
   matx:  ' $',
   lng:   ' $',
-  mos:   ' $',
+  urea:  ' $/ton',
 }
 
 export default function TickerBar({ data }) {
-  const keys = ['brent', 'wti', 'ttf', 'bdry', 'zim', 'matx', 'lng', 'mos']
+  const keys = ['brent', 'wti', 'ttf', 'bdry', 'zim', 'matx', 'lng', 'urea']
 
   return (
     <div

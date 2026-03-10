@@ -16,7 +16,7 @@ const OTHER_TICKERS = {
   zim:  'ZIM',
   matx: 'MATX',
   lng:  'LNG',
-  mos:  'MOS',
+  urea: 'UFB=F',
 }
 
 const delay = (ms) => new Promise(r => setTimeout(r, ms))
@@ -118,7 +118,7 @@ export function useCommodityData() {
     zim:   { ...initialState },
     matx:  { ...initialState },
     lng:   { ...initialState },
-    mos:   { ...initialState },
+    urea:  { ...initialState },
   })
 
   // Incremented on every refresh — running loops from a previous generation

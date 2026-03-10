@@ -8,11 +8,19 @@ import GasLNG from './components/sections/GasLNG'
 import Shipping from './components/sections/Shipping'
 import Chokepoints from './components/sections/Chokepoints'
 import Fertilizer from './components/sections/Fertilizer'
+import FoodCommodities from './components/sections/FoodCommodities'
 import Inflation from './components/sections/Inflation'
 import CompareSection from './components/sections/CompareSection'
+import RiskIndicators from './components/sections/RiskIndicators'
 import { useCommodityData } from './hooks/useCommodityData'
 import { useEurostatData } from './hooks/useEurostatData'
 import { useNewsData } from './hooks/useNewsData'
+import { useFoodCommoditiesData } from './hooks/useFoodCommoditiesData'
+import { useIMFData } from './hooks/useIMFData'
+import { useOECDData } from './hooks/useOECDData'
+import { useGDELTData } from './hooks/useGDELTData'
+import { usePortWatchData } from './hooks/usePortWatchData'
+import { useGPRData } from './hooks/useGPRData'
 
 
 export default function App() {
@@ -23,12 +31,19 @@ export default function App() {
   const { data: commodityData, refresh: refreshCommodity } = useCommodityData()
   const { headline, food, combined } = useEurostatData()
   const { articles, loading: newsLoading, error: newsError, refresh: refreshNews } = useNewsData()
+  const { data: foodData, refresh: refreshFood } = useFoodCommoditiesData()
+  const { pfert } = useIMFData()
+  const oecdData = useOECDData()
+  const { sparkline: gdeltSparkline } = useGDELTData()
+  const { portwatch } = usePortWatchData()
+  const gprData = useGPRData()
 
   const handleRefresh = useCallback(() => {
     refreshCommodity()
     refreshNews()
+    refreshFood()
     setLastUpdated(new Date())
-  }, [refreshCommodity, refreshNews])
+  }, [refreshCommodity, refreshNews, refreshFood])
 
   // Update lastUpdated whenever commodity data finishes loading
   const anyLoading = Object.values(commodityData).some((d) => d.loading)
@@ -70,6 +85,16 @@ export default function App() {
       >
         {/* Left column — data sections */}
         <main>
+          {/* Risk Indicators — always visible at top */}
+          {sectionVisible('risk') && (
+            <RiskIndicators
+              history={gprData.history}
+              loading={gprData.loading}
+              isFallback={gprData.isFallback}
+              gprValue={gprData.gprValue}
+              status={gprData.status}
+            />
+          )}
           {sectionVisible('oil') && (
             <CrudeOil brent={commodityData.brent} wti={commodityData.wti} />
           )}
@@ -84,10 +109,13 @@ export default function App() {
             />
           )}
           {sectionVisible('chokepoints') && (
-            <Chokepoints />
+            <Chokepoints portwatch={portwatch} />
           )}
           {sectionVisible('fertilizer') && (
-            <Fertilizer mos={commodityData.mos} />
+            <Fertilizer urea={commodityData.urea} pfert={pfert} />
+          )}
+          {sectionVisible('food') && (
+            <FoodCommodities data={foodData} />
           )}
           {sectionVisible('inflation') && (
             <Inflation
@@ -95,6 +123,7 @@ export default function App() {
               food={food}
               combined={combined}
               isFallback={headline?.isFallback || food?.isFallback}
+              oecdData={oecdData}
             />
           )}
           {sectionVisible('compare') && (
@@ -113,6 +142,7 @@ export default function App() {
             loading={newsLoading}
             error={newsError}
             activeFilter={activeFilter}
+            sparkline={gdeltSparkline}
           />
         </div>
       </div>

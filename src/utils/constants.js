@@ -6,7 +6,7 @@ export const TICKERS = {
   zim:   'ZIM',    // ZIM Integrated Shipping — container proxy
   matx:  'MATX',   // Matson — container confirmation
   lng:   'LNG',
-  mos:   'MOS',
+  urea:  'UFB=F',  // Urea futures — nitrogen fertilizer benchmark
 }
 
 export const YAHOO_BASE = 'https://query1.finance.yahoo.com/v8/finance/chart'
@@ -38,11 +38,13 @@ export const SOURCE_COLORS = {
 
 export const FILTER_TABS = [
   { id: 'ALL',         label: 'ALL',         emoji: '' },
+  { id: 'risk',        label: 'Geo Risk',    emoji: '⚠️' },
   { id: 'oil',         label: 'Oil',         emoji: '🛢️' },
   { id: 'gas',         label: 'Gas & LNG',   emoji: '⚡' },
   { id: 'shipping',    label: 'Shipping',    emoji: '🚢' },
   { id: 'chokepoints', label: 'Chokepoints', emoji: '🗺' },
   { id: 'fertilizer',  label: 'Fertilizer',  emoji: '🌾' },
+  { id: 'food',        label: 'Food',        emoji: '🌿' },
   { id: 'inflation',   label: 'Inflation',   emoji: '📈' },
   { id: 'compare',     label: 'Compare',     emoji: '📊' },
 ]
@@ -55,7 +57,7 @@ export const TICKER_LABELS = {
   zim:   'ZIM',
   matx:  'MATX',
   lng:   'LNG',
-  mos:   'Mosaic',
+  urea:  'Urea',
 }
 
 export const NEWS_CATEGORY_KEYWORDS = {

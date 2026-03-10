@@ -106,14 +106,50 @@ const COASTLINES = [
   ].map(([lng, lat]) => `${mapX(lng).toFixed(0)},${mapY(lat).toFixed(0)}`).join(' L'),
 ]
 
-const EXPLAINER = 'Key maritime chokepoints affecting global energy and food supply chains. The Strait of Hormuz alone controls ~21% of global oil supply — a closure would immediately affect European energy and food prices. Status as of March 2026. Updated manually.'
+// Map PortWatch chokepoint ids to our chokepoint ids
+const PORTWATCH_KEY_MAP = {
+  hormuz:  ['hormuz', 'strait of hormuz'],
+  bab:     ['bab', 'bab-el-mandeb', 'bab el mandeb', 'mandeb'],
+  suez:    ['suez'],
+  persian: ['persian', 'persian gulf'],
+}
 
-export default function Chokepoints() {
+function getPortWatchStatus(deviation) {
+  if (deviation == null) return null
+  if (deviation < -40) return 'CRITICAL'
+  if (deviation < -25) return 'DISRUPTED'
+  if (deviation < -10) return 'ELEVATED'
+  return 'WATCH'
+}
+
+const EXPLAINER = 'Key maritime chokepoints affecting global energy and food supply chains. The Strait of Hormuz alone controls ~21% of global oil supply — a closure would immediately affect European energy and food prices.'
+
+export default function Chokepoints({ portwatch = null }) {
   const [hoveredId, setHoveredId] = useState(null)
+
+  // Merge live PortWatch data into CHOKEPOINTS
+  const enrichedChokepoints = CHOKEPOINTS.map((cp) => {
+    if (!portwatch) return cp
+    // Find PortWatch entry matching this chokepoint
+    const pwKeys = PORTWATCH_KEY_MAP[cp.id] || []
+    const pwEntry = Object.entries(portwatch).find(([key]) =>
+      pwKeys.some((k) => key.toLowerCase().includes(k))
+    )
+    if (!pwEntry) return cp
+    const [, pw] = pwEntry
+    const liveStatus = getPortWatchStatus(pw.deviation)
+    return {
+      ...cp,
+      status: liveStatus ?? cp.status,
+      vesselCount: pw.vesselCount ?? null,
+      deviation: pw.deviation ?? null,
+      isLive: true,
+    }
+  })
 
   const statusCounts = Object.entries(STATUS_CONFIG).map(([status, cfg]) => ({
     status,
-    count: CHOKEPOINTS.filter((c) => c.status === status).length,
+    count: enrichedChokepoints.filter((c) => c.status === status).length,
     emoji: cfg.emoji,
   }))
 
@@ -183,7 +219,7 @@ export default function Chokepoints() {
           </text>
 
           {/* Chokepoint dots */}
-          {CHOKEPOINTS.map((cp) => {
+          {enrichedChokepoints.map((cp) => {
             const cfg = STATUS_CONFIG[cp.status]
             const cx = mapX(cp.lng)
             const cy = mapY(cp.lat)
@@ -247,7 +283,7 @@ export default function Chokepoints() {
 
         {/* Tooltip */}
         {hoveredId && (() => {
-          const cp = CHOKEPOINTS.find((c) => c.id === hoveredId)
+          const cp = enrichedChokepoints.find((c) => c.id === hoveredId)
           if (!cp) return null
           const cfg = STATUS_CONFIG[cp.status]
           return (
@@ -288,7 +324,17 @@ export default function Chokepoints() {
                 >
                   {cp.status}
                 </span>
+                {cp.isLive && (
+                  <span style={{ fontSize: 9, color: '#4ade80', fontFamily: "'DM Mono', monospace" }}>LIVE</span>
+                )}
               </div>
+              {cp.isLive && (cp.vesselCount != null || cp.deviation != null) && (
+                <p style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 11, marginBottom: 6 }}>
+                  {cp.vesselCount != null ? `${cp.vesselCount} vessels` : ''}
+                  {cp.vesselCount != null && cp.deviation != null ? ' · ' : ''}
+                  {cp.deviation != null ? `${cp.deviation > 0 ? '+' : ''}${cp.deviation.toFixed(1)}% vs 30d avg` : ''}
+                </p>
+              )}
               <p style={{ color: 'var(--muted)', lineHeight: 1.6 }}>{cp.note}</p>
             </div>
           )
@@ -313,7 +359,7 @@ export default function Chokepoints() {
         ))}
       </div>
 
-      {/* Disclaimer */}
+      {/* Source note */}
       <p
         className="mt-4 text-xs"
         style={{
@@ -323,7 +369,9 @@ export default function Chokepoints() {
           opacity: 0.7,
         }}
       >
-        ⚠ Static data · Status reflects March 2026 intelligence assessment · Not a live feed
+        {portwatch
+          ? 'Source: IMF PortWatch · vessel transit data updated weekly · status derived from 30d deviation'
+          : '⚠ Static data · Status reflects March 2026 intelligence assessment · Not a live feed'}
       </p>
     </section>
   )

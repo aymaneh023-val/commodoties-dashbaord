@@ -60,10 +60,80 @@ const SECTIONS = [
     title: 'FERTILIZER',
     sources: [
       {
-        name: 'Mosaic Company (MOS)',
+        name: 'Urea Futures (UFB=F)',
         provider: 'Yahoo Finance',
-        url: 'https://finance.yahoo.com/quote/MOS',
-        desc: 'Global fertilizer producer, NYSE',
+        url: 'https://finance.yahoo.com/quote/UFB=F',
+        desc: 'Urea futures — nitrogen fertilizer benchmark, CME listed',
+      },
+      {
+        name: 'IMF Fertilizer Price Index (PFERT)',
+        provider: 'IMF Primary Commodity Prices',
+        url: 'https://imfstatapi.imf.org/v1/data/PCPS/M.W00.PFERT.IX',
+        desc: 'IMF global fertilizer price index (2016=100). Monthly data via IMF SDMX-JSON API.',
+      },
+    ],
+  },
+  {
+    title: 'FOOD COMMODITIES',
+    sources: [
+      {
+        name: 'Wheat Futures (ZW=F)',
+        provider: 'Yahoo Finance',
+        url: 'https://finance.yahoo.com/quote/ZW=F',
+        desc: 'CBOT soft red winter wheat futures, $/bushel',
+      },
+      {
+        name: 'Corn Futures (ZC=F)',
+        provider: 'Yahoo Finance',
+        url: 'https://finance.yahoo.com/quote/ZC=F',
+        desc: 'CBOT corn futures, $/bushel',
+      },
+      {
+        name: 'Soybean Futures (ZS=F)',
+        provider: 'Yahoo Finance',
+        url: 'https://finance.yahoo.com/quote/ZS=F',
+        desc: 'CBOT soybean futures, $/bushel',
+      },
+      {
+        name: 'Soybean Oil Futures (ZL=F)',
+        provider: 'Yahoo Finance',
+        url: 'https://finance.yahoo.com/quote/ZL=F',
+        desc: 'CBOT soybean oil futures, cents/lb',
+      },
+      {
+        name: 'Soybean Meal Futures (ZM=F)',
+        provider: 'Yahoo Finance',
+        url: 'https://finance.yahoo.com/quote/ZM=F',
+        desc: 'CBOT soybean meal futures, $/short ton',
+      },
+      {
+        name: 'Rough Rice Futures (ZR=F)',
+        provider: 'Yahoo Finance',
+        url: 'https://finance.yahoo.com/quote/ZR=F',
+        desc: 'CBOT rough rice futures, $/cwt',
+      },
+      {
+        name: 'Sugar #11 Futures (SB=F)',
+        provider: 'Yahoo Finance',
+        url: 'https://finance.yahoo.com/quote/SB=F',
+        desc: 'ICE raw sugar futures, cents/lb',
+      },
+      {
+        name: 'Crude Palm Oil Futures (FCPO=F)',
+        provider: 'Yahoo Finance',
+        url: 'https://finance.yahoo.com/quote/FCPO=F',
+        desc: 'Bursa Malaysia crude palm oil futures, MYR/tonne',
+      },
+    ],
+  },
+  {
+    title: 'GEOPOLITICAL RISK',
+    sources: [
+      {
+        name: 'Geopolitical Risk Index (GPR)',
+        provider: 'Caldara & Iacoviello (2022)',
+        url: 'https://matteoiacoviello.com/gpr.htm',
+        desc: 'Monthly index of geopolitical risk based on text analysis of news articles. Caldara, D. and M. Iacoviello, "Measuring Geopolitical Risk," American Economic Review, 2022.',
       },
     ],
   },
@@ -76,10 +146,16 @@ const SECTIONS = [
         url: 'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_mmor',
         desc: 'Harmonised Index of Consumer Prices, Euro Area. Monthly data, official EU source.',
       },
+      {
+        name: 'US, UK, China Food CPI',
+        provider: 'OECD SDMX API',
+        url: 'https://sdmx.oecd.org/public/rest/data/OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL',
+        desc: 'Food price index (2015=100) for USA, GBR, CHN. MoM % computed server-side from index values.',
+      },
     ],
   },
   {
-    title: 'NEWS',
+    title: 'NEWS & MEDIA',
     sources: [
       {
         name: 'NewsAPI',
@@ -87,28 +163,34 @@ const SECTIONS = [
         url: 'https://newsapi.org',
         desc: 'Aggregated headlines from Reuters, AP, BBC, FT, Al Jazeera, WSJ, Bloomberg. Free plan: 24h article delay.',
       },
+      {
+        name: 'GDELT Media Attention Index',
+        provider: 'GDELT Project',
+        url: 'https://api.gdeltproject.org/api/v2/doc/doc',
+        desc: 'Real-time global media attention volume for energy and food topics. 30-day timeline, 15-minute resolution.',
+      },
     ],
   },
   {
     title: 'CHOKEPOINTS',
     sources: [
       {
+        name: 'IMF PortWatch — Vessel Transit Data',
+        provider: 'IMF',
+        url: 'https://portwatch.imf.org',
+        desc: 'Live vessel transit counts per chokepoint. 30-day deviation used to compute dynamic status (NORMAL / WATCH / DISRUPTED / CRITICAL).',
+      },
+      {
         name: 'IEA Oil Market Report — March 2026',
         provider: 'IEA',
         url: 'https://iea.org/reports/oil-market-report-march-2026',
-        desc: 'Strait of Hormuz transit volumes',
+        desc: 'Strait of Hormuz transit volumes (static context)',
       },
       {
         name: 'UN Conference on Trade and Development (UNCTAD)',
         provider: 'UNCTAD',
         url: 'https://unctad.org/topic/transport-and-trade-logistics',
         desc: 'Red Sea disruption impact data',
-      },
-      {
-        name: "Lloyd's List Intelligence",
-        provider: "Lloyd's List",
-        url: 'https://lloydslist.com',
-        desc: 'Suez Canal vessel traffic data',
       },
     ],
   },
@@ -118,9 +200,17 @@ const METHODOLOGY = `All commodity prices are sourced via Yahoo Finance and are 
 
 Percentage changes shown as '% vs 30d ago' are calculated using the first available data point in the 30-day history window as the base value.
 
-HICP inflation data is sourced directly from Eurostat's dissemination API. Data is monthly and may lag by 4-6 weeks from the current date.
+HICP inflation data is sourced directly from Eurostat's dissemination API. Data is monthly and may lag by 4-6 weeks from the current date. OECD food CPI data (US, UK, China) is fetched via a serverless proxy and MoM % is computed from index values (2015=100).
 
-The chokepoint map reflects a static assessment as of March 2026 and is not a live feed.
+The IMF Fertilizer Price Index (PFERT) is fetched directly from the IMF SDMX-JSON API. Static fallback data is used if the API is unavailable.
+
+The Geopolitical Risk Index (GPR) is sourced from the Excel file published by Caldara & Iacoviello (2022). It is parsed server-side via a Vercel serverless function. Thresholds: >200 CRITICAL, >150 ELEVATED, >100 MODERATE, ≤100 NORMAL.
+
+Chokepoint statuses are driven by IMF PortWatch vessel transit counts when available. Status is derived from the 30-day deviation: >-10% NORMAL, <-10% WATCH, <-25% DISRUPTED, <-40% CRITICAL. Static assessments are shown when live data is unavailable.
+
+The GDELT media attention sparkline reflects normalised article volume for energy and food topics over the past 30 days. It is decorative — the raw scale is articles per 15-minute window.
+
+The food commodities comparison chart normalises all metrics to a 0-100% scale using min-max normalisation over the 30-day window.
 
 The comparison chart normalises all metrics to a 0-100% scale using min-max normalisation over the 30-day window. This allows visual comparison of metrics with different units but does not imply any direct causal relationship between them.
 

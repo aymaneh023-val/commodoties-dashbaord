@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { LineChart, Line, Tooltip, ResponsiveContainer } from 'recharts'
 import { timeAgo } from '../utils/formatters'
 
 const SOURCE_CONFIG = {
@@ -38,7 +39,7 @@ const getCategory = (article) => {
   return { label: 'Markets', color: 'var(--muted)', id: 'ALL' }
 }
 
-export default function NewsFeed({ articles, loading, error, activeFilter }) {
+export default function NewsFeed({ articles, loading, error, activeFilter, sparkline = [] }) {
   const [showCount, setShowCount] = useState(20)
 
   const enriched = articles.map((a) => ({ ...a, _cat: getCategory(a) }))
@@ -75,6 +76,49 @@ export default function NewsFeed({ articles, loading, error, activeFilter }) {
           ⚠ Free plan: articles up to 24h delayed
         </p>
       </div>
+
+      {/* GDELT media attention sparkline */}
+      {sparkline.length > 0 && (
+        <div className="mb-4">
+          <p style={{ fontSize: 10, color: 'var(--muted)', fontFamily: "'DM Mono', monospace", marginBottom: 4, opacity: 0.7 }}>
+            Media attention — 30d
+          </p>
+          <ResponsiveContainer width="100%" height={48}>
+            <LineChart data={sparkline} margin={{ top: 2, right: 0, left: 0, bottom: 2 }}>
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="var(--muted)"
+                strokeWidth={1}
+                dot={false}
+                activeDot={{ r: 2, strokeWidth: 0, fill: 'var(--muted)' }}
+              />
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (!active || !payload?.length) return null
+                  const d = payload[0]?.payload
+                  return (
+                    <div
+                      style={{
+                        background: 'var(--surface2)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 6,
+                        padding: '4px 8px',
+                        fontSize: 10,
+                        fontFamily: "'DM Mono', monospace",
+                        color: 'var(--muted)',
+                      }}
+                    >
+                      {d?.value != null ? `${Number(d.value).toFixed(0)} articles/15min` : '—'}
+                      {d?.date ? ` · ${d.date}` : ''}
+                    </div>
+                  )
+                }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
       {/* States */}
       {loading && !articles.length && (

@@ -2,9 +2,12 @@ import DataCard from '../DataCard'
 import LineChartWrapper from '../LineChart'
 import { formatMonth } from '../../utils/formatters'
 
-const EXPLAINER = 'HICP (Harmonised Index of Consumer Prices) is the EU\'s official inflation measure. The ECB targets 2%. Food HICP tracks grocery and food service prices separately — it typically reacts to energy and fertilizer shocks with a 3–6 month lag.'
+const EXPLAINER =
+  "HICP (Harmonised Index of Consumer Prices) is the EU's official inflation measure. The ECB targets 2%. " +
+  'Food HICP tracks grocery and food service prices separately — it typically reacts to energy and fertilizer shocks with a 3–6 month lag. ' +
+  'US, UK and China food CPI are shown for cross-regional comparison.'
 
-export default function Inflation({ headline, food, combined, isFallback }) {
+export default function Inflation({ headline, food, combined, isFallback, oecdData }) {
   const headlineLatest = headline?.latest
   const foodLatest = food?.latest
 
@@ -17,14 +20,28 @@ export default function Inflation({ headline, food, combined, isFallback }) {
   }
 
   const headlineMoM = getMoMChange(headline?.data, headlineLatest)
-  const foodMoM = getMoMChange(food?.data, foodLatest)
+  const foodMoM     = getMoMChange(food?.data, foodLatest)
 
-  // Human-readable reference period (replaces raw "2025-13" style keys)
-  const headlineAsOf = headlineLatest?.monthStr ? formatMonth(headlineLatest.monthStr) + ' (latest available)' : null
-  const foodAsOf = foodLatest?.monthStr ? formatMonth(foodLatest.monthStr) + ' (latest available)' : null
+  const headlineAsOf = headlineLatest?.monthStr ? formatMonth(headlineLatest.monthStr) + ' (latest)' : null
+  const foodAsOf     = foodLatest?.monthStr     ? formatMonth(foodLatest.monthStr)     + ' (latest)' : null
 
   const chartStart = combined?.[0]?.month
-  const chartEnd = combined?.slice(-1)[0]?.month
+  const chartEnd   = combined?.slice(-1)[0]?.month
+
+  // Merge OECD data into combined chart — align by month label
+  const enriched = (combined ?? []).map(row => {
+    const usRow  = oecdData?.usa?.find(d => d.month === row.month)
+    const gbrRow = oecdData?.gbr?.find(d => d.month === row.month)
+    const chnRow = oecdData?.chn?.find(d => d.month === row.month)
+    return {
+      ...row,
+      us_food:  usRow?.value  ?? null,
+      uk_food:  gbrRow?.value ?? null,
+      chn_food: chnRow?.value ?? null,
+    }
+  })
+
+  const hasOECD = (oecdData?.usa?.length ?? 0) > 0
 
   return (
     <section id="inflation" className="mb-14">
@@ -39,14 +56,22 @@ export default function Inflation({ headline, food, combined, isFallback }) {
           className="text-lg font-bold inline ml-2"
           style={{ fontFamily: "'Syne', sans-serif" }}
         >
-          Inflation (HICP)
+          Inflation
         </h2>
         {isFallback && (
           <span
             className="ml-3 text-xs px-2 py-0.5 rounded"
             style={{ color: '#f59e0b', background: '#f59e0b18', border: '1px solid #f59e0b40', fontFamily: "'DM Mono', monospace" }}
           >
-            ⚠ Static fallback · as of Feb 2026
+            ⚠ Static fallback
+          </span>
+        )}
+        {oecdData?.isFallback && (
+          <span
+            className="ml-2 text-xs px-2 py-0.5 rounded"
+            style={{ color: '#6b7280', background: '#6b728018', fontFamily: "'DM Mono', monospace" }}
+          >
+            OECD fallback
           </span>
         )}
       </div>
@@ -54,7 +79,8 @@ export default function Inflation({ headline, food, combined, isFallback }) {
         {EXPLAINER}
       </p>
 
-      <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
+      {/* EU HICP cards + OECD summary cards */}
+      <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
         <DataCard
           title="EA HICP Headline"
           value={headlineLatest?.value}
@@ -75,7 +101,7 @@ export default function Inflation({ headline, food, combined, isFallback }) {
           pctChange={foodMoM}
           decimals={1}
           unit="%"
-          subLabel="Eurozone food inflation · COICOP CP01"
+          subLabel="Eurozone food inflation · CP01"
           loading={food?.loading}
           error={food?.error && !food?.isFallback}
           inverse={false}
@@ -83,38 +109,78 @@ export default function Inflation({ headline, food, combined, isFallback }) {
           asOf={foodAsOf}
           isFallback={food?.isFallback}
         />
+        {hasOECD && (() => {
+          const oecdRows = [
+            { key: 'usa', label: 'US CPI Food',     sub: 'US food CPI · MoM · OECD',    arr: oecdData.usa },
+            { key: 'gbr', label: 'UK CPI Food',     sub: 'UK food CPI · MoM · OECD',    arr: oecdData.gbr },
+            { key: 'chn', label: 'China CPI Food',  sub: 'China food CPI · MoM · OECD', arr: oecdData.chn },
+          ]
+          return oecdRows.map(({ key, label, sub, arr }) => {
+            const latest = arr?.[arr.length - 1]
+            const prev   = arr?.[arr.length - 2]
+            const mom    = (latest && prev) ? latest.value - prev.value : null
+            return (
+              <DataCard
+                key={key}
+                title={label}
+                value={latest?.value}
+                pctChange={mom}
+                decimals={2}
+                unit="%"
+                subLabel={sub}
+                loading={oecdData?.loading}
+                error={false}
+                inverse={false}
+                asOf={latest?.month}
+                isFallback={oecdData?.isFallback}
+              />
+            )
+          })
+        })()}
       </div>
 
-      {combined?.length > 0 && (
+      {/* Combined multi-region chart */}
+      {enriched.length > 0 && (
         <div className="card" style={{ padding: '16px 16px 8px' }}>
           <p
             className="text-xs mb-1"
             style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
           >
-            13-Month HICP Trend — Headline vs Food (% MoM)
+            Food Inflation — EU · US · UK · China (% MoM)
           </p>
           {chartStart && chartEnd && (
-            <p
-              style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 10, opacity: 0.7, marginBottom: 8 }}
-            >
+            <p style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 10, opacity: 0.7, marginBottom: 8 }}>
               Period: {chartStart} – {chartEnd}
             </p>
           )}
-          <div className="flex gap-4 mb-3">
-            <LegendDot color="var(--inflation)" label="Headline" />
-            <LegendDot color="var(--food)" label="Food" />
-            <LegendDot color="#6b7fa3" label="ECB Target 2.0%" dashed />
+          <div className="flex gap-4 mb-3 flex-wrap">
+            <LegendDot color="var(--inflation)"  label="EA Headline" />
+            <LegendDot color="var(--food)"       label="EA Food" />
+            {hasOECD && <>
+              <LegendDot color="var(--oil)"      label="US Food"    dashed />
+              <LegendDot color="var(--shipping)" label="UK Food"    dashed />
+              <LegendDot color="var(--gas)"      label="China Food" dashed />
+            </>}
+            <LegendDot color="#6b7fa3" label="ECB 2%" dashed />
           </div>
           <LineChartWrapper
-            data={combined}
+            data={enriched}
             lines={[
-              { key: 'headline', color: 'var(--inflation)', label: 'Headline' },
-              { key: 'food', color: 'var(--food)', label: 'Food' },
+              { key: 'headline',  color: 'var(--inflation)',  label: 'EA Headline' },
+              { key: 'food',      color: 'var(--food)',       label: 'EA Food' },
+              ...(hasOECD ? [
+                { key: 'us_food',  color: 'var(--oil)',      label: 'US Food',    dashed: true },
+                { key: 'uk_food',  color: 'var(--shipping)', label: 'UK Food',    dashed: true },
+                { key: 'chn_food', color: 'var(--gas)',      label: 'China Food', dashed: true },
+              ] : []),
             ]}
             xKey="month"
             yUnit="%"
-            height={160}
-            referenceLines={[{ value: 2.0, label: 'ECB 2%', color: '#6b7fa3' }]}
+            height={180}
+            referenceLines={[
+              { value: 2.0, label: 'ECB 2%',    color: '#6b7fa3' },
+              { value: 0.0, label: 'Deflation', color: '#4ade8060' },
+            ]}
             showLegend={false}
           />
         </div>
