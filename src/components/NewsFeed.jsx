@@ -1,11 +1,11 @@
 import { timeAgo } from '../utils/formatters'
-import { SOURCE_COLORS } from '../utils/constants'
 
-const SOURCE_LABEL = {
-  reuters: 'Reuters',
-  ft: 'FT',
-  bloomberg: 'Bloomberg',
-  iea: 'IEA',
+const SOURCE_CONFIG = {
+  'reuters':            { label: 'Reuters',    color: '#f59e0b' },
+  'associated-press':   { label: 'AP',         color: '#6366f1' },
+  'bbc-news':           { label: 'BBC',        color: '#ef4444' },
+  'financial-times':    { label: 'FT',         color: '#f97316' },
+  'al-jazeera-english': { label: 'Al Jazeera', color: '#10b981' },
 }
 
 const CATEGORY_COLORS = {
@@ -27,7 +27,7 @@ export default function NewsFeed({ articles, loading, error, activeFilter }) {
       className="news-feed-scroll"
       style={{
         position: 'sticky',
-        top: '145px',  // below header + ticker bar
+        top: '145px',
         maxHeight: 'calc(100vh - 160px)',
         overflowY: 'auto',
       }}
@@ -41,7 +41,13 @@ export default function NewsFeed({ articles, loading, error, activeFilter }) {
           Market Intelligence Feed
         </h2>
         <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
-          Credible sources · Energy, food supply chain &amp; geopolitics
+          Sources: Reuters · AP · BBC · FT · Al Jazeera
+        </p>
+        <p
+          className="text-xs mt-0.5"
+          style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 10, opacity: 0.7 }}
+        >
+          ⚠ Free plan: articles up to 24h delayed
         </p>
       </div>
 
@@ -79,9 +85,8 @@ export default function NewsFeed({ articles, loading, error, activeFilter }) {
 }
 
 function ArticleCard({ article }) {
-  const sourceKey = article.sourceName?.toLowerCase()
-  const sourceColor = SOURCE_COLORS[sourceKey] || SOURCE_COLORS.default
-  const sourceLabel = SOURCE_LABEL[sourceKey] || article.sourceName || 'Source'
+  const sourceId = article.source?.id || ''
+  const src = SOURCE_CONFIG[sourceId] || { label: article.source?.name || 'Source', color: '#6b7fa3' }
   const catColor = CATEGORY_COLORS[article.category] || CATEGORY_COLORS.ALL
   const catLabel = article.category === 'ALL' ? 'General' : article.category.charAt(0).toUpperCase() + article.category.slice(1)
 
@@ -105,13 +110,13 @@ function ArticleCard({ article }) {
         <span
           className="text-xs px-2 py-0.5 rounded font-medium"
           style={{
-            color: sourceColor,
-            background: `${sourceColor}18`,
+            color: src.color,
+            background: `${src.color}18`,
             fontFamily: "'DM Mono', monospace",
             fontSize: 10,
           }}
         >
-          {sourceLabel}
+          {src.label}
         </span>
         <span
           className="text-xs px-2 py-0.5 rounded"

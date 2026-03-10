@@ -1,3 +1,9 @@
+const SOURCES = 'reuters,associated-press,bbc-news,financial-times,al-jazeera-english'
+
+const DEFAULT_QUERY =
+  '"oil" OR "gas" OR "Iran" OR "energy" OR "food prices" OR "LNG" OR ' +
+  '"shipping" OR "fertilizer" OR "Strait of Hormuz" OR "supply chain"'
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS')
@@ -9,13 +15,20 @@ export default async function handler(req, res) {
     return res.status(500).json({ status: 'error', message: 'NEWS_API_KEY not configured on server' })
   }
 
-  // Forward all query params from the client, then inject the key
-  const qs = req.url.includes('?') ? req.url.split('?')[1] : ''
-  const params = new URLSearchParams(qs)
-  params.set('apiKey', apiKey)
+  const clientParams = new URL(req.url, 'http://localhost').searchParams
+  const query = clientParams.get('q') || DEFAULT_QUERY
+
+  const url =
+    `https://newsapi.org/v2/everything?` +
+    `sources=${SOURCES}&` +
+    `q=${encodeURIComponent(query)}&` +
+    `language=en&` +
+    `sortBy=publishedAt&` +
+    `pageSize=10&` +
+    `apiKey=${apiKey}`
 
   try {
-    const upstream = await fetch(`https://newsapi.org/v2/everything?${params}`, {
+    const upstream = await fetch(url, {
       headers: { 'User-Agent': 'EU-Energy-Monitor/1.0' },
     })
     const data = await upstream.json()
