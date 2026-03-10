@@ -8,16 +8,11 @@ const memCache = {}
 // Brent has a fallback ticker list (BZ=F is sometimes rate-limited)
 const BRENT_TICKERS = ['BZ=F', 'CB=F']
 
-// WTI also has a fallback
-const WTI_TICKERS = ['CL=F', 'MCL=F']
-
 // All other tickers — fetched with 300ms stagger between each
 const OTHER_TICKERS = {
   ttf:  'TTF=F',
   bdry: 'BDRY',
   zim:  'ZIM',
-  matx: 'MATX',
-  lng:  'LNG',
   urea: 'UFB=F',
 }
 
@@ -106,21 +101,6 @@ async function fetchBrent() {
   return fromCacheResult('brent') ?? errorResult('brent')
 }
 
-async function fetchWTI() {
-  for (const ticker of WTI_TICKERS) {
-    try {
-      const url = `${YAHOO_BASE}/${ticker}?interval=1d&range=30d`
-      const json = await fetchWithRetry(url)
-      const parsed = parseTickerData(json)
-      if (!parsed.error) {
-        memCache['wti'] = { ...parsed, cachedAt: Date.now() }
-        return { key: 'wti', ...parsed, fromCache: false }
-      }
-    } catch { /* try next WTI ticker */ }
-  }
-  return fromCacheResult('wti') ?? errorResult('wti')
-}
-
 const initialState = {
   price: null, pctChange: null, baseDate: null,
   history: [], loading: true, error: false, fromCache: false,
@@ -129,12 +109,9 @@ const initialState = {
 export function useCommodityData() {
   const [data, setData] = useState({
     brent: { ...initialState },
-    wti:   { ...initialState },
     ttf:   { ...initialState },
     bdry:  { ...initialState },
     zim:   { ...initialState },
-    matx:  { ...initialState },
-    lng:   { ...initialState },
     urea:  { ...initialState },
   })
 
@@ -153,7 +130,7 @@ export function useCommodityData() {
     })
 
     // All keys in one flat list — each gets its own independent retry loop.
-    const allEntries = [['brent', null], ['wti', null], ...Object.entries(OTHER_TICKERS)]
+    const allEntries = [['brent', null], ...Object.entries(OTHER_TICKERS)]
 
     allEntries.forEach(([key, ticker], i) => {
       const run = async () => {
@@ -170,8 +147,6 @@ export function useCommodityData() {
 
           const result = key === 'brent'
             ? await fetchBrent()
-            : key === 'wti'
-            ? await fetchWTI()
             : await fetchTicker(key, ticker)
 
           if (genRef.current !== gen) return

@@ -3,17 +3,14 @@ import { TICKER_LABELS } from '../utils/constants'
 
 const TICKER_UNITS = {
   brent: ' $/bbl',
-  wti:   ' $/bbl',
   ttf:   ' €/MWh',
   bdry:  ' $',
   zim:   ' $',
-  matx:  ' $',
-  lng:   ' $',
   urea:  ' $/ton',
 }
 
 export default function TickerBar({ data }) {
-  const keys = ['brent', 'wti', 'ttf', 'bdry', 'zim', 'matx', 'lng', 'urea']
+  const keys = ['brent', 'ttf', 'bdry', 'zim', 'urea']
 
   return (
     <div

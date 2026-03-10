@@ -13,13 +13,10 @@ import {
 const METRIC_OPTIONS = [
   { value: '', label: '— None —', group: null },
   { value: 'brent', label: 'Brent Crude', group: 'Oil', color: 'var(--oil)', unit: '$/bbl' },
-  { value: 'wti', label: 'WTI Crude', group: 'Oil', color: 'var(--oil)', unit: '$/bbl' },
   { value: 'ttf', label: 'TTF Natural Gas', group: 'Gas', color: 'var(--gas)', unit: '€/MWh' },
-  { value: 'lng', label: 'LNG (Cheniere)', group: 'Gas', color: 'var(--gas)', unit: '$' },
   { value: 'bdry', label: 'BDRY (Dry Bulk)', group: 'Shipping', color: 'var(--shipping)', unit: '$' },
   { value: 'zim', label: 'ZIM (Container)', group: 'Shipping', color: 'var(--shipping)', unit: '$' },
-  { value: 'matx', label: 'MATX (Container 2)', group: 'Shipping', color: 'var(--shipping)', unit: '$' },
-  { value: 'mos', label: 'Mosaic Co. (MOS)', group: 'Fertilizer', color: 'var(--fertilizer)', unit: '$' },
+  { value: 'urea', label: 'Urea Futures', group: 'Fertilizer', color: 'var(--fertilizer)', unit: '$/ton' },
   { value: 'hicp_headline', label: 'EA HICP Headline', group: 'Inflation', color: 'var(--inflation)', unit: '%' },
   { value: 'hicp_food', label: 'EA HICP Food', group: 'Inflation', color: 'var(--food)', unit: '%' },
 ]
@@ -27,7 +24,7 @@ const METRIC_OPTIONS = [
 // Distinct stroke colors for up to 4 lines (resolved at render via getComputedStyle)
 const LINE_COLORS = ['#f59e0b', '#38bdf8', '#818cf8', '#4ade80']
 
-const DEFAULT_SELECTIONS = ['brent', 'ttf', 'zim', 'mos']
+const DEFAULT_SELECTIONS = ['brent', 'ttf', 'zim', 'urea']
 
 function getOptionMeta(value) {
   return METRIC_OPTIONS.find((o) => o.value === value)
@@ -46,7 +43,6 @@ function generateInsight(selections, chartData) {
   const active = selections.filter(Boolean)
   if (active.length < 2) return 'Select metrics above to compare their 30-day performance on a normalised scale.'
 
-  // Check first and last values for each active metric
   const changes = {}
   active.forEach((key) => {
     const vals = chartData.map((d) => d[`raw_${key}`]).filter((v) => v != null)
@@ -57,21 +53,16 @@ function generateInsight(selections, chartData) {
     }
   })
 
-  const hasBrent = active.includes('brent')
-  const hasTTF = active.includes('ttf')
-  const hasZIM = active.includes('zim')
-  const hasMOS = active.includes('mos')
+  const rising = active.filter((k) => (changes[k] ?? 0) > 0)
+  const falling = active.filter((k) => (changes[k] ?? 0) < 0)
 
-  if (hasBrent && hasTTF && changes.brent > 20 && changes.ttf > 20)
-    return 'Energy double shock: both oil and gas up sharply — amplified impact on EU production costs.'
+  if (rising.length === 0 && falling.length === 0)
+    return 'Selected metrics show minimal movement over the period.'
 
-  if (hasZIM && hasBrent && changes.zim > 0 && changes.brent > 0)
-    return 'Shipping and energy rising together — compounding pressure on import prices.'
-
-  if (hasMOS && hasTTF && changes.mos < 0 && changes.ttf > 0)
-    return 'Fertilizer demand destruction signal: gas costs rising faster than market can absorb.'
-
-  return 'Select metrics above to compare their 30-day performance on a normalised scale.'
+  const parts = []
+  if (rising.length > 0) parts.push(`${rising.length} of ${active.length} selected metrics rising`)
+  if (falling.length > 0) parts.push(`${falling.length} falling`)
+  return `${parts.join(', ')} over 30 days.`
 }
 
 export default function CompareSection({ commodityData, eurostatData }) {
@@ -158,7 +149,7 @@ export default function CompareSection({ commodityData, eurostatData }) {
           className="text-xs uppercase tracking-widest"
           style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
         >
-          06 —
+          08 —
         </span>
         <h2
           className="text-lg font-bold inline ml-2"
@@ -168,7 +159,7 @@ export default function CompareSection({ commodityData, eurostatData }) {
         </h2>
       </div>
       <p style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 400, marginBottom: 20 }}>
-        Select up to 4 indicators to compare on a normalised scale (0–100%)
+        Select up to 4 indicators to compare on a normalised 0–100% scale. Each series is independently min-max scaled over 30 days.
       </p>
 
       {/* Dropdowns */}
@@ -295,7 +286,7 @@ export default function CompareSection({ commodityData, eurostatData }) {
           lineHeight: 1.6,
         }}
       >
-        💡 {insight}
+        {insight}
       </div>
     </section>
   )

@@ -1,18 +1,12 @@
 import DataCard from '../DataCard'
 import LineChartWrapper from '../LineChart'
 
-const EXPLAINER = 'Brent is the global benchmark priced in London, used for ~70% of world oil contracts. WTI is the US benchmark, typically $2–4 cheaper than Brent.'
+const EXPLAINER = 'Brent crude futures (BZ=F), ICE London. Front-month contract, daily close, 30-day window via Yahoo Finance. USD per barrel.'
 
-export default function CrudeOil({ brent, wti }) {
-  const lastDate = brent?.history?.slice(-1)[0]?.date ?? null
-  const chartStart = brent?.history?.[0]?.date
-
-  // Merge Brent + WTI history by index (same timestamps from Yahoo Finance)
-  const combinedHistory = brent?.history?.map((b, i) => ({
-    date: b.date,
-    brent: b.close,
-    wti: wti?.history?.[i]?.close ?? null,
-  })) ?? []
+export default function CrudeOil({ brent }) {
+  const brentHistory = brent?.history ?? []
+  const lastDate = brentHistory.slice(-1)[0]?.date ?? null
+  const chartStart = brentHistory[0]?.date
 
   return (
     <section id="oil" className="mb-14">
@@ -21,7 +15,7 @@ export default function CrudeOil({ brent, wti }) {
           className="text-xs uppercase tracking-widest"
           style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
         >
-          01 —
+          03 —
         </span>
         <h2
           className="text-lg font-bold inline ml-2"
@@ -34,14 +28,14 @@ export default function CrudeOil({ brent, wti }) {
         {EXPLAINER}
       </p>
 
-      <div className="grid grid-cols-2 gap-4 mb-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
+      <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
         <DataCard
           title="Brent Crude"
           value={brent?.price}
           pctChange={brent?.pctChange}
           decimals={2}
           unit=" $/bbl"
-          subLabel="ICE Brent Futures · USD/bbl"
+          subLabel="ICE Brent (BZ=F) · USD/bbl · daily via Yahoo Finance"
           loading={brent?.loading}
           error={brent?.error}
           inverse={false}
@@ -51,25 +45,9 @@ export default function CrudeOil({ brent, wti }) {
           baseDate={brent?.baseDate}
           isFallback={brent?.error && brent?.price != null}
         />
-        <DataCard
-          title="WTI Crude"
-          value={wti?.price}
-          pctChange={wti?.pctChange}
-          decimals={2}
-          unit=" $/bbl"
-          subLabel="NYMEX WTI Futures · USD/bbl"
-          loading={wti?.loading}
-          error={wti?.error}
-          inverse={false}
-          asOf={wti?.history?.slice(-1)[0]?.date ?? null}
-          fromCache={wti?.fromCache}
-          cacheAge={wti?.cacheAge}
-          baseDate={wti?.baseDate}
-          isFallback={wti?.error && wti?.price != null}
-        />
       </div>
 
-      {combinedHistory.length > 0 && (
+      {brentHistory.length > 0 && (
         <div className="card" style={{ padding: '16px 16px 8px' }}>
           {chartStart && lastDate && (
             <p style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 10, opacity: 0.7, marginBottom: 8 }}>
@@ -77,15 +55,13 @@ export default function CrudeOil({ brent, wti }) {
             </p>
           )}
           <LineChartWrapper
-            data={combinedHistory}
+            data={brentHistory}
             lines={[
-              { key: 'brent', color: '#f59e0b', label: 'Brent' },
-              { key: 'wti',   color: '#6b7fa3', label: 'WTI', dashed: true },
+              { key: 'close', color: '#f59e0b', label: 'Brent' },
             ]}
             xKey="date"
             yUnit=" $/bbl"
             height={160}
-            showLegend={true}
           />
         </div>
       )}

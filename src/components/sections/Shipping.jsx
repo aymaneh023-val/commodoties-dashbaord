@@ -2,9 +2,8 @@ import DataCard from '../DataCard'
 import LineChartWrapper from '../LineChart'
 
 const EXPLAINER =
-  'Global shipping costs directly affect European import prices. ' +
-  'The values below are share prices of shipping-related stocks and ETFs — they move in line with freight rates and serve as daily proxies for the cost of moving goods by sea. ' +
-  'A rising trend signals higher logistics costs that typically flow into commodity prices within 2–4 weeks.'
+  'Shipping cost proxies via Yahoo Finance. BDRY is an ETF that tracks the Baltic Dry Index (dry bulk freight). ' +
+  'ZIM is an Israeli container shipping stock used as a container freight proxy. Both are equity prices, not freight rates directly.'
 
 const CHOKEPOINTS = [
   {
@@ -55,7 +54,7 @@ function getPortWatchStatus(deviation) {
   return 'NORMAL'
 }
 
-export default function Shipping({ bdry, zim, matx, portwatch = null }) {
+export default function Shipping({ bdry, zim, portwatch = null }) {
   const bdryHistory = bdry?.history ?? []
   const zimHistory  = zim?.history  ?? []
 
@@ -85,7 +84,7 @@ export default function Shipping({ bdry, zim, matx, portwatch = null }) {
           className="text-xs uppercase tracking-widest"
           style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
         >
-          03 —
+          06 —
         </span>
         <h2
           className="text-lg font-bold inline ml-2"
@@ -99,14 +98,14 @@ export default function Shipping({ bdry, zim, matx, portwatch = null }) {
       </p>
 
       {/* Data cards */}
-      <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
+      <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
         <DataCard
           title="Dry Bulk Shipping (BDRY)"
           value={bdry?.price}
           pctChange={bdry?.pctChange}
           decimals={2}
           unit=" $"
-          subLabel="ETF share price · tracks Baltic Dry Index"
+          subLabel="Proxy: ETF share price tracking Baltic Dry Index"
           loading={bdry?.loading}
           error={bdry?.error}
           inverse={false}
@@ -121,7 +120,7 @@ export default function Shipping({ bdry, zim, matx, portwatch = null }) {
           pctChange={zim?.pctChange}
           decimals={2}
           unit=" $"
-          subLabel="Stock price · tracks container freight demand"
+          subLabel="Proxy: Stock price correlated with container freight rates"
           loading={zim?.loading}
           error={zim?.error}
           inverse={false}
@@ -129,21 +128,6 @@ export default function Shipping({ bdry, zim, matx, portwatch = null }) {
           fromCache={zim?.fromCache}
           cacheAge={zim?.cacheAge}
           baseDate={zim?.baseDate}
-        />
-        <DataCard
-          title="Container Shipping (MATX)"
-          value={matx?.price}
-          pctChange={matx?.pctChange}
-          decimals={2}
-          unit=" $"
-          subLabel="Stock price · Pacific container routes"
-          loading={matx?.loading}
-          error={matx?.error}
-          inverse={false}
-          asOf={matx?.history?.slice(-1)[0]?.date ?? null}
-          fromCache={matx?.fromCache}
-          cacheAge={matx?.cacheAge}
-          baseDate={matx?.baseDate}
         />
       </div>
 
@@ -224,7 +208,7 @@ export default function Shipping({ bdry, zim, matx, portwatch = null }) {
 
       {/* Note */}
       <p style={{ fontSize: 11, color: 'var(--muted)', fontFamily: "'DM Mono', monospace", opacity: 0.7 }}>
-        Note: BDRY, ZIM and MATX are stock market proxies — their share prices correlate with shipping rate indices but are not the indices themselves.
+        Note: BDRY and ZIM are stock market proxies — their share prices correlate with shipping rate indices but are not the indices themselves.
       </p>
     </section>
   )

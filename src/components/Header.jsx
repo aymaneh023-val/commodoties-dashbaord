@@ -119,7 +119,6 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
                 cursor: 'pointer',
               }}
             >
-              {tab.emoji && <span className="mr-1">{tab.emoji}</span>}
               {tab.label}
             </button>
           )

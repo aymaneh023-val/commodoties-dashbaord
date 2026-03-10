@@ -13,19 +13,17 @@ export const FOOD_TICKERS = {
   rice:        'ZR=F',
   sugar:       'SB=F',
   palm:        'FCPO=F',
-  natgas:      'NG=F',
 }
 
 export const FOOD_META = {
-  wheat:       { label: 'Wheat',            unit: ' ¢/bu',  note: 'CBOT global wheat benchmark' },
-  corn:        { label: 'Corn',             unit: ' ¢/bu',  note: 'Primary animal feed crop' },
-  soybeans:    { label: 'Soybeans',         unit: ' ¢/bu',  note: 'Oil + protein supply chain' },
-  soybeanOil:  { label: 'Soybean Oil',      unit: ' ¢/lb',  note: 'Vegetable oil inflation proxy' },
-  soybeanMeal: { label: 'Soybean Meal',     unit: ' $/ton', note: 'Animal feed — links soy to meat prices' },
-  rice:        { label: 'Rice',             unit: ' ¢/cwt', note: 'Asia food security indicator' },
-  sugar:       { label: 'Sugar',            unit: ' ¢/lb',  note: 'Global calorie inflation signal' },
-  palm:        { label: 'Palm Oil',         unit: ' MYR/t', note: '35-40% of global vegetable oil supply' },
-  natgas:      { label: 'Natural Gas',      unit: ' $/MMBtu', note: 'Upstream driver: gas → fertilizer → food' },
+  wheat:       { label: 'Wheat',            unit: ' ¢/bu',  note: 'CBOT Wheat (ZW=F). Global benchmark.' },
+  corn:        { label: 'Corn',             unit: ' ¢/bu',  note: 'CBOT Corn (ZC=F). Primary feed grain.' },
+  soybeans:    { label: 'Soybeans',         unit: ' ¢/bu',  note: 'CBOT Soybeans (ZS=F). Oil and protein crop.' },
+  soybeanOil:  { label: 'Soybean Oil',      unit: ' ¢/lb',  note: 'CBOT Soybean Oil (ZL=F). Vegetable oil benchmark.' },
+  soybeanMeal: { label: 'Soybean Meal',     unit: ' $/ton', note: 'CBOT Soybean Meal (ZM=F). Animal feed input.' },
+  rice:        { label: 'Rice',             unit: ' ¢/cwt', note: 'CBOT Rough Rice (ZR=F). US contract.' },
+  sugar:       { label: 'Sugar',            unit: ' ¢/lb',  note: 'ICE Sugar No.11 (SB=F). Global raw sugar.' },
+  palm:        { label: 'Palm Oil',         unit: ' MYR/t', note: 'Bursa Malaysia FCPO. ~35% of global veg oil.' },
 }
 
 const delay = ms => new Promise(r => setTimeout(r, ms))

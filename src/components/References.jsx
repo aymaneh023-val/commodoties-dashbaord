@@ -8,28 +8,16 @@ const SECTIONS = [
         url: 'https://finance.yahoo.com/quote/BZ=F',
         desc: 'ICE Brent crude futures, 15-min delayed',
       },
-      {
-        name: 'NYMEX WTI Futures (CL=F)',
-        provider: 'Yahoo Finance',
-        url: 'https://finance.yahoo.com/quote/CL=F',
-        desc: 'NYMEX WTI crude futures, 15-min delayed',
-      },
     ],
   },
   {
-    title: 'NATURAL GAS & LNG',
+    title: 'EUROPEAN GAS',
     sources: [
       {
         name: 'TTF Natural Gas Futures (TTF=F)',
         provider: 'Yahoo Finance',
         url: 'https://finance.yahoo.com/quote/TTF=F',
         desc: 'Dutch TTF gas futures, EU benchmark',
-      },
-      {
-        name: 'Cheniere Energy (LNG)',
-        provider: 'Yahoo Finance',
-        url: 'https://finance.yahoo.com/quote/LNG',
-        desc: 'LNG equity proxy, NYSE listed',
       },
     ],
   },
@@ -47,12 +35,6 @@ const SECTIONS = [
         provider: 'Yahoo Finance',
         url: 'https://finance.yahoo.com/quote/ZIM',
         desc: 'Container freight rate proxy, NYSE',
-      },
-      {
-        name: 'Matson Inc. (MATX)',
-        provider: 'Yahoo Finance',
-        url: 'https://finance.yahoo.com/quote/MATX',
-        desc: 'Pacific container carrier, NYSE',
       },
     ],
   },
@@ -155,19 +137,13 @@ const SECTIONS = [
     ],
   },
   {
-    title: 'NEWS & MEDIA',
+    title: 'NEWS',
     sources: [
       {
         name: 'NewsAPI',
         provider: 'newsapi.org',
         url: 'https://newsapi.org',
         desc: 'Aggregated headlines from Reuters, AP, BBC, FT, Al Jazeera, WSJ, Bloomberg. Free plan: 24h article delay.',
-      },
-      {
-        name: 'GDELT Media Attention Index',
-        provider: 'GDELT Project',
-        url: 'https://api.gdeltproject.org/api/v2/doc/doc',
-        desc: 'Real-time global media attention volume for energy and food topics. 30-day timeline, 15-minute resolution.',
       },
     ],
   },
@@ -207,8 +183,6 @@ The IMF Fertilizer Price Index (PFERT) is fetched directly from the IMF SDMX-JSO
 The Geopolitical Risk Index (GPR) is sourced from the Excel file published by Caldara & Iacoviello (2022). It is parsed server-side via a Vercel serverless function. Thresholds: >200 CRITICAL, >150 ELEVATED, >100 MODERATE, ≤100 NORMAL.
 
 Chokepoint statuses are driven by IMF PortWatch vessel transit counts when available. Status is derived from the 30-day deviation: >-10% NORMAL, <-10% WATCH, <-25% DISRUPTED, <-40% CRITICAL. Static assessments are shown when live data is unavailable.
-
-The GDELT media attention sparkline reflects normalised article volume for energy and food topics over the past 30 days. It is decorative — the raw scale is articles per 15-minute window.
 
 The food commodities comparison chart normalises all metrics to a 0-100% scale using min-max normalisation over the 30-day window.
 

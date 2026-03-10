@@ -3,9 +3,8 @@ import LineChartWrapper from '../LineChart'
 import { formatMonth } from '../../utils/formatters'
 
 const EXPLAINER =
-  "HICP (Harmonised Index of Consumer Prices) is the EU's official inflation measure. The ECB targets 2%. " +
-  'Food HICP tracks grocery and food service prices separately — it typically reacts to energy and fertilizer shocks with a 3–6 month lag. ' +
-  'US, UK and China food CPI are shown for cross-regional comparison.'
+  'Euro Area HICP (Harmonised Index of Consumer Prices) from Eurostat. Monthly rate of change (%). ' +
+  'Headline (CP00) and Food (CP01) shown separately. US, UK and China food CPI from OECD for cross-regional context.'
 
 export default function Inflation({ headline, food, combined, isFallback, oecdData }) {
   const headlineLatest = headline?.latest
@@ -50,7 +49,7 @@ export default function Inflation({ headline, food, combined, isFallback, oecdDa
           className="text-xs uppercase tracking-widest"
           style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
         >
-          05 —
+          07 —
         </span>
         <h2
           className="text-lg font-bold inline ml-2"

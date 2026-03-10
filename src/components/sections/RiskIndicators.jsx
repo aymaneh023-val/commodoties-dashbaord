@@ -5,8 +5,8 @@ import {
 const HISTORICAL_AVG = 100 // GPR long-run mean 1985-2020
 
 const EXPLAINER =
-  'Measures geopolitical risk via newspaper text mining across 10 major papers. Values above 150 historically ' +
-  'precede commodity price spikes by 2–4 weeks. Source: Caldara & Iacoviello (2022), American Economic Review 112(4).'
+  'Geopolitical Risk Index (GPR) by Caldara & Iacoviello. Derived from newspaper text mining across 10 major papers. ' +
+  'Monthly, global scope. Source: American Economic Review 112(4), 2022.'
 
 export default function RiskIndicators({ gprHistory = [], gprValue, gprStatus, gprError }) {
   const chartData = gprHistory.map(d => ({ month: d.month, value: d.value }))
@@ -18,7 +18,7 @@ export default function RiskIndicators({ gprHistory = [], gprValue, gprStatus, g
           className="text-xs uppercase tracking-widest"
           style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
         >
-          00 —
+          01 —
         </span>
         <h2
           className="text-lg font-bold inline ml-2"

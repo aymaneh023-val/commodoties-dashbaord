@@ -7,9 +7,8 @@ import { FOOD_META } from '../../hooks/useFoodCommoditiesData'
 import { formatPrice, formatPct, pctArrow, pctColor } from '../../utils/formatters'
 
 const EXPLAINER =
-  'Global food commodity prices are an early warning system for consumer food inflation. ' +
-  'Moves in wheat, soybeans and palm oil typically feed into retail food prices with a 3–6 month lag. ' +
-  'Natural gas is included as the upstream input — it drives fertilizer costs which drive crop production costs.'
+  'Global food commodity futures from CBOT, ICE, and Bursa Malaysia. ' +
+  'Prices are in original contract units. All contracts are front-month, 30-day daily data via Yahoo Finance.'
 
 const GROUPS = [
   {
@@ -19,10 +18,6 @@ const GROUPS = [
   {
     label: 'SOFT COMMODITIES',
     keys: ['sugar', 'palm'],
-  },
-  {
-    label: 'UPSTREAM INPUT',
-    keys: ['natgas'],
   },
 ]
 
@@ -36,7 +31,6 @@ const COMMODITY_COLORS = {
   rice:        '#38bdf8',
   sugar:       '#f87171',
   palm:        '#fb923c',
-  natgas:      '#818cf8',
 }
 
 function normalise(arr) {
@@ -81,9 +75,8 @@ export default function FoodCommodities({ data }) {
   const insight = useMemo(() => {
     const upCount = Object.keys(FOOD_META).filter(k => (data[k]?.pctChange ?? 0) > 10).length
     const total = Object.keys(FOOD_META).length
-    if (upCount >= 7) return `Broad-based food shock: ${upCount}/${total} commodities rising — systemic supply chain stress.`
-    if (upCount >= 4) return `${upCount}/${total} commodities elevated — partial supply chain disruption.`
-    return 'Commodity moves diverging — shock appears sector-specific, not systemic.'
+    if (upCount === 0) return 'All food commodity moves are below 10% over 30 days.'
+    return `${upCount} of ${total} food commodities up >10% over 30 days.`
   }, [data])
 
   return (
@@ -93,7 +86,7 @@ export default function FoodCommodities({ data }) {
           className="text-xs uppercase tracking-widest"
           style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
         >
-          04.5 —
+          02 —
         </span>
         <h2
           className="text-lg font-bold inline ml-2"
@@ -234,7 +227,7 @@ export default function FoodCommodities({ data }) {
           lineHeight: 1.6,
         }}
       >
-        💡 {insight}
+        {insight}
       </div>
     </section>
   )

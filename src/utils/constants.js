@@ -1,11 +1,8 @@
 export const TICKERS = {
   brent: 'BZ=F',   // Brent crude (with CB=F fallback handled in hook)
-  wti:   'CL=F',
   ttf:   'TTF=F',
   bdry:  'BDRY',   // Breakwave Dry Bulk ETF — BDI proxy
   zim:   'ZIM',    // ZIM Integrated Shipping — container proxy
-  matx:  'MATX',   // Matson — container confirmation
-  lng:   'LNG',
   urea:  'UFB=F',  // Urea futures — nitrogen fertilizer benchmark
 }
 
@@ -37,25 +34,22 @@ export const SOURCE_COLORS = {
 }
 
 export const FILTER_TABS = [
-  { id: 'ALL',         label: 'ALL',         emoji: '' },
-  { id: 'risk',        label: 'Geopolitics', emoji: '' },
-  { id: 'oil',         label: 'Oil',         emoji: '🛢️' },
-  { id: 'gas',         label: 'Gas & LNG',   emoji: '⚡' },
-  { id: 'shipping',    label: 'Shipping',    emoji: '🚢' },
-  { id: 'fertilizer',  label: 'Fertilizer',  emoji: '🌾' },
-  { id: 'food',        label: 'Food',        emoji: '🌿' },
-  { id: 'inflation',   label: 'Inflation',   emoji: '📈' },
-  { id: 'compare',     label: 'Compare',     emoji: '📊' },
+  { id: 'ALL',         label: 'All' },
+  { id: 'risk',        label: 'Geopolitics' },
+  { id: 'oil',         label: 'Oil' },
+  { id: 'gas',         label: 'Gas' },
+  { id: 'shipping',    label: 'Shipping' },
+  { id: 'fertilizer',  label: 'Fertilizer' },
+  { id: 'food',        label: 'Food' },
+  { id: 'inflation',   label: 'Inflation' },
+  { id: 'compare',     label: 'Compare' },
 ]
 
 export const TICKER_LABELS = {
   brent: 'Brent',
-  wti:   'WTI',
   ttf:   'TTF Gas',
   bdry:  'BDRY',
   zim:   'ZIM',
-  matx:  'MATX',
-  lng:   'LNG',
   urea:  'Urea',
 }
 

@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import Header from './components/Header'
-import TickerBar from './components/TickerBar'
+import WatchStrip from './components/WatchStrip'
+import ContextRow from './components/ContextRow'
 import NewsFeed from './components/NewsFeed'
 import References from './components/References'
 import CrudeOil from './components/sections/CrudeOil'
@@ -17,7 +18,6 @@ import { useNewsData } from './hooks/useNewsData'
 import { useFoodCommoditiesData } from './hooks/useFoodCommoditiesData'
 import { useIMFData } from './hooks/useIMFData'
 import { useOECDData } from './hooks/useOECDData'
-import { useGDELTData } from './hooks/useGDELTData'
 import { usePortWatchData } from './hooks/usePortWatchData'
 import { useGPRData } from './hooks/useGPRData'
 
@@ -33,7 +33,6 @@ export default function App() {
   const { data: foodData, refresh: refreshFood } = useFoodCommoditiesData()
   const { pfert } = useIMFData()
   const oecdData = useOECDData()
-  const { sparkline: gdeltSparkline } = useGDELTData()
   const { portwatch } = usePortWatchData()
   const gprData = useGPRData()
 
@@ -76,7 +75,18 @@ export default function App() {
         onShowReferences={() => setShowReferences(true)}
       />
 
-      <TickerBar data={commodityData} />
+      <WatchStrip
+        commodityData={commodityData}
+        foodData={foodData}
+        eurostatFood={food}
+      />
+
+      <ContextRow
+        gprValue={gprData.gprValue}
+        gprStatus={gprData.status}
+        gprError={gprData.error}
+        portwatch={portwatch}
+      />
 
       <div
         className="two-col"
@@ -84,7 +94,6 @@ export default function App() {
       >
         {/* Left column — data sections */}
         <main>
-          {/* Risk Indicators — always visible at top */}
           {sectionVisible('risk') && (
             <RiskIndicators
               gprHistory={gprData.history}
@@ -93,25 +102,24 @@ export default function App() {
               gprError={gprData.error}
             />
           )}
+          {sectionVisible('food') && (
+            <FoodCommodities data={foodData} />
+          )}
           {sectionVisible('oil') && (
-            <CrudeOil brent={commodityData.brent} wti={commodityData.wti} />
+            <CrudeOil brent={commodityData.brent} />
           )}
           {sectionVisible('gas') && (
-            <GasLNG ttf={commodityData.ttf} lng={commodityData.lng} />
+            <GasLNG ttf={commodityData.ttf} />
+          )}
+          {sectionVisible('fertilizer') && (
+            <Fertilizer urea={commodityData.urea} pfert={pfert} />
           )}
           {sectionVisible('shipping') && (
             <Shipping
               bdry={commodityData.bdry}
               zim={commodityData.zim}
-              matx={commodityData.matx}
               portwatch={portwatch}
             />
-          )}
-          {sectionVisible('fertilizer') && (
-            <Fertilizer urea={commodityData.urea} pfert={pfert} />
-          )}
-          {sectionVisible('food') && (
-            <FoodCommodities data={foodData} />
           )}
           {sectionVisible('inflation') && (
             <Inflation
@@ -138,7 +146,6 @@ export default function App() {
             loading={newsLoading}
             error={newsError}
             activeFilter={activeFilter}
-            sparkline={gdeltSparkline}
           />
         </div>
       </div>

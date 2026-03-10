@@ -3,13 +3,12 @@ import LineChartWrapper from '../LineChart'
 import { formatPrice, pctColor, pctArrow, formatPct } from '../../utils/formatters'
 
 const EXPLAINER =
-  'Urea is the world\'s most traded nitrogen fertilizer. Its price is 70–80% driven by natural gas costs. ' +
-  'A urea spike follows gas price moves by ~4–6 weeks and directly raises farming input costs across Europe and Asia.'
+  'Urea front-month futures (UFB=F), CBOT. Daily close, 30-day window via Yahoo Finance. USD per metric ton. ' +
+  'IMF PFERT index shown alongside for institutional comparison (monthly, index base 2016=100).'
 
-const WHY_IT_MATTERS = [
-  'Natural gas accounts for 70–80% of nitrogen fertilizer production cost — a gas spike flows directly into urea prices.',
-  'IMF PFERT aggregates urea, DAP, TSP and potash — the institutional benchmark used by the World Bank and FAO.',
-  'Rising fertilizer costs raise agricultural input costs, then food prices, then EU food HICP with a 3–6 month lag.',
+const WHY_TRACKED = [
+  'Natural gas accounts for 70\u201380% of nitrogen fertilizer production cost.',
+  'IMF PFERT aggregates urea, DAP, TSP and potash. Published monthly by the IMF.',
 ]
 
 export default function Fertilizer({ urea, pfert }) {
@@ -28,7 +27,7 @@ export default function Fertilizer({ urea, pfert }) {
           className="text-xs uppercase tracking-widest"
           style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
         >
-          04 —
+          05 —
         </span>
         <h2
           className="text-lg font-bold inline ml-2"
@@ -48,7 +47,7 @@ export default function Fertilizer({ urea, pfert }) {
           pctChange={urea?.pctChange}
           decimals={2}
           unit=" $/ton"
-          subLabel="CBOT Urea futures · nitrogen benchmark"
+          subLabel="CBOT Urea (UFB=F) · USD/ton · daily via Yahoo Finance"
           loading={urea?.loading}
           error={urea?.error}
           inverse={false}
@@ -153,10 +152,10 @@ export default function Fertilizer({ urea, pfert }) {
           className="text-xs uppercase tracking-widest mb-3"
           style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
         >
-          Why this matters for food prices
+          Why tracked
         </p>
         <ul className="space-y-2">
-          {WHY_IT_MATTERS.map((point, i) => (
+          {WHY_TRACKED.map((point, i) => (
             <li key={i} className="flex gap-2 text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>
               <span style={{ color: 'var(--fertilizer)', flexShrink: 0 }}>·</span>
               {point}
