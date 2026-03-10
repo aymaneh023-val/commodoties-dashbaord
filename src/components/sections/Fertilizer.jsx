@@ -40,6 +40,8 @@ export default function Fertilizer({ mos }) {
           error={mos?.error}
           inverse={false}
           asOf={lastDate}
+          fromCache={mos?.fromCache}
+          cacheAge={mos?.cacheAge}
           isFallback={mos?.error && mos?.price != null}
         />
 

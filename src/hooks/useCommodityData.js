@@ -1,20 +1,41 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { TICKERS, YAHOO_BASE, CORS_PROXIES } from '../utils/constants'
+import { useState, useEffect, useCallback } from 'react'
+import { YAHOO_BASE, CORS_PROXIES } from '../utils/constants'
 import { formatDate } from '../utils/formatters'
 
-async function fetchWithProxy(url) {
-  for (const proxy of CORS_PROXIES) {
-    try {
-      const res = await fetch(proxy(url), { signal: AbortSignal.timeout(8000) })
-      if (res.ok) {
-        const text = await res.text()
-        return JSON.parse(text)
-      }
-    } catch {
-      // try next proxy
+// Module-level cache — survives React re-renders and manual refreshes
+const memCache = {}
+
+// Brent has a fallback ticker list (BZ=F is sometimes rate-limited)
+const BRENT_TICKERS = ['BZ=F', 'CB=F']
+
+// All other tickers — fetched with 300ms stagger between each
+const OTHER_TICKERS = {
+  wti:  'CL=F',
+  ttf:  'TTF=F',
+  bdry: 'BDRY',
+  zim:  'ZIM',
+  matx: 'MATX',
+  lng:  'LNG',
+  mos:  'MOS',
+}
+
+const delay = (ms) => new Promise(r => setTimeout(r, ms))
+
+// Try every proxy; if all fail, wait 2s and retry once
+async function fetchWithRetry(url) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    for (const proxy of CORS_PROXIES) {
+      try {
+        const res = await fetch(proxy(url), { signal: AbortSignal.timeout(8000) })
+        if (res.ok) {
+          const json = JSON.parse(await res.text())
+          if (json?.chart?.result?.[0]) return json
+        }
+      } catch { /* try next proxy */ }
     }
+    if (attempt === 0) await delay(2000)
   }
-  throw new Error('All proxies failed')
+  throw new Error(`All proxies failed for: ${url}`)
 }
 
 function parseTickerData(json) {
@@ -24,94 +45,109 @@ function parseTickerData(json) {
     const price = meta.regularMarketPrice
     const prevClose = meta.chartPreviousClose
     const pctChange = prevClose ? ((price - prevClose) / prevClose) * 100 : null
-
     const timestamps = result.timestamp || []
     const closes = result.indicators?.quote?.[0]?.close || []
-
     const history = timestamps
       .map((ts, i) => ({
         date: formatDate(ts),
         close: closes[i] != null ? parseFloat(closes[i].toFixed(2)) : null,
       }))
       .filter((d) => d.close != null)
-
     return { price, prevClose, pctChange, history, error: false }
   } catch {
     return { price: null, prevClose: null, pctChange: null, history: [], error: true }
   }
 }
 
+function fromCacheResult(key) {
+  const c = memCache[key]
+  if (!c) return null
+  return { key, ...c, fromCache: true, cacheAge: Math.round((Date.now() - c.cachedAt) / 60000), error: false }
+}
+
+function errorResult(key) {
+  return { key, price: null, prevClose: null, pctChange: null, history: [], error: true, fromCache: false }
+}
+
+async function fetchTicker(key, ticker) {
+  try {
+    const url = `${YAHOO_BASE}/${ticker}?interval=1d&range=30d`
+    const json = await fetchWithRetry(url)
+    const parsed = parseTickerData(json)
+    if (!parsed.error) {
+      memCache[key] = { ...parsed, cachedAt: Date.now() }
+      return { key, ...parsed, fromCache: false }
+    }
+    throw new Error('Parse error')
+  } catch {
+    return fromCacheResult(key) ?? errorResult(key)
+  }
+}
+
+async function fetchBrent() {
+  for (const ticker of BRENT_TICKERS) {
+    try {
+      const url = `${YAHOO_BASE}/${ticker}?interval=1d&range=30d`
+      const json = await fetchWithRetry(url)
+      const parsed = parseTickerData(json)
+      if (!parsed.error) {
+        memCache['brent'] = { ...parsed, cachedAt: Date.now() }
+        return { key: 'brent', ...parsed, fromCache: false }
+      }
+    } catch { /* try next Brent ticker */ }
+  }
+  return fromCacheResult('brent') ?? errorResult('brent')
+}
+
 const initialState = {
-  price: null,
-  prevClose: null,
-  pctChange: null,
-  history: [],
-  loading: true,
-  error: false,
+  price: null, prevClose: null, pctChange: null,
+  history: [], loading: true, error: false, fromCache: false,
 }
 
 export function useCommodityData() {
   const [data, setData] = useState({
     brent: { ...initialState },
-    wti: { ...initialState },
-    ttf: { ...initialState },
-    bdi: { ...initialState },
-    lng: { ...initialState },
-    mos: { ...initialState },
+    wti:   { ...initialState },
+    ttf:   { ...initialState },
+    bdry:  { ...initialState },
+    zim:   { ...initialState },
+    matx:  { ...initialState },
+    lng:   { ...initialState },
+    mos:   { ...initialState },
   })
 
-  // Keep last known good values so we never go blank
-  const lastGood = useRef({})
-
   const fetchAll = useCallback(async () => {
-    const entries = Object.entries(TICKERS)
-
-    // Mark all as loading (but keep current values visible)
-    setData((prev) => {
-      const next = { ...prev }
-      entries.forEach(([key]) => {
-        next[key] = { ...prev[key], loading: true }
-      })
+    // Mark all as loading (keep current values visible while refreshing)
+    setData(prev => {
+      const next = {}
+      Object.keys(prev).forEach(k => { next[k] = { ...prev[k], loading: true } })
       return next
     })
 
-    const results = await Promise.allSettled(
-      entries.map(async ([key, ticker]) => {
-        const url = `${YAHOO_BASE}/${ticker}?interval=1d&range=30d`
-        const json = await fetchWithProxy(url)
-        const parsed = parseTickerData(json)
-        return { key, ...parsed }
-      })
-    )
+    // Brent with multi-ticker fallback + others staggered 300ms apart
+    const otherEntries = Object.entries(OTHER_TICKERS)
+    const promises = [
+      fetchBrent(),
+      ...otherEntries.map(([key, ticker], i) =>
+        delay(300 * (i + 1)).then(() => fetchTicker(key, ticker))
+      ),
+    ]
 
-    setData((prev) => {
+    const results = await Promise.allSettled(promises)
+
+    setData(prev => {
       const next = { ...prev }
-      results.forEach((result, i) => {
-        const key = entries[i][0]
-        if (result.status === 'fulfilled' && !result.value.error) {
-          const val = result.value
-          lastGood.current[key] = { price: val.price, prevClose: val.prevClose, pctChange: val.pctChange, history: val.history }
-          next[key] = { ...val, loading: false, error: false }
-        } else {
-          // Keep last good value, flag error
-          const lg = lastGood.current[key] || {}
-          next[key] = {
-            price: lg.price ?? null,
-            prevClose: lg.prevClose ?? null,
-            pctChange: lg.pctChange ?? null,
-            history: lg.history ?? [],
-            loading: false,
-            error: true,
-          }
+      results.forEach(r => {
+        if (r.status === 'fulfilled' && r.value?.key) {
+          const { key, ...rest } = r.value
+          next[key] = { ...rest, loading: false }
         }
       })
       return next
     })
   }, [])
 
-  useEffect(() => {
-    fetchAll()
-  }, [fetchAll])
+  useEffect(() => { fetchAll() }, [fetchAll])
 
   return { data, refresh: fetchAll }
 }

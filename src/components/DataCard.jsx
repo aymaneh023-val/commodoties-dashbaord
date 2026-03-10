@@ -13,8 +13,10 @@ export default function DataCard({
   inverse = false,
   note = null,
   signal = null,
-  asOf = null,       // "as of [date]" label shown below value
-  isFallback = false, // shows amber fallback pill
+  asOf = null,
+  isFallback = false,
+  fromCache = false,
+  cacheAge = null,
   children,
 }) {
   const badgeColor = pctColor(pctChange, inverse)
@@ -32,28 +34,27 @@ export default function DataCard({
       </p>
 
       {loading ? (
-        <div className="flex items-center gap-2">
-          <span className="spinner" />
-          <span style={{ color: 'var(--muted)', fontSize: 12 }}>Loading…</span>
-        </div>
-      ) : error ? (
+        /* Skeleton — no text, just animated placeholders */
         <div>
-          <p
-            className="text-2xl font-bold mb-1"
-            style={{ color: 'var(--muted)', fontFamily: "'Syne', sans-serif" }}
-          >
-            {displayValue !== '—' ? displayValue : '—'}
+          <div className="skeleton" style={{ width: 80, height: 32, marginBottom: 8 }} />
+          <div className="skeleton" style={{ width: 120, height: 10, marginBottom: 4 }} />
+          <div className="skeleton" style={{ width: 90, height: 8 }} />
+        </div>
+      ) : error && !fromCache ? (
+        /* Hard error — no cached data available */
+        <div>
+          <p className="text-2xl font-bold mb-1" style={{ color: 'var(--muted)', fontFamily: "'Syne', sans-serif" }}>
+            —
           </p>
-          <p className="text-xs" style={{ color: 'var(--muted)' }}>
-            ⚠ Live data unavailable
-          </p>
+          <p className="text-xs" style={{ color: 'var(--muted)' }}>⚠ Unavailable</p>
         </div>
       ) : (
+        /* Normal display — includes fromCache state */
         <>
           <div className="flex items-end gap-3 flex-wrap">
             <span
               className="text-3xl font-bold leading-none"
-              style={{ fontFamily: "'Syne', sans-serif", color: 'var(--text)' }}
+              style={{ fontFamily: "'Syne', sans-serif", color: fromCache ? 'var(--muted)' : 'var(--text)' }}
             >
               {displayValue}
             </span>
@@ -80,22 +81,22 @@ export default function DataCard({
             </p>
           )}
 
+          {/* Cache indicator */}
+          {fromCache && (
+            <p style={{ fontSize: 10, fontFamily: "'DM Mono', monospace", color: '#f59e0b', marginTop: 4 }}>
+              ⚠ Cached{cacheAge != null ? ` · ${cacheAge}min ago` : ''}
+            </p>
+          )}
+
           {/* Reference period */}
-          {asOf && !isFallback && (
-            <p
-              style={{
-                color: 'var(--muted)',
-                fontFamily: "'DM Mono', monospace",
-                fontSize: 10,
-                marginTop: 4,
-              }}
-            >
+          {!fromCache && asOf && !isFallback && (
+            <p style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 10, marginTop: 4 }}>
               as of {asOf}
             </p>
           )}
 
-          {/* Fallback badge */}
-          {isFallback && (
+          {/* Static fallback badge */}
+          {isFallback && !fromCache && (
             <span
               style={{
                 display: 'inline-block',
@@ -133,7 +134,7 @@ function SignalPill({ signal }) {
   const colors = {
     Critical: { bg: '#f87171' },
     Elevated: { bg: '#fb923c' },
-    Watch: { bg: '#6b7fa3' },
+    Watch:    { bg: '#6b7fa3' },
   }
   const c = colors[signal] || colors.Watch
   return (

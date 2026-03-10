@@ -95,9 +95,9 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
               className="text-xs px-3 py-1.5 rounded-lg transition-all"
               style={{
                 fontFamily: "'DM Mono', monospace",
-                background: isActive ? 'rgba(255,255,255,0.08)' : 'transparent',
+                background: isActive ? 'var(--surface2)' : 'transparent',
                 color: isActive ? 'var(--text)' : 'var(--muted)',
-                border: isActive ? '1px solid rgba(255,255,255,0.12)' : '1px solid transparent',
+                border: isActive ? '1px solid var(--border)' : '1px solid transparent',
                 cursor: 'pointer',
               }}
             >

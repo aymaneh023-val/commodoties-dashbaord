@@ -68,7 +68,11 @@ export default function App() {
             <GasLNG ttf={commodityData.ttf} lng={commodityData.lng} />
           )}
           {sectionVisible('shipping') && (
-            <Shipping bdi={commodityData.bdi} />
+            <Shipping
+              bdry={commodityData.bdry}
+              zim={commodityData.zim}
+              matx={commodityData.matx}
+            />
           )}
           {sectionVisible('fertilizer') && (
             <Fertilizer mos={commodityData.mos} />

@@ -46,6 +46,8 @@ export default function CrudeOil({ brent, wti }) {
           error={brent?.error}
           inverse={false}
           asOf={lastDate}
+          fromCache={brent?.fromCache}
+          cacheAge={brent?.cacheAge}
           isFallback={brent?.error && brent?.price != null}
         />
         <DataCard
@@ -59,6 +61,8 @@ export default function CrudeOil({ brent, wti }) {
           error={wti?.error}
           inverse={false}
           asOf={wti?.history?.slice(-1)[0]?.date ?? null}
+          fromCache={wti?.fromCache}
+          cacheAge={wti?.cacheAge}
           isFallback={wti?.error && wti?.price != null}
         />
       </div>

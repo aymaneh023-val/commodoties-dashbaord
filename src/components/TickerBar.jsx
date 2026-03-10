@@ -3,17 +3,17 @@ import { TICKER_LABELS } from '../utils/constants'
 
 const TICKER_UNITS = {
   brent: ' $/bbl',
-  wti: ' $/bbl',
-  ttf: ' €/MWh',
-  bdi: '',
-  lng: ' $',
-  mos: ' $',
+  wti:   ' $/bbl',
+  ttf:   ' €/MWh',
+  bdry:  ' $',
+  zim:   ' $',
+  matx:  ' $',
+  lng:   ' $',
+  mos:   ' $',
 }
 
-const TICKER_INVERSE = { bdi: true }
-
 export default function TickerBar({ data }) {
-  const keys = ['brent', 'wti', 'ttf', 'bdi', 'lng', 'mos']
+  const keys = ['brent', 'wti', 'ttf', 'bdry', 'zim', 'matx', 'lng', 'mos']
 
   return (
     <div
@@ -21,14 +21,13 @@ export default function TickerBar({ data }) {
       style={{
         background: 'var(--surface)',
         borderBottom: '1px solid var(--border)',
-        top: '97px',  // below sticky header (adjust to header height)
+        top: '97px',
       }}
     >
       {keys.map((key, i) => {
         const d = data[key] || {}
         const { price, pctChange, loading, error } = d
-        const inverse = !!TICKER_INVERSE[key]
-        const color = pctColor(pctChange, inverse)
+        const color = pctColor(pctChange, false)
         const arrow = pctArrow(pctChange)
 
         return (

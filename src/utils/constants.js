@@ -1,10 +1,12 @@
 export const TICKERS = {
-  brent: 'BZ=F',
-  wti: 'CL=F',
-  ttf: 'TTF=F',
-  bdi: '^BDI',
-  lng: 'LNG',
-  mos: 'MOS',
+  brent: 'BZ=F',   // Brent crude (with CB=F fallback handled in hook)
+  wti:   'CL=F',
+  ttf:   'TTF=F',
+  bdry:  'BDRY',   // Breakwave Dry Bulk ETF — BDI proxy
+  zim:   'ZIM',    // ZIM Integrated Shipping — container proxy
+  matx:  'MATX',   // Matson — container confirmation
+  lng:   'LNG',
+  mos:   'MOS',
 }
 
 export const YAHOO_BASE = 'https://query1.finance.yahoo.com/v8/finance/chart'
@@ -34,31 +36,32 @@ export const SOURCE_COLORS = {
 }
 
 export const FILTER_TABS = [
-  { id: 'ALL', label: 'ALL', emoji: '' },
-  { id: 'oil', label: 'Oil', emoji: '🛢️' },
-  { id: 'gas', label: 'Gas & LNG', emoji: '⚡' },
-  { id: 'shipping', label: 'Shipping', emoji: '🚢' },
+  { id: 'ALL',        label: 'ALL',        emoji: '' },
+  { id: 'oil',        label: 'Oil',        emoji: '🛢️' },
+  { id: 'gas',        label: 'Gas & LNG',  emoji: '⚡' },
+  { id: 'shipping',   label: 'Shipping',   emoji: '🚢' },
   { id: 'fertilizer', label: 'Fertilizer', emoji: '🌾' },
-  { id: 'inflation', label: 'Inflation', emoji: '📈' },
+  { id: 'inflation',  label: 'Inflation',  emoji: '📈' },
 ]
 
 export const TICKER_LABELS = {
   brent: 'Brent',
-  wti: 'WTI',
-  ttf: 'TTF Gas',
-  bdi: 'Baltic Dry',
-  lng: 'LNG',
-  mos: 'Mosaic (MOS)',
+  wti:   'WTI',
+  ttf:   'TTF Gas',
+  bdry:  'BDRY',
+  zim:   'ZIM',
+  matx:  'MATX',
+  lng:   'LNG',
+  mos:   'Mosaic',
 }
 
-// Category keyword map for auto-tagging news
 export const NEWS_CATEGORY_KEYWORDS = {
-  oil: ['oil', 'crude', 'brent', 'wti', 'opec', 'petroleum', 'iran oil', 'hormuz'],
-  gas: ['gas', 'lng', 'natural gas', 'ttf', 'energy prices', 'lng europe'],
-  shipping: ['shipping', 'freight', 'baltic', 'container', 'red sea', 'suez', 'strait of hormuz'],
+  oil:        ['oil', 'crude', 'brent', 'wti', 'opec', 'petroleum', 'iran oil', 'hormuz'],
+  gas:        ['gas', 'lng', 'natural gas', 'ttf', 'energy prices', 'lng europe'],
+  shipping:   ['shipping', 'freight', 'baltic', 'container', 'red sea', 'suez', 'strait of hormuz'],
   fertilizer: ['fertilizer', 'fertiliser', 'mosaic', 'potash', 'nitrogen', 'food supply'],
-  inflation: ['inflation', 'hicp', 'cpi', 'food prices', 'food supply chain'],
+  inflation:  ['inflation', 'hicp', 'cpi', 'food prices', 'food supply chain'],
 }
 
-export const REFRESH_INTERVAL_COMMODITY = 5 * 60 * 1000  // 5 minutes
-export const REFRESH_INTERVAL_NEWS = 15 * 60 * 1000       // 15 minutes
+export const REFRESH_INTERVAL_COMMODITY = 5 * 60 * 1000
+export const REFRESH_INTERVAL_NEWS = 15 * 60 * 1000
