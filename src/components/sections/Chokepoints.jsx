@@ -6,24 +6,24 @@ const CHOKEPOINTS = [
     name: 'Strait of Hormuz',
     lng: 56.5,
     lat: 26.5,
-    status: 'CRITICAL',
-    note: '~21% of global oil + 20% LNG transits here. US-Iran conflict = direct closure risk. A closure adds 14-21 days via Cape of Good Hope.',
+    status: 'CONSTRAINED',
+    note: 'Handles ~21% of global oil and 20% of LNG. A closure would add 14–21 days via Cape of Good Hope detour.',
   },
   {
     id: 'bab',
     name: 'Bab-el-Mandeb',
     lng: 43.4,
     lat: 12.6,
-    status: 'DISRUPTED',
-    note: 'Houthi attacks since Nov 2023 rerouted ~90% of Asia-EU container traffic via Africa. Adds $2,000-4,000/container and 10-14 days.',
+    status: 'REDUCED',
+    note: '~90% of Asia-EU container traffic rerouted via Africa since late 2023. Adds $2,000–4,000/container and 10–14 days.',
   },
   {
     id: 'suez',
     name: 'Suez Canal',
     lng: 32.5,
     lat: 30.0,
-    status: 'WATCH',
-    note: '12% of global trade passes through here. Vessel traffic down ~50% since Red Sea crisis. Egypt losing ~$7bn/year in transit fees.',
+    status: 'NORMAL',
+    note: '12% of global trade passes through here. Transit volumes down ~50% since late 2023. Egypt losing ~$7bn/year in transit fees.',
   },
   {
     id: 'persian',
@@ -31,15 +31,15 @@ const CHOKEPOINTS = [
     lng: 50.5,
     lat: 26.0,
     status: 'ELEVATED',
-    note: 'Main export route for Saudi, UAE, Kuwait oil. US Navy 5th Fleet operating in region. Insurance premiums up 300% since conflict began.',
+    note: 'Primary export corridor for Gulf-state oil. Maritime insurance premiums elevated, up ~300% year-over-year.',
   },
 ]
 
 const STATUS_CONFIG = {
-  CRITICAL:  { color: '#f87171', size: 14, pulse: true,  emoji: '🔴' },
-  DISRUPTED: { color: '#f59e0b', size: 12, pulse: true,  emoji: '🟠' },
-  ELEVATED:  { color: '#818cf8', size: 10, pulse: true,  emoji: '🟣' },
-  WATCH:     { color: '#6b7280', size: 8,  pulse: false, emoji: '⚫' },
+  CONSTRAINED: { color: '#f87171', size: 12, pulse: false, emoji: '●' },
+  REDUCED:     { color: '#f59e0b', size: 10, pulse: false, emoji: '●' },
+  ELEVATED:    { color: '#818cf8', size: 10, pulse: false, emoji: '●' },
+  NORMAL:      { color: '#6b7280', size: 8,  pulse: false, emoji: '●' },
 }
 
 // SVG viewBox: longitude 25E–65E, latitude 5N–35N
@@ -116,10 +116,10 @@ const PORTWATCH_KEY_MAP = {
 
 function getPortWatchStatus(deviation) {
   if (deviation == null) return null
-  if (deviation < -40) return 'CRITICAL'
-  if (deviation < -25) return 'DISRUPTED'
+  if (deviation < -40) return 'CONSTRAINED'
+  if (deviation < -25) return 'REDUCED'
   if (deviation < -10) return 'ELEVATED'
-  return 'WATCH'
+  return 'NORMAL'
 }
 
 const EXPLAINER = 'Key maritime chokepoints affecting global energy and food supply chains. The Strait of Hormuz alone controls ~21% of global oil supply — a closure would immediately affect European energy and food prices.'

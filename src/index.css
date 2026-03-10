@@ -19,7 +19,7 @@
   --shipping:   #818cf8;
   --fertilizer: #4ade80;
   --inflation:  #fb923c;
-  --food:       #f87171;
+  --food:       #a78bfa;
 }
 
 /* ─── Dark theme (system preference) ────────────────── */
@@ -35,8 +35,8 @@
 
   body {
     background-image:
-      linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+      linear-gradient(rgba(255, 255, 255, 0.008) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.008) 1px, transparent 1px);
   }
 }
 
@@ -49,8 +49,8 @@
 body {
   background-color: var(--bg);
   background-image:
-    linear-gradient(rgba(0, 0, 0, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.025) 1px, transparent 1px);
+    linear-gradient(rgba(0, 0, 0, 0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.012) 1px, transparent 1px);
   background-size: 40px 40px;
   color: var(--text);
   font-family: 'DM Mono', monospace;

@@ -64,7 +64,7 @@ export default function NewsFeed({ articles, loading, error, activeFilter, spark
           className="text-base font-bold"
           style={{ fontFamily: "'Syne', sans-serif" }}
         >
-          Market Intelligence Feed
+          Market News
         </h2>
         <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
           Sources: Reuters · AP · BBC · FT · Al Jazeera · WSJ · Bloomberg
@@ -124,7 +124,7 @@ export default function NewsFeed({ articles, loading, error, activeFilter, spark
       {loading && !articles.length && (
         <div className="flex items-center gap-2 py-6" style={{ color: 'var(--muted)', fontSize: 12 }}>
           <span className="spinner" />
-          Loading latest market intelligence…
+          Loading latest news…
         </div>
       )}
 

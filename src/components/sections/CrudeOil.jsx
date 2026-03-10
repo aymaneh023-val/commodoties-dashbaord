@@ -1,7 +1,7 @@
 import DataCard from '../DataCard'
 import LineChartWrapper from '../LineChart'
 
-const EXPLAINER = 'Brent is the global benchmark priced in London, used for ~70% of world oil contracts. WTI is the US benchmark, typically $2–4 cheaper than Brent. Both spiked after US-Iran hostilities began.'
+const EXPLAINER = 'Brent is the global benchmark priced in London, used for ~70% of world oil contracts. WTI is the US benchmark, typically $2–4 cheaper than Brent.'
 
 export default function CrudeOil({ brent, wti }) {
   const lastDate = brent?.history?.slice(-1)[0]?.date ?? null

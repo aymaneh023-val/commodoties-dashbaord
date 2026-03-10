@@ -76,10 +76,10 @@ export default function RiskIndicators({ gprHistory = [], gprValue, gprStatus, g
             {/* Threshold legend */}
             <div className="mt-4 space-y-1">
               {[
-                { color: '#f87171', label: '> 200  CRITICAL' },
-                { color: '#f59e0b', label: '> 150  ELEVATED' },
-                { color: '#818cf8', label: '> 100  MODERATE' },
-                { color: '#4ade80', label: '≤ 100  NORMAL' },
+                { color: '#f87171', label: '> 200  High' },
+                { color: '#f59e0b', label: '> 150  Above avg' },
+                { color: '#818cf8', label: '> 100  Average' },
+                { color: '#4ade80', label: '≤ 100  Low' },
               ].map(t => (
                 <div key={t.label} className="flex items-center gap-2">
                   <div style={{ width: 6, height: 6, borderRadius: '50%', background: t.color, flexShrink: 0 }} />

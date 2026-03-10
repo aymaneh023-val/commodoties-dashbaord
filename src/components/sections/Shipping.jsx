@@ -117,13 +117,13 @@ export default function Shipping({ bdry, zim, matx }) {
         style={{ background: 'var(--surface2)', borderLeft: '3px solid var(--shipping)' }}
       >
         <p className="text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}>
-          Supply Chain Disruption Risk
+          Shipping Route Context
         </p>
         <p className="text-sm leading-relaxed mb-2" style={{ color: 'var(--muted)' }}>
           <strong style={{ color: 'var(--text)' }}>Strait of Hormuz:</strong> ~21% of global oil and 20% of LNG transits this chokepoint. A closure adds 14-21 days via Cape of Good Hope detour.
         </p>
         <p className="text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>
-          <strong style={{ color: 'var(--text)' }}>Red Sea:</strong> Houthi attacks rerouted ~90% of Asia-EU container traffic via Africa, adding $2,000-4,000/container and 10-14 days.
+          <strong style={{ color: 'var(--text)' }}>Red Sea:</strong> Rerouting since late 2023 shifted ~90% of Asia-EU container traffic via Africa, adding $2,000–4,000/container and 10–14 days.
         </p>
       </div>
 

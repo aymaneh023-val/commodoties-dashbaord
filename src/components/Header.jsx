@@ -3,9 +3,9 @@ import { FILTER_TABS } from '../utils/constants'
 import { formatTime } from '../utils/formatters'
 
 const STATUS_DOT = {
-  green: { color: '#22c55e', label: 'All sources live', animation: 'pulse-dot' },
-  amber: { color: '#f59e0b', label: 'Some sources degraded', animation: '' },
-  red:   { color: '#ef4444', label: 'All sources down — showing fallback data', animation: '' },
+  green: { color: '#22c55e', label: 'All sources connected', animation: '' },
+  amber: { color: '#f59e0b', label: 'Some sources partially available', animation: '' },
+  red:   { color: '#ef4444', label: 'Sources unavailable — showing fallback data', animation: '' },
 }
 
 export default function Header({ activeFilter, onFilterChange, onRefresh, lastUpdated, connectionStatus = 'green', onShowReferences }) {
@@ -49,7 +49,7 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
               className="text-xs tracking-widest uppercase"
               style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
             >
-              {connectionStatus === 'green' ? 'LIVE' : connectionStatus === 'amber' ? 'DEGRADED' : 'OFFLINE'} · Last updated {lastUpdated ? formatTime(lastUpdated) : '—'}
+              {connectionStatus === 'green' ? 'Connected' : connectionStatus === 'amber' ? 'Partial' : 'Reconnecting'} · Last updated {lastUpdated ? formatTime(lastUpdated) : '—'}
             </span>
           </div>
 
@@ -58,10 +58,10 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
             className="text-xl font-bold leading-tight"
             style={{ fontFamily: "'Syne', sans-serif", color: 'var(--text)' }}
           >
-            EU Energy &amp; Inflation Shock Monitor
+            EU Commodity Monitor
           </h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--muted)' }}>
-            Tracking geopolitical shock impact on European markets
+            Live prices, supply routes, and macro indicators for European markets
           </p>
         </div>
 
