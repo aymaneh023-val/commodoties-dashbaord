@@ -88,11 +88,10 @@ export default function App() {
           {/* Risk Indicators — always visible at top */}
           {sectionVisible('risk') && (
             <RiskIndicators
-              history={gprData.history}
-              loading={gprData.loading}
-              isFallback={gprData.isFallback}
+              gprHistory={gprData.history}
               gprValue={gprData.gprValue}
-              status={gprData.status}
+              gprStatus={gprData.status}
+              gprFallback={gprData.isFallback}
             />
           )}
           {sectionVisible('oil') && (

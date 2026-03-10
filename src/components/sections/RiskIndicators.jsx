@@ -8,7 +8,7 @@ const EXPLAINER =
   'Measures geopolitical risk via newspaper text mining across 10 major papers. Values above 150 historically ' +
   'precede commodity price spikes by 2–4 weeks. Source: Caldara & Iacoviello (2022), American Economic Review 112(4).'
 
-export default function RiskIndicators({ gprHistory, gprValue, gprStatus, gprFallback }) {
+export default function RiskIndicators({ gprHistory = [], gprValue, gprStatus, gprFallback }) {
   const chartData = gprHistory.map(d => ({ month: d.month, value: d.value }))
 
   return (
