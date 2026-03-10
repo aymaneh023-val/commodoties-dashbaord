@@ -29,7 +29,18 @@ function parseIMFResponse(json) {
   }
 }
 
-async function fetchIMFPFERT() {
+async function fetchViaProxy() {
+  const res = await fetch('/api/imf', { signal: AbortSignal.timeout(20000) })
+  if (!res.ok) throw new Error(`IMF proxy: ${res.status}`)
+  const json = await res.json()
+  if (json.status !== 'ok') throw new Error('IMF proxy returned error')
+
+  const data = parseIMFResponse(json.data)
+  if (!data?.length) throw new Error('Empty IMF proxy data')
+  return { data, isFallback: false }
+}
+
+async function fetchDirectIMF() {
   // 1. Try direct
   try {
     const r = await fetch(IMF_PFERT_URL, {
@@ -43,7 +54,7 @@ async function fetchIMFPFERT() {
     }
   } catch { /* fall through */ }
 
-  // 2. Proxy chain
+  // 2. CORS proxy chain
   for (const proxy of CORS_PROXIES) {
     try {
       const r = await fetch(proxy(IMF_PFERT_URL), { signal: AbortSignal.timeout(10000) })
@@ -62,9 +73,20 @@ export function useIMFData() {
   const [pfert, setPfert] = useState({ data: [], loading: true, isFallback: false })
 
   useEffect(() => {
-    fetchIMFPFERT().then(result => {
+    async function fetchAll() {
+      // Try server-side proxy first (works on Vercel)
+      try {
+        const result = await fetchViaProxy()
+        setPfert({ ...result, loading: false })
+        return
+      } catch { /* fall through to direct/CORS */ }
+
+      // Fallback: direct + CORS proxies (works on localhost)
+      const result = await fetchDirectIMF()
       setPfert({ ...result, loading: false })
-    })
+    }
+
+    fetchAll()
   }, [])
 
   const latest = pfert.data[pfert.data.length - 1] ?? null
