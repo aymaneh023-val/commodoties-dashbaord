@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { YAHOO_BASE, CORS_PROXIES } from '../utils/constants'
 import { formatDate } from '../utils/formatters'
 
@@ -23,6 +23,8 @@ export const FOOD_META = {
 }
 
 const delay = ms => new Promise(r => setTimeout(r, ms))
+
+const RETRY_DELAYS = [2000, 5000, 12000]
 
 async function fetchWithRetry(url) {
   for (let attempt = 0; attempt < 2; attempt++) {
@@ -52,6 +54,7 @@ function parseTicker(json) {
         close: closes[i] != null ? parseFloat(closes[i].toFixed(4)) : null,
       }))
       .filter(d => d.close != null)
+    if (!price || history.length === 0) return { price: null, pctChange: null, baseDate: null, history: [], error: true }
     const firstClose = history[0]?.close ?? null
     const pctChange = firstClose ? ((price - firstClose) / firstClose) * 100 : null
     const baseDate = history[0]?.date ?? null
@@ -59,6 +62,16 @@ function parseTicker(json) {
   } catch {
     return { price: null, pctChange: null, baseDate: null, history: [], error: true }
   }
+}
+
+function fromCacheResult(key) {
+  const c = memCache[key]
+  if (!c) return null
+  return { key, ...c, fromCache: true, cacheAge: Math.round((Date.now() - c.cachedAt) / 60000), error: false }
+}
+
+function errorResult(key) {
+  return { key, price: null, pctChange: null, baseDate: null, history: [], error: true, fromCache: false }
 }
 
 async function fetchTicker(key, ticker) {
@@ -72,9 +85,7 @@ async function fetchTicker(key, ticker) {
     }
     throw new Error('Parse error')
   } catch {
-    const c = memCache[key]
-    if (c) return { key, ...c, fromCache: true, cacheAge: Math.round((Date.now() - c.cachedAt) / 60000), error: false }
-    return { key, price: null, pctChange: null, baseDate: null, history: [], error: true, fromCache: false }
+    return fromCacheResult(key) ?? errorResult(key)
   }
 }
 
@@ -87,7 +98,11 @@ export function useFoodCommoditiesData() {
     return s
   })
 
-  const fetchAll = useCallback(async () => {
+  const genRef = useRef(0)
+
+  const fetchAll = useCallback(() => {
+    const gen = ++genRef.current
+
     setData(prev => {
       const next = {}
       Object.keys(prev).forEach(k => { next[k] = { ...prev[k], loading: true } })
@@ -95,19 +110,38 @@ export function useFoodCommoditiesData() {
     })
 
     const entries = Object.entries(FOOD_TICKERS)
-    const results = await Promise.allSettled(
-      entries.map(([key, ticker], i) => delay(300 * i).then(() => fetchTicker(key, ticker)))
-    )
 
-    setData(prev => {
-      const next = { ...prev }
-      results.forEach(r => {
-        if (r.status === 'fulfilled' && r.value?.key) {
-          const { key, ...rest } = r.value
-          next[key] = { ...rest, loading: false }
+    entries.forEach(([key, ticker], i) => {
+      const run = async () => {
+        await delay(300 * i)
+        if (genRef.current !== gen) return
+
+        for (let attempt = 0; attempt <= RETRY_DELAYS.length; attempt++) {
+          if (attempt > 0) {
+            await delay(RETRY_DELAYS[attempt - 1])
+            if (genRef.current !== gen) return
+          }
+
+          const result = await fetchTicker(key, ticker)
+          if (genRef.current !== gen) return
+
+          if (!result.error) {
+            const { key: _k, ...rest } = result
+            setData(prev => ({ ...prev, [key]: { ...rest, loading: false } }))
+            return
+          }
+
+          if (result.fromCache) {
+            const { key: _k, ...rest } = result
+            setData(prev => ({ ...prev, [key]: { ...rest, loading: true } }))
+          }
         }
-      })
-      return next
+
+        const fallback = fromCacheResult(key) ?? errorResult(key)
+        setData(prev => ({ ...prev, [key]: { ...fallback, loading: false } }))
+      }
+
+      run()
     })
   }, [])
 

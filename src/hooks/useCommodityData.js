@@ -51,6 +51,7 @@ function parseTickerData(json) {
         close: closes[i] != null ? parseFloat(closes[i].toFixed(2)) : null,
       }))
       .filter((d) => d.close != null)
+    if (!price || history.length === 0) return { price: null, pctChange: null, baseDate: null, history: [], error: true }
     // 30-day % change vs first available history point
     const firstClose = history[0]?.close ?? null
     const pctChange = firstClose ? ((price - firstClose) / firstClose) * 100 : null
