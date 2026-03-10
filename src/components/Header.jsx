@@ -8,7 +8,7 @@ const STATUS_DOT = {
   red:   { color: '#ef4444', label: 'All sources down — showing fallback data', animation: '' },
 }
 
-export default function Header({ activeFilter, onFilterChange, onRefresh, lastUpdated, connectionStatus = 'green' }) {
+export default function Header({ activeFilter, onFilterChange, onRefresh, lastUpdated, connectionStatus = 'green', onShowReferences }) {
   const status = STATUS_DOT[connectionStatus] ?? STATUS_DOT.green
   // Read initial hash on mount
   useEffect(() => {
@@ -65,23 +65,41 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
           </p>
         </div>
 
-        {/* Refresh button */}
-        <button
-          onClick={onRefresh}
-          className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg transition-colors"
-          style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border)',
-            color: 'var(--muted)',
-            fontFamily: "'DM Mono', monospace",
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text)' }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--muted)' }}
-        >
-          ↻ Refresh
-        </button>
+        {/* Action buttons */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onShowReferences}
+            className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg transition-colors"
+            style={{
+              background: 'transparent',
+              border: '1px solid transparent',
+              color: 'var(--muted)',
+              fontFamily: "'DM Mono', monospace",
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--muted)' }}
+          >
+            References
+          </button>
+          <button
+            onClick={onRefresh}
+            className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg transition-colors"
+            style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              color: 'var(--muted)',
+              fontFamily: "'DM Mono', monospace",
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--muted)' }}
+          >
+            ↻ Refresh
+          </button>
+        </div>
       </div>
 
       {/* Filter tabs */}

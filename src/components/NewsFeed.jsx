@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { timeAgo } from '../utils/formatters'
 
 const SOURCE_CONFIG = {
@@ -6,6 +7,8 @@ const SOURCE_CONFIG = {
   'bbc-news':           { label: 'BBC',        color: '#ef4444' },
   'financial-times':    { label: 'FT',         color: '#f97316' },
   'al-jazeera-english': { label: 'Al Jazeera', color: '#10b981' },
+  'the-wall-street-journal': { label: 'WSJ',   color: '#3b82f6' },
+  'bloomberg':          { label: 'Bloomberg',  color: '#7c3aed' },
 }
 
 const CATEGORY_COLORS = {
@@ -17,10 +20,32 @@ const CATEGORY_COLORS = {
   ALL: 'var(--muted)',
 }
 
+const getCategory = (article) => {
+  const text = (
+    article.title + ' ' + (article.description || '')
+  ).toLowerCase()
+
+  if (text.match(/food|wheat|grain|soy|crop|fertilizer|agricultural|fao|hunger|harvest/))
+    return { label: 'Food', color: 'var(--food)', id: 'fertilizer' }
+  if (text.match(/ship|freight|container|port|vessel|cargo|logistics|red sea|hormuz/))
+    return { label: 'Shipping', color: 'var(--shipping)', id: 'shipping' }
+  if (text.match(/gas|lng|ttf|pipeline|energy|electricity|power/))
+    return { label: 'Gas/Energy', color: 'var(--gas)', id: 'gas' }
+  if (text.match(/oil|brent|wti|crude|opec|barrel/))
+    return { label: 'Oil', color: 'var(--oil)', id: 'oil' }
+  if (text.match(/inflation|cpi|hicp|prices|cost of living/))
+    return { label: 'Inflation', color: 'var(--inflation)', id: 'inflation' }
+  return { label: 'Markets', color: 'var(--muted)', id: 'ALL' }
+}
+
 export default function NewsFeed({ articles, loading, error, activeFilter }) {
+  const [showCount, setShowCount] = useState(20)
+
+  const enriched = articles.map((a) => ({ ...a, _cat: getCategory(a) }))
+
   const filtered = activeFilter === 'ALL'
-    ? articles
-    : articles.filter((a) => a.category === activeFilter)
+    ? enriched
+    : enriched.filter((a) => a._cat.id === activeFilter || a.category === activeFilter)
 
   return (
     <aside
@@ -41,7 +66,7 @@ export default function NewsFeed({ articles, loading, error, activeFilter }) {
           Market Intelligence Feed
         </h2>
         <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
-          Sources: Reuters · AP · BBC · FT · Al Jazeera
+          Sources: Reuters · AP · BBC · FT · Al Jazeera · WSJ · Bloomberg
         </p>
         <p
           className="text-xs mt-0.5"
@@ -74,12 +99,30 @@ export default function NewsFeed({ articles, loading, error, activeFilter }) {
         </div>
       )}
 
-      {/* Articles — capped at 8 */}
+      {/* Articles — show 20, load more reveals next 10 */}
       <div className="flex flex-col gap-3">
-        {filtered.slice(0, 8).map((article, i) => (
+        {filtered.slice(0, showCount).map((article, i) => (
           <ArticleCard key={`${article.url}-${i}`} article={article} />
         ))}
       </div>
+
+      {filtered.length > showCount && (
+        <button
+          onClick={() => setShowCount((c) => c + 10)}
+          className="w-full mt-3 py-2 rounded-lg text-xs transition-colors"
+          style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            color: 'var(--muted)',
+            fontFamily: "'DM Mono', monospace",
+            cursor: 'pointer',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--muted)' }}
+        >
+          Load more ({filtered.length - showCount} remaining)
+        </button>
+      )}
     </aside>
   )
 }
@@ -87,8 +130,7 @@ export default function NewsFeed({ articles, loading, error, activeFilter }) {
 function ArticleCard({ article }) {
   const sourceId = article.source?.id || ''
   const src = SOURCE_CONFIG[sourceId] || { label: article.source?.name || 'Source', color: '#6b7fa3' }
-  const catColor = CATEGORY_COLORS[article.category] || CATEGORY_COLORS.ALL
-  const catLabel = article.category === 'ALL' ? 'General' : article.category.charAt(0).toUpperCase() + article.category.slice(1)
+  const cat = article._cat || getCategory(article)
 
   return (
     <a
@@ -121,13 +163,13 @@ function ArticleCard({ article }) {
         <span
           className="text-xs px-2 py-0.5 rounded"
           style={{
-            color: catColor,
-            background: `${catColor}18`,
+            color: cat.color,
+            background: `color-mix(in srgb, ${cat.color === 'var(--muted)' ? '#6b7280' : cat.color} 10%, transparent)`,
             fontFamily: "'DM Mono', monospace",
             fontSize: 10,
           }}
         >
-          {catLabel}
+          {cat.label}
         </span>
         <span
           className="text-xs ml-auto"

@@ -47,6 +47,7 @@ export default function GasLNG({ ttf, lng }) {
           asOf={ttfHistory.slice(-1)[0]?.date ?? null}
           fromCache={ttf?.fromCache}
           cacheAge={ttf?.cacheAge}
+          baseDate={ttf?.baseDate}
           isFallback={ttf?.error && ttf?.price != null}
         />
         <DataCard
@@ -62,6 +63,7 @@ export default function GasLNG({ ttf, lng }) {
           asOf={lngHistory.slice(-1)[0]?.date ?? null}
           fromCache={lng?.fromCache}
           cacheAge={lng?.cacheAge}
+          baseDate={lng?.baseDate}
           isFallback={lng?.error && lng?.price != null}
         />
       </div>

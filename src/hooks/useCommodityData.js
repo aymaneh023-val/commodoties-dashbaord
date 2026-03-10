@@ -43,8 +43,6 @@ function parseTickerData(json) {
     const result = json.chart.result[0]
     const meta = result.meta
     const price = meta.regularMarketPrice
-    const prevClose = meta.chartPreviousClose
-    const pctChange = prevClose ? ((price - prevClose) / prevClose) * 100 : null
     const timestamps = result.timestamp || []
     const closes = result.indicators?.quote?.[0]?.close || []
     const history = timestamps
@@ -53,9 +51,13 @@ function parseTickerData(json) {
         close: closes[i] != null ? parseFloat(closes[i].toFixed(2)) : null,
       }))
       .filter((d) => d.close != null)
-    return { price, prevClose, pctChange, history, error: false }
+    // 30-day % change vs first available history point
+    const firstClose = history[0]?.close ?? null
+    const pctChange = firstClose ? ((price - firstClose) / firstClose) * 100 : null
+    const baseDate = history[0]?.date ?? null
+    return { price, pctChange, baseDate, history, error: false }
   } catch {
-    return { price: null, prevClose: null, pctChange: null, history: [], error: true }
+    return { price: null, pctChange: null, baseDate: null, history: [], error: true }
   }
 }
 
@@ -66,7 +68,7 @@ function fromCacheResult(key) {
 }
 
 function errorResult(key) {
-  return { key, price: null, prevClose: null, pctChange: null, history: [], error: true, fromCache: false }
+  return { key, price: null, pctChange: null, baseDate: null, history: [], error: true, fromCache: false }
 }
 
 async function fetchTicker(key, ticker) {
@@ -100,7 +102,7 @@ async function fetchBrent() {
 }
 
 const initialState = {
-  price: null, prevClose: null, pctChange: null,
+  price: null, pctChange: null, baseDate: null,
   history: [], loading: true, error: false, fromCache: false,
 }
 

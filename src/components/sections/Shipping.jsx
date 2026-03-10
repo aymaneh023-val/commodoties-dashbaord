@@ -42,6 +42,7 @@ export default function Shipping({ bdry, zim, matx }) {
           asOf={bdryHistory.slice(-1)[0]?.date ?? null}
           fromCache={bdry?.fromCache}
           cacheAge={bdry?.cacheAge}
+          baseDate={bdry?.baseDate}
           isFallback={bdry?.error && bdry?.price != null}
         />
         <DataCard
@@ -57,6 +58,7 @@ export default function Shipping({ bdry, zim, matx }) {
           asOf={zimHistory.slice(-1)[0]?.date ?? null}
           fromCache={zim?.fromCache}
           cacheAge={zim?.cacheAge}
+          baseDate={zim?.baseDate}
           isFallback={zim?.error && zim?.price != null}
         />
         <DataCard
@@ -72,6 +74,7 @@ export default function Shipping({ bdry, zim, matx }) {
           asOf={matx?.history?.slice(-1)[0]?.date ?? null}
           fromCache={matx?.fromCache}
           cacheAge={matx?.cacheAge}
+          baseDate={matx?.baseDate}
           isFallback={matx?.error && matx?.price != null}
         />
       </div>

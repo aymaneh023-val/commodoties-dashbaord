@@ -36,12 +36,14 @@ export const SOURCE_COLORS = {
 }
 
 export const FILTER_TABS = [
-  { id: 'ALL',        label: 'ALL',        emoji: '' },
-  { id: 'oil',        label: 'Oil',        emoji: '🛢️' },
-  { id: 'gas',        label: 'Gas & LNG',  emoji: '⚡' },
-  { id: 'shipping',   label: 'Shipping',   emoji: '🚢' },
-  { id: 'fertilizer', label: 'Fertilizer', emoji: '🌾' },
-  { id: 'inflation',  label: 'Inflation',  emoji: '📈' },
+  { id: 'ALL',         label: 'ALL',         emoji: '' },
+  { id: 'oil',         label: 'Oil',         emoji: '🛢️' },
+  { id: 'gas',         label: 'Gas & LNG',   emoji: '⚡' },
+  { id: 'shipping',    label: 'Shipping',    emoji: '🚢' },
+  { id: 'chokepoints', label: 'Chokepoints', emoji: '🗺' },
+  { id: 'fertilizer',  label: 'Fertilizer',  emoji: '🌾' },
+  { id: 'inflation',   label: 'Inflation',   emoji: '📈' },
+  { id: 'compare',     label: 'Compare',     emoji: '📊' },
 ]
 
 export const TICKER_LABELS = {

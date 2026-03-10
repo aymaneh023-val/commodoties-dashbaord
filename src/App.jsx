@@ -2,11 +2,14 @@ import { useState, useCallback } from 'react'
 import Header from './components/Header'
 import TickerBar from './components/TickerBar'
 import NewsFeed from './components/NewsFeed'
+import References from './components/References'
 import CrudeOil from './components/sections/CrudeOil'
 import GasLNG from './components/sections/GasLNG'
 import Shipping from './components/sections/Shipping'
+import Chokepoints from './components/sections/Chokepoints'
 import Fertilizer from './components/sections/Fertilizer'
 import Inflation from './components/sections/Inflation'
+import CompareSection from './components/sections/CompareSection'
 import { useCommodityData } from './hooks/useCommodityData'
 import { useEurostatData } from './hooks/useEurostatData'
 import { useNewsData } from './hooks/useNewsData'
@@ -15,6 +18,7 @@ import { useNewsData } from './hooks/useNewsData'
 export default function App() {
   const [activeFilter, setActiveFilter] = useState('ALL')
   const [lastUpdated, setLastUpdated] = useState(null)
+  const [showReferences, setShowReferences] = useState(false)
 
   const { data: commodityData, refresh: refreshCommodity } = useCommodityData()
   const { headline, food, combined } = useEurostatData()
@@ -43,6 +47,10 @@ export default function App() {
 
   const sectionVisible = (tag) => activeFilter === 'ALL' || activeFilter === tag
 
+  if (showReferences) {
+    return <References onBack={() => setShowReferences(false)} />
+  }
+
   return (
     <div style={{ minHeight: '100vh' }}>
       <Header
@@ -51,6 +59,7 @@ export default function App() {
         onRefresh={handleRefresh}
         lastUpdated={lastUpdated}
         connectionStatus={connectionStatus}
+        onShowReferences={() => setShowReferences(true)}
       />
 
       <TickerBar data={commodityData} />
@@ -74,6 +83,9 @@ export default function App() {
               matx={commodityData.matx}
             />
           )}
+          {sectionVisible('chokepoints') && (
+            <Chokepoints />
+          )}
           {sectionVisible('fertilizer') && (
             <Fertilizer mos={commodityData.mos} />
           )}
@@ -83,6 +95,12 @@ export default function App() {
               food={food}
               combined={combined}
               isFallback={headline?.isFallback || food?.isFallback}
+            />
+          )}
+          {sectionVisible('compare') && (
+            <CompareSection
+              commodityData={commodityData}
+              eurostatData={{ headline, food, combined }}
             />
           )}
 

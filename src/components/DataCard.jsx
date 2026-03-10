@@ -17,6 +17,7 @@ export default function DataCard({
   isFallback = false,
   fromCache = false,
   cacheAge = null,
+  baseDate = null,
   children,
 }) {
   const badgeColor = pctColor(pctChange, inverse)
@@ -78,6 +79,13 @@ export default function DataCard({
           {subLabel && (
             <p className="text-xs mt-1" style={{ color: 'var(--muted)' }}>
               {subLabel}
+            </p>
+          )}
+
+          {/* 30d comparison date */}
+          {!fromCache && baseDate && pctChange != null && (
+            <p style={{ fontSize: 10, fontFamily: "'DM Mono', monospace", color: 'var(--muted)', marginTop: 2, opacity: 0.7 }}>
+              compared to {baseDate}
             </p>
           )}
 
