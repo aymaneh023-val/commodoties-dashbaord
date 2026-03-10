@@ -2,6 +2,8 @@ import DataCard from '../DataCard'
 import LineChartWrapper from '../LineChart'
 import { formatMonth } from '../../utils/formatters'
 
+const EXPLAINER = 'HICP (Harmonised Index of Consumer Prices) is the EU\'s official inflation measure. The ECB targets 2%. Food HICP tracks grocery and food service prices separately — it typically reacts to energy and fertilizer shocks with a 3–6 month lag.'
+
 export default function Inflation({ headline, food, combined, isFallback }) {
   const headlineLatest = headline?.latest
   const foodLatest = food?.latest
@@ -26,7 +28,7 @@ export default function Inflation({ headline, food, combined, isFallback }) {
 
   return (
     <section id="inflation" className="mb-14">
-      <div className="mb-4">
+      <div className="mb-2">
         <span
           className="text-xs uppercase tracking-widest"
           style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
@@ -48,6 +50,9 @@ export default function Inflation({ headline, food, combined, isFallback }) {
           </span>
         )}
       </div>
+      <p style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 400, marginBottom: 20 }}>
+        {EXPLAINER}
+      </p>
 
       <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
         <DataCard
@@ -108,7 +113,7 @@ export default function Inflation({ headline, food, combined, isFallback }) {
             ]}
             xKey="month"
             yUnit="%"
-            height={220}
+            height={160}
             referenceLines={[{ value: 2.0, label: 'ECB 2%', color: '#6b7fa3' }]}
             showLegend={false}
           />

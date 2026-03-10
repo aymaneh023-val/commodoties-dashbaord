@@ -1,6 +1,8 @@
 import DataCard from '../DataCard'
 import LineChartWrapper from '../LineChart'
 
+const EXPLAINER = 'The Baltic Dry Index tracks the cost of shipping raw materials globally. A rising BDI signals higher demand or supply chain stress — it often leads commodity price moves by 2–4 weeks.'
+
 function getBDISignal(price) {
   if (price == null) return null
   if (price > 2000) return 'Critical'
@@ -15,7 +17,7 @@ export default function Shipping({ bdi }) {
 
   return (
     <section id="shipping" className="mb-14">
-      <div className="mb-4">
+      <div className="mb-2">
         <span
           className="text-xs uppercase tracking-widest"
           style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
@@ -29,6 +31,9 @@ export default function Shipping({ bdi }) {
           Shipping &amp; Containers
         </h2>
       </div>
+      <p style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 400, marginBottom: 20 }}>
+        {EXPLAINER}
+      </p>
 
       <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
         <DataCard
@@ -67,26 +72,21 @@ export default function Shipping({ bdi }) {
 
       {bdi?.history?.length > 0 && (
         <div className="card" style={{ padding: '16px 16px 8px' }}>
-          <p
-            className="text-xs mb-1"
-            style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
-          >
-            Baltic Dry Index — 30-Day Trend
-          </p>
           {chartStart && lastDate && (
-            <p
-              className="text-xs mb-3"
-              style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 10, opacity: 0.7 }}
-            >
+            <p style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 10, opacity: 0.7, marginBottom: 8 }}>
               Period: {chartStart} – {lastDate}
             </p>
           )}
           <LineChartWrapper
             data={bdi.history}
-            lines={[{ key: 'close', color: 'var(--shipping)', label: 'BDI' }]}
+            lines={[{ key: 'close', color: '#818cf8', label: 'BDI' }]}
             xKey="date"
             yUnit=""
-            height={200}
+            height={160}
+            referenceLines={[
+              { value: 1500, label: 'Elevated', color: '#6b7fa3' },
+              { value: 2000, label: 'Critical',  color: '#6b7fa3' },
+            ]}
           />
         </div>
       )}

@@ -12,12 +12,12 @@ import {
 
 /**
  * @param {Object} props
- * @param {Array} props.data - array of data points
- * @param {Array<{key: string, color: string, label: string}>} props.lines
- * @param {string} props.xKey - key for x-axis (e.g. 'date' or 'month')
- * @param {string} props.yUnit - unit appended in tooltip
+ * @param {Array} props.data
+ * @param {Array<{key, color, label, dashed?}>} props.lines
+ * @param {string} props.xKey
+ * @param {string} props.yUnit
  * @param {number} props.height
- * @param {Array<{value: number, label: string, color: string}>} props.referenceLines
+ * @param {Array<{value, label, color}>} props.referenceLines
  * @param {boolean} props.showLegend
  */
 export default function LineChartWrapper({
@@ -25,7 +25,7 @@ export default function LineChartWrapper({
   lines = [],
   xKey = 'date',
   yUnit = '',
-  height = 200,
+  height = 160,
   referenceLines = [],
   showLegend = false,
 }) {
@@ -40,27 +40,32 @@ export default function LineChartWrapper({
 
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <ReLineChart data={data} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+      <ReLineChart data={data} margin={{ top: 8, right: 40, left: 0, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
         <XAxis
           dataKey={xKey}
           tick={{ fill: '#6b7fa3', fontSize: 11, fontFamily: "'DM Mono', monospace" }}
           axisLine={{ stroke: 'rgba(255,255,255,0.07)' }}
           tickLine={false}
-          interval="preserveStartEnd"
+          interval={6}
         />
         <YAxis
+          orientation="right"
+          tickCount={3}
           tick={{ fill: '#6b7fa3', fontSize: 11, fontFamily: "'DM Mono', monospace" }}
           axisLine={false}
           tickLine={false}
           domain={['auto', 'auto']}
+          width={40}
         />
-        <Tooltip content={<CustomTooltip yUnit={yUnit} lines={lines} />} />
+        <Tooltip content={<CustomTooltip yUnit={yUnit} />} />
         {showLegend && (
           <Legend
+            verticalAlign="bottom"
+            align="left"
             iconType="circle"
-            iconSize={8}
-            wrapperStyle={{ fontSize: 11, fontFamily: "'DM Mono', monospace", color: '#6b7fa3' }}
+            iconSize={7}
+            wrapperStyle={{ fontSize: 11, fontFamily: "'DM Mono', monospace", color: '#6b7fa3', paddingTop: 8 }}
           />
         )}
         {referenceLines.map((rl) => (
@@ -69,6 +74,7 @@ export default function LineChartWrapper({
             y={rl.value}
             stroke={rl.color || '#6b7fa3'}
             strokeDasharray="4 4"
+            strokeWidth={1}
             label={{
               value: rl.label,
               fill: rl.color || '#6b7fa3',
@@ -84,9 +90,10 @@ export default function LineChartWrapper({
             type="monotone"
             dataKey={l.key}
             stroke={l.color}
-            strokeWidth={2}
+            strokeWidth={1.5}
+            strokeDasharray={l.dashed ? '5 3' : undefined}
             dot={false}
-            activeDot={{ r: 4, strokeWidth: 0 }}
+            activeDot={{ r: 3, strokeWidth: 0 }}
             name={l.label || l.key}
           />
         ))}
@@ -95,7 +102,7 @@ export default function LineChartWrapper({
   )
 }
 
-function CustomTooltip({ active, payload, label, yUnit, lines }) {
+function CustomTooltip({ active, payload, label, yUnit }) {
   if (!active || !payload || !payload.length) return null
   return (
     <div

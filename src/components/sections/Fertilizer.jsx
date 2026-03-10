@@ -1,11 +1,16 @@
 import DataCard from '../DataCard'
+import LineChartWrapper from '../LineChart'
+
+const EXPLAINER = 'Mosaic Co. (MOS) is one of the world\'s largest fertilizer producers. Its stock price is a reliable proxy for global fertilizer costs, which are 70–80% driven by natural gas prices.'
 
 export default function Fertilizer({ mos }) {
-  const asOf = mos?.history?.slice(-1)[0]?.date ?? null
+  const mosHistory = mos?.history ?? []
+  const lastDate = mosHistory.slice(-1)[0]?.date ?? null
+  const chartStart = mosHistory[0]?.date
 
   return (
     <section id="fertilizer" className="mb-14">
-      <div className="mb-4">
+      <div className="mb-2">
         <span
           className="text-xs uppercase tracking-widest"
           style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
@@ -19,8 +24,11 @@ export default function Fertilizer({ mos }) {
           Fertilizer
         </h2>
       </div>
+      <p style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 400, marginBottom: 20 }}>
+        {EXPLAINER}
+      </p>
 
-      <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
+      <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
         <DataCard
           title="Mosaic Co. (MOS)"
           value={mos?.price}
@@ -31,7 +39,7 @@ export default function Fertilizer({ mos }) {
           loading={mos?.loading}
           error={mos?.error}
           inverse={false}
-          asOf={asOf}
+          asOf={lastDate}
           isFallback={mos?.error && mos?.price != null}
         />
 
@@ -54,6 +62,23 @@ export default function Fertilizer({ mos }) {
           </p>
         </div>
       </div>
+
+      {mosHistory.length > 0 && (
+        <div className="card" style={{ padding: '16px 16px 8px' }}>
+          {chartStart && lastDate && (
+            <p style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 10, opacity: 0.7, marginBottom: 8 }}>
+              Period: {chartStart} – {lastDate}
+            </p>
+          )}
+          <LineChartWrapper
+            data={mosHistory}
+            lines={[{ key: 'close', color: '#4ade80', label: 'MOS' }]}
+            xKey="date"
+            yUnit=" $"
+            height={160}
+          />
+        </div>
+      )}
     </section>
   )
 }
