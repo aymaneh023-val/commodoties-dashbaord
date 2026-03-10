@@ -103,24 +103,7 @@ export default function DataCard({
             </p>
           )}
 
-          {/* Static fallback badge */}
-          {isFallback && !fromCache && (
-            <span
-              style={{
-                display: 'inline-block',
-                marginTop: 6,
-                fontSize: 10,
-                fontFamily: "'DM Mono', monospace",
-                color: '#f59e0b',
-                background: '#f59e0b18',
-                border: '1px solid #f59e0b40',
-                borderRadius: 4,
-                padding: '1px 6px',
-              }}
-            >
-              ⚠ Static fallback · as of Feb 2026
-            </span>
-          )}
+
         </>
       )}
 

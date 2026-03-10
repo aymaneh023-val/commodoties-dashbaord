@@ -42,7 +42,6 @@ export const FILTER_TABS = [
   { id: 'oil',         label: 'Oil',         emoji: '🛢️' },
   { id: 'gas',         label: 'Gas & LNG',   emoji: '⚡' },
   { id: 'shipping',    label: 'Shipping',    emoji: '🚢' },
-  { id: 'chokepoints', label: 'Chokepoints', emoji: '🗺' },
   { id: 'fertilizer',  label: 'Fertilizer',  emoji: '🌾' },
   { id: 'food',        label: 'Food',        emoji: '🌿' },
   { id: 'inflation',   label: 'Inflation',   emoji: '📈' },

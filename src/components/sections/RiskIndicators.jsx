@@ -8,7 +8,7 @@ const EXPLAINER =
   'Measures geopolitical risk via newspaper text mining across 10 major papers. Values above 150 historically ' +
   'precede commodity price spikes by 2–4 weeks. Source: Caldara & Iacoviello (2022), American Economic Review 112(4).'
 
-export default function RiskIndicators({ gprHistory = [], gprValue, gprStatus, gprFallback }) {
+export default function RiskIndicators({ gprHistory = [], gprValue, gprStatus, gprError }) {
   const chartData = gprHistory.map(d => ({ month: d.month, value: d.value }))
 
   return (
@@ -26,14 +26,7 @@ export default function RiskIndicators({ gprHistory = [], gprValue, gprStatus, g
         >
           Risk Indicators
         </h2>
-        {gprFallback && (
-          <span
-            className="ml-3 text-xs px-2 py-0.5 rounded"
-            style={{ color: '#6b7280', background: '#6b728018', fontFamily: "'DM Mono', monospace" }}
-          >
-            ⚠ Estimated
-          </span>
-        )}
+
       </div>
       <p style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 400, marginBottom: 20 }}>
         {EXPLAINER}
@@ -56,6 +49,11 @@ export default function RiskIndicators({ gprHistory = [], gprValue, gprStatus, g
               >
                 {gprValue != null ? Math.round(gprValue) : '—'}
               </span>
+              {gprError && gprValue == null && (
+                <span className="text-xs ml-2" style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}>
+                  Data currently unavailable
+                </span>
+              )}
               {gprStatus && (
                 <span
                   className="text-xs px-2 py-0.5 rounded-full font-medium mb-1"

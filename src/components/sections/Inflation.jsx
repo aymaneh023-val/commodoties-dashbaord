@@ -58,22 +58,7 @@ export default function Inflation({ headline, food, combined, isFallback, oecdDa
         >
           Inflation
         </h2>
-        {isFallback && (
-          <span
-            className="ml-3 text-xs px-2 py-0.5 rounded"
-            style={{ color: '#f59e0b', background: '#f59e0b18', border: '1px solid #f59e0b40', fontFamily: "'DM Mono', monospace" }}
-          >
-            ⚠ Static fallback
-          </span>
-        )}
-        {oecdData?.isFallback && (
-          <span
-            className="ml-2 text-xs px-2 py-0.5 rounded"
-            style={{ color: '#6b7280', background: '#6b728018', fontFamily: "'DM Mono', monospace" }}
-          >
-            OECD fallback
-          </span>
-        )}
+
       </div>
       <p style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 400, marginBottom: 20 }}>
         {EXPLAINER}

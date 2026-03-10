@@ -5,17 +5,6 @@ import { shortMonth } from '../utils/formatters'
 const IMF_PFERT_URL =
   'https://imfstatapi.imf.org/v1/data/PCPS/M.W00.PFERT.IX?lastNObservations=13'
 
-// Fallback static data (index 2016=100, approximate recent values)
-const FALLBACK_PFERT = [
-  { month: 'Feb \'25', value: 128 }, { month: 'Mar \'25', value: 131 },
-  { month: 'Apr \'25', value: 134 }, { month: 'May \'25', value: 138 },
-  { month: 'Jun \'25', value: 142 }, { month: 'Jul \'25', value: 139 },
-  { month: 'Aug \'25', value: 136 }, { month: 'Sep \'25', value: 133 },
-  { month: 'Oct \'25', value: 130 }, { month: 'Nov \'25', value: 127 },
-  { month: 'Dec \'25', value: 124 }, { month: 'Jan \'26', value: 129 },
-  { month: 'Feb \'26', value: 133 },
-]
-
 function parseIMFResponse(json) {
   try {
     // SDMX-JSON format
@@ -66,7 +55,7 @@ async function fetchIMFPFERT() {
     } catch { /* try next */ }
   }
 
-  return { data: FALLBACK_PFERT, isFallback: true }
+  return { data: [], isFallback: false }
 }
 
 export function useIMFData() {

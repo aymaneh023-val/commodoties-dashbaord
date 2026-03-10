@@ -6,7 +6,6 @@ import References from './components/References'
 import CrudeOil from './components/sections/CrudeOil'
 import GasLNG from './components/sections/GasLNG'
 import Shipping from './components/sections/Shipping'
-import Chokepoints from './components/sections/Chokepoints'
 import Fertilizer from './components/sections/Fertilizer'
 import FoodCommodities from './components/sections/FoodCommodities'
 import Inflation from './components/sections/Inflation'
@@ -91,7 +90,7 @@ export default function App() {
               gprHistory={gprData.history}
               gprValue={gprData.gprValue}
               gprStatus={gprData.status}
-              gprFallback={gprData.isFallback}
+              gprError={gprData.error}
             />
           )}
           {sectionVisible('oil') && (
@@ -105,10 +104,8 @@ export default function App() {
               bdry={commodityData.bdry}
               zim={commodityData.zim}
               matx={commodityData.matx}
+              portwatch={portwatch}
             />
-          )}
-          {sectionVisible('chokepoints') && (
-            <Chokepoints portwatch={portwatch} />
           )}
           {sectionVisible('fertilizer') && (
             <Fertilizer urea={commodityData.urea} pfert={pfert} />

@@ -99,17 +99,10 @@ export default function Fertilizer({ urea, pfert }) {
                   as of {pfertLatest.month}
                 </p>
               )}
-              {pfert?.isFallback && (
-                <span
-                  style={{
-                    display: 'inline-block', marginTop: 6, fontSize: 10,
-                    fontFamily: "'DM Mono', monospace", color: '#f59e0b',
-                    background: '#f59e0b18', border: '1px solid #f59e0b40',
-                    borderRadius: 4, padding: '1px 6px',
-                  }}
-                >
-                  ⚠ Static fallback
-                </span>
+              {!pfert?.loading && pfert?.data?.length === 0 && (
+                <p style={{ fontSize: 11, color: 'var(--muted)', fontFamily: "'DM Mono', monospace", marginTop: 4 }}>
+                  Data currently unavailable
+                </p>
               )}
             </>
           )}

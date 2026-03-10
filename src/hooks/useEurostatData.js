@@ -2,24 +2,6 @@ import { useState, useEffect } from 'react'
 import { EUROSTAT_HEADLINE, EUROSTAT_FOOD } from '../utils/constants'
 import { shortMonth } from '../utils/formatters'
 
-const FALLBACK_HEADLINE = Array.from({ length: 13 }, (_, i) => {
-  const d = new Date(2025, i, 1)
-  return {
-    month: d.toLocaleDateString('en-US', { month: 'short' }),
-    monthStr: `2025-${String(i + 1).padStart(2, '0')}`,
-    value: +(2.0 + Math.sin(i * 0.5) * 0.5).toFixed(1),
-  }
-})
-
-const FALLBACK_FOOD = Array.from({ length: 13 }, (_, i) => {
-  const d = new Date(2025, i, 1)
-  return {
-    month: d.toLocaleDateString('en-US', { month: 'short' }),
-    monthStr: `2025-${String(i + 1).padStart(2, '0')}`,
-    value: +(3.0 + Math.sin(i * 0.4) * 0.7).toFixed(1),
-  }
-})
-
 async function fetchEurostat(url) {
   // 1. Try direct fetch with explicit Accept header
   try {
@@ -79,7 +61,7 @@ export function useEurostatData() {
         if (!data || data.length === 0) throw new Error('Empty parse')
         setHeadline({ data, loading: false, error: false, isFallback: false })
       } catch {
-        setHeadline({ data: FALLBACK_HEADLINE, loading: false, error: true, isFallback: true })
+        setHeadline({ data: [], loading: false, error: true, isFallback: false })
       }
     }
 
@@ -90,7 +72,7 @@ export function useEurostatData() {
         if (!data || data.length === 0) throw new Error('Empty parse')
         setFood({ data, loading: false, error: false, isFallback: false })
       } catch {
-        setFood({ data: FALLBACK_FOOD, loading: false, error: true, isFallback: true })
+        setFood({ data: [], loading: false, error: true, isFallback: false })
       }
     }
 
