@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { YAHOO_BASE, CORS_PROXIES } from '../utils/constants'
 import { formatDate } from '../utils/formatters'
 
@@ -20,6 +20,9 @@ const OTHER_TICKERS = {
 }
 
 const delay = (ms) => new Promise(r => setTimeout(r, ms))
+
+// After the initial attempt fails, retry at these intervals (ms)
+const RETRY_DELAYS = [4000, 10000, 25000]
 
 // Try every proxy; if all fail, wait 2s and retry once
 async function fetchWithRetry(url) {
@@ -118,7 +121,13 @@ export function useCommodityData() {
     mos:   { ...initialState },
   })
 
-  const fetchAll = useCallback(async () => {
+  // Incremented on every refresh — running loops from a previous generation
+  // check this and bail out immediately so stale retries don't overwrite new data.
+  const genRef = useRef(0)
+
+  const fetchAll = useCallback(() => {
+    const gen = ++genRef.current
+
     // Mark all as loading (keep current values visible while refreshing)
     setData(prev => {
       const next = {}
@@ -126,26 +135,48 @@ export function useCommodityData() {
       return next
     })
 
-    // Brent with multi-ticker fallback + others staggered 300ms apart
-    const otherEntries = Object.entries(OTHER_TICKERS)
-    const promises = [
-      fetchBrent(),
-      ...otherEntries.map(([key, ticker], i) =>
-        delay(300 * (i + 1)).then(() => fetchTicker(key, ticker))
-      ),
-    ]
+    // All keys in one flat list — each gets its own independent retry loop.
+    const allEntries = [['brent', null], ...Object.entries(OTHER_TICKERS)]
 
-    const results = await Promise.allSettled(promises)
+    allEntries.forEach(([key, ticker], i) => {
+      const run = async () => {
+        // Stagger initial attempts 300ms apart (same as before)
+        await delay(300 * i)
+        if (genRef.current !== gen) return
 
-    setData(prev => {
-      const next = { ...prev }
-      results.forEach(r => {
-        if (r.status === 'fulfilled' && r.value?.key) {
-          const { key, ...rest } = r.value
-          next[key] = { ...rest, loading: false }
+        for (let attempt = 0; attempt <= RETRY_DELAYS.length; attempt++) {
+          // Wait before retry (skip on first attempt)
+          if (attempt > 0) {
+            await delay(RETRY_DELAYS[attempt - 1])
+            if (genRef.current !== gen) return
+          }
+
+          const result = key === 'brent'
+            ? await fetchBrent()
+            : await fetchTicker(key, ticker)
+
+          if (genRef.current !== gen) return
+
+          if (!result.error) {
+            // Got real data — update this ticker and stop retrying
+            const { key: _k, ...rest } = result
+            setData(prev => ({ ...prev, [key]: { ...rest, loading: false } }))
+            return
+          }
+
+          // Failed — if we have stale cached data, surface it while retrying
+          if (result.fromCache) {
+            const { key: _k, ...rest } = result
+            setData(prev => ({ ...prev, [key]: { ...rest, loading: true } }))
+          }
         }
-      })
-      return next
+
+        // All retries exhausted — show cache if available, otherwise hard error
+        const fallback = fromCacheResult(key) ?? errorResult(key)
+        setData(prev => ({ ...prev, [key]: { ...fallback, loading: false } }))
+      }
+
+      run()
     })
   }, [])
 

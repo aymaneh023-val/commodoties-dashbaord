@@ -14,6 +14,7 @@ export const YAHOO_BASE = 'https://query1.finance.yahoo.com/v8/finance/chart'
 export const CORS_PROXIES = [
   (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
   (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  (url) => `https://corsproxy.org/?${encodeURIComponent(url)}`,
 ]
 
 export const EUROSTAT_HEADLINE =
