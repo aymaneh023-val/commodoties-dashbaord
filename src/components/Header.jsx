@@ -2,7 +2,14 @@ import { useEffect } from 'react'
 import { FILTER_TABS } from '../utils/constants'
 import { formatTime } from '../utils/formatters'
 
-export default function Header({ activeFilter, onFilterChange, onRefresh, lastUpdated }) {
+const STATUS_DOT = {
+  green: { color: '#22c55e', label: 'All sources live', animation: 'pulse-dot' },
+  amber: { color: '#f59e0b', label: 'Some sources degraded', animation: '' },
+  red:   { color: '#ef4444', label: 'All sources down — showing fallback data', animation: '' },
+}
+
+export default function Header({ activeFilter, onFilterChange, onRefresh, lastUpdated, connectionStatus = 'green' }) {
+  const status = STATUS_DOT[connectionStatus] ?? STATUS_DOT.green
   // Read initial hash on mount
   useEffect(() => {
     const hash = window.location.hash.replace('#', '').toLowerCase()
@@ -26,12 +33,23 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
         <div className="flex-1 min-w-0">
           {/* Eyebrow */}
           <div className="flex items-center gap-2 mb-2">
-            <span className="pulse-dot" />
+            <span
+              className={status.animation}
+              title={status.label}
+              style={{
+                display: 'inline-block',
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                backgroundColor: status.color,
+                flexShrink: 0,
+              }}
+            />
             <span
               className="text-xs tracking-widest uppercase"
               style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
             >
-              LIVE · Last updated {lastUpdated ? formatTime(lastUpdated) : '—'}
+              {connectionStatus === 'green' ? 'LIVE' : connectionStatus === 'amber' ? 'DEGRADED' : 'OFFLINE'} · Last updated {lastUpdated ? formatTime(lastUpdated) : '—'}
             </span>
           </div>
 

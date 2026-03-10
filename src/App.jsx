@@ -12,8 +12,6 @@ import { useCommodityData } from './hooks/useCommodityData'
 import { useEurostatData } from './hooks/useEurostatData'
 import { useNewsData } from './hooks/useNewsData'
 
-// Map each section to its filter tag
-const SECTION_TAGS = ['oil', 'gas', 'shipping', 'fertilizer', 'inflation']
 
 export default function App() {
   const [activeFilter, setActiveFilter] = useState('ALL')
@@ -35,6 +33,15 @@ export default function App() {
     setLastUpdated(new Date())
   }
 
+  // Connection status: green = all live, amber = some degraded, red = all down
+  const commodityValues = Object.values(commodityData)
+  const commodityErrorCount = commodityValues.filter((d) => d.error).length
+  const eurostatDegraded = headline?.isFallback || food?.isFallback
+  const newsDegraded = !!newsError
+  const allDown = commodityErrorCount === commodityValues.length && newsDegraded
+  const anyDegraded = commodityErrorCount > 0 || eurostatDegraded || newsDegraded
+  const connectionStatus = allDown ? 'red' : anyDegraded ? 'amber' : 'green'
+
   const sectionVisible = (tag) => activeFilter === 'ALL' || activeFilter === tag
 
   return (
@@ -44,6 +51,7 @@ export default function App() {
         onFilterChange={setActiveFilter}
         onRefresh={handleRefresh}
         lastUpdated={lastUpdated}
+        connectionStatus={connectionStatus}
       />
 
       <TickerBar data={commodityData} />

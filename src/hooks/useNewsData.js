@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { NEWS_API_KEY, NEWS_QUERY, NEWS_CATEGORY_KEYWORDS, REFRESH_INTERVAL_NEWS } from '../utils/constants'
+import { NEWS_QUERY, NEWS_CATEGORY_KEYWORDS, REFRESH_INTERVAL_NEWS } from '../utils/constants'
 
 function detectCategory(article) {
   const text = `${article.title || ''} ${article.description || ''}`.toLowerCase()
@@ -24,12 +24,6 @@ export function useNewsData() {
   const [error, setError] = useState(null)
 
   const fetchNews = useCallback(async () => {
-    if (!NEWS_API_KEY) {
-      setError('News feed unavailable — check API key')
-      setLoading(false)
-      return
-    }
-
     setLoading(true)
     try {
       const params = new URLSearchParams({
@@ -37,14 +31,14 @@ export function useNewsData() {
         language: 'en',
         sortBy: 'publishedAt',
         pageSize: '40',
-        apiKey: NEWS_API_KEY,
       })
 
-      const res = await fetch(`https://newsapi.org/v2/everything?${params}`, {
-        signal: AbortSignal.timeout(10000),
+      // Call our Vercel serverless proxy — avoids CORS + keeps API key server-side
+      const res = await fetch(`/api/news?${params}`, {
+        signal: AbortSignal.timeout(12000),
       })
 
-      if (!res.ok) throw new Error(`NewsAPI error: ${res.status}`)
+      if (!res.ok) throw new Error(`Proxy error: ${res.status}`)
 
       const json = await res.json()
       if (json.status !== 'ok') throw new Error(json.message || 'NewsAPI error')
@@ -59,7 +53,7 @@ export function useNewsData() {
       setError(null)
     } catch (err) {
       setError('News feed unavailable — check API key')
-      console.error('NewsAPI fetch failed:', err)
+      console.error('News fetch failed:', err)
     } finally {
       setLoading(false)
     }

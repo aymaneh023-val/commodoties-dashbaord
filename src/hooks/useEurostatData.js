@@ -20,18 +20,41 @@ const FALLBACK_FOOD = Array.from({ length: 13 }, (_, i) => {
   }
 })
 
+async function fetchEurostat(url) {
+  // 1. Try direct fetch with explicit Accept header
+  try {
+    const res = await fetch(url, {
+      headers: { Accept: 'application/json' },
+      mode: 'cors',
+      signal: AbortSignal.timeout(10000),
+    })
+    if (res.ok) return await res.json()
+  } catch {
+    // fall through to proxy
+  }
+
+  // 2. Fallback: corsproxy.io
+  try {
+    const proxied = `https://corsproxy.io/?${encodeURIComponent(url)}`
+    const res = await fetch(proxied, { signal: AbortSignal.timeout(10000) })
+    if (res.ok) return await res.json()
+  } catch {
+    // fall through to allorigins
+  }
+
+  // 3. Fallback: allorigins
+  const proxied2 = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+  const res = await fetch(proxied2, { signal: AbortSignal.timeout(10000) })
+  if (!res.ok) throw new Error('All Eurostat fetch attempts failed')
+  return await res.json()
+}
+
 function parseEurostat(json) {
   try {
-    const times = json.id?.time ? json.dimension?.time?.category?.index : null
-    const timeIds = json.id
-    // The response structure: dimension.time.category.label gives {period: label}
     const timeDim = json.dimension?.time?.category
-    const timeLabels = timeDim?.label ?? {}   // e.g. {"2024-01": "2024-01", ...}
-    const timeIndex = timeDim?.index ?? {}    // e.g. {"2024-01": 0, ...}
-
+    const timeIndex = timeDim?.index ?? {}
     const values = json.value ?? {}
 
-    // Build sorted list by index
     const periods = Object.entries(timeIndex).sort((a, b) => a[1] - b[1])
 
     return periods.map(([period, idx]) => ({
@@ -51,9 +74,7 @@ export function useEurostatData() {
   useEffect(() => {
     async function fetchHeadline() {
       try {
-        const res = await fetch(EUROSTAT_HEADLINE, { signal: AbortSignal.timeout(10000) })
-        if (!res.ok) throw new Error('Eurostat headline error')
-        const json = await res.json()
+        const json = await fetchEurostat(EUROSTAT_HEADLINE)
         const data = parseEurostat(json)
         if (!data || data.length === 0) throw new Error('Empty parse')
         setHeadline({ data, loading: false, error: false, isFallback: false })
@@ -64,9 +85,7 @@ export function useEurostatData() {
 
     async function fetchFood() {
       try {
-        const res = await fetch(EUROSTAT_FOOD, { signal: AbortSignal.timeout(10000) })
-        if (!res.ok) throw new Error('Eurostat food error')
-        const json = await res.json()
+        const json = await fetchEurostat(EUROSTAT_FOOD)
         const data = parseEurostat(json)
         if (!data || data.length === 0) throw new Error('Empty parse')
         setFood({ data, loading: false, error: false, isFallback: false })
@@ -79,11 +98,9 @@ export function useEurostatData() {
     fetchFood()
   }, [])
 
-  // Latest values
   const headlineLatest = headline.data.length > 0 ? headline.data[headline.data.length - 1] : null
   const foodLatest = food.data.length > 0 ? food.data[food.data.length - 1] : null
 
-  // Combined for dual-line chart
   const combined = headline.data.map((h, i) => ({
     month: h.month,
     headline: h.value,
