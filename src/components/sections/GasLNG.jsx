@@ -18,7 +18,7 @@ export default function GasLNG({ ttf }) {
           className="text-xs uppercase tracking-widest"
           style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
         >
-          04 —
+          03 —
         </span>
         <h2
           className="text-lg font-bold inline ml-2"

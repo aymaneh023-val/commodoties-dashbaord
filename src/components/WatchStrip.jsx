@@ -5,10 +5,9 @@ const ITEMS = [
   { key: 'ttf',   label: 'TTF',   unit: '€/MWh', decimals: 2, source: 'commodity' },
   { key: 'urea',  label: 'Urea',  unit: '$/ton',  decimals: 2, source: 'commodity' },
   { key: 'wheat', label: 'Wheat', unit: '¢/bu',   decimals: 2, source: 'food' },
-  { key: 'hicp_food', label: 'EA Food HICP', unit: '%', decimals: 1, source: 'eurostat' },
 ]
 
-export default function WatchStrip({ commodityData, foodData, eurostatFood }) {
+export default function WatchStrip({ commodityData, foodData }) {
   return (
     <div
       className="sticky z-40 px-6 py-3"
@@ -20,7 +19,7 @@ export default function WatchStrip({ commodityData, foodData, eurostatFood }) {
     >
       <div className="flex items-center gap-6 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
         {ITEMS.map((item, i) => {
-          const d = resolveData(item, commodityData, foodData, eurostatFood)
+          const d = resolveData(item, commodityData, foodData)
           return (
             <div key={item.key} className="flex items-center gap-3 shrink-0">
               {i > 0 && (
@@ -70,7 +69,7 @@ export default function WatchStrip({ commodityData, foodData, eurostatFood }) {
   )
 }
 
-function resolveData(item, commodityData, foodData, eurostatFood) {
+function resolveData(item, commodityData, foodData) {
   if (item.source === 'commodity') {
     const d = commodityData?.[item.key] ?? {}
     return {
@@ -88,29 +87,6 @@ function resolveData(item, commodityData, foodData, eurostatFood) {
       error: d.error ?? false,
       display: formatPrice(d.price, item.decimals),
       pctChange: d.pctChange ?? null,
-    }
-  }
-
-  if (item.source === 'eurostat') {
-    const latest = eurostatFood?.latest
-    const data = eurostatFood?.data ?? []
-    const loading = eurostatFood?.loading ?? true
-    const error = eurostatFood?.error ?? false
-
-    if (loading || !latest) {
-      return { loading, error, display: '—', pctChange: null }
-    }
-
-    // Compute YoY-style change from first to last data point available
-    const prev = data.length >= 2 ? data[data.length - 2] : null
-    const mom = prev ? (latest.value - prev.value) : null
-
-    return {
-      loading: false,
-      error,
-      display: latest.value != null ? latest.value.toFixed(item.decimals) : '—',
-      pctChange: mom,
-      isIndex: true,
     }
   }
 

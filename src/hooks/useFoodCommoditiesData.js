@@ -9,10 +9,8 @@ export const FOOD_TICKERS = {
   corn:        'ZC=F',
   soybeans:    'ZS=F',
   soybeanOil:  'ZL=F',
-  soybeanMeal: 'ZM=F',
   rice:        'ZR=F',
   sugar:       'SB=F',
-  palm:        'FCPO=F',
 }
 
 export const FOOD_META = {
@@ -20,10 +18,8 @@ export const FOOD_META = {
   corn:        { label: 'Corn',             unit: ' ¢/bu',  note: 'CBOT Corn (ZC=F). Primary feed grain.' },
   soybeans:    { label: 'Soybeans',         unit: ' ¢/bu',  note: 'CBOT Soybeans (ZS=F). Oil and protein crop.' },
   soybeanOil:  { label: 'Soybean Oil',      unit: ' ¢/lb',  note: 'CBOT Soybean Oil (ZL=F). Vegetable oil benchmark.' },
-  soybeanMeal: { label: 'Soybean Meal',     unit: ' $/ton', note: 'CBOT Soybean Meal (ZM=F). Animal feed input.' },
   rice:        { label: 'Rice',             unit: ' ¢/cwt', note: 'CBOT Rough Rice (ZR=F). US contract.' },
   sugar:       { label: 'Sugar',            unit: ' ¢/lb',  note: 'ICE Sugar No.11 (SB=F). Global raw sugar.' },
-  palm:        { label: 'Palm Oil',         unit: ' MYR/t', note: 'Bursa Malaysia FCPO. ~35% of global veg oil.' },
 }
 
 const delay = ms => new Promise(r => setTimeout(r, ms))

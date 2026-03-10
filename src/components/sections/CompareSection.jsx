@@ -17,8 +17,6 @@ const METRIC_OPTIONS = [
   { value: 'bdry', label: 'BDRY (Dry Bulk)', group: 'Shipping', color: 'var(--shipping)', unit: '$' },
   { value: 'zim', label: 'ZIM (Container)', group: 'Shipping', color: 'var(--shipping)', unit: '$' },
   { value: 'urea', label: 'Urea Futures', group: 'Fertilizer', color: 'var(--fertilizer)', unit: '$/ton' },
-  { value: 'hicp_headline', label: 'EA HICP Headline', group: 'Inflation', color: 'var(--inflation)', unit: '%' },
-  { value: 'hicp_food', label: 'EA HICP Food', group: 'Inflation', color: 'var(--food)', unit: '%' },
 ]
 
 // Distinct stroke colors for up to 4 lines (resolved at render via getComputedStyle)
@@ -65,7 +63,7 @@ function generateInsight(selections, chartData) {
   return `${parts.join(', ')} over 30 days.`
 }
 
-export default function CompareSection({ commodityData, eurostatData }) {
+export default function CompareSection({ commodityData }) {
   const [selections, setSelections] = useState(DEFAULT_SELECTIONS)
 
   const handleChange = (index, value) => {
@@ -80,14 +78,7 @@ export default function CompareSection({ commodityData, eurostatData }) {
   const { chartData, activeMetrics } = useMemo(() => {
     const active = selections.filter(Boolean).map((key) => {
       const meta = getOptionMeta(key)
-      let history = []
-      if (key === 'hicp_headline') {
-        history = (eurostatData?.combined || []).map((d) => ({ date: d.date, close: d.headline }))
-      } else if (key === 'hicp_food') {
-        history = (eurostatData?.combined || []).map((d) => ({ date: d.date, close: d.food }))
-      } else {
-        history = commodityData?.[key]?.history || []
-      }
+      const history = commodityData?.[key]?.history || []
       return { key, meta, history }
     })
 
@@ -120,7 +111,7 @@ export default function CompareSection({ commodityData, eurostatData }) {
     })
 
     return { chartData: data, activeMetrics: active }
-  }, [selections, commodityData, eurostatData])
+  }, [selections, commodityData])
 
   const insight = generateInsight(selections, chartData)
 
@@ -149,7 +140,7 @@ export default function CompareSection({ commodityData, eurostatData }) {
           className="text-xs uppercase tracking-widest"
           style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
         >
-          08 —
+          06 —
         </span>
         <h2
           className="text-lg font-bold inline ml-2"

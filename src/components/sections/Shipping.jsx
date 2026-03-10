@@ -84,7 +84,7 @@ export default function Shipping({ bdry, zim, portwatch = null }) {
           className="text-xs uppercase tracking-widest"
           style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
         >
-          06 —
+          05 —
         </span>
         <h2
           className="text-lg font-bold inline ml-2"

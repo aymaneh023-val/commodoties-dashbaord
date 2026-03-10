@@ -1,75 +1,38 @@
-import { useMemo } from 'react'
-import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Legend,
-} from 'recharts'
+import { useState, useMemo } from 'react'
+import LineChartWrapper from '../LineChart'
 import { FOOD_META } from '../../hooks/useFoodCommoditiesData'
 import { formatPrice, formatPct, pctArrow, pctColor } from '../../utils/formatters'
 
 const EXPLAINER =
-  'Global food commodity futures from CBOT, ICE, and Bursa Malaysia. ' +
+  'Global food commodity futures from CBOT and ICE. ' +
   'Prices are in original contract units. All contracts are front-month, 30-day daily data via Yahoo Finance.'
 
 const GROUPS = [
   {
     label: 'GRAINS & OILSEEDS',
-    keys: ['wheat', 'corn', 'soybeans', 'soybeanOil', 'soybeanMeal', 'rice'],
+    keys: ['wheat', 'corn', 'soybeans', 'soybeanOil', 'rice'],
   },
   {
     label: 'SOFT COMMODITIES',
-    keys: ['sugar', 'palm'],
+    keys: ['sugar'],
   },
 ]
 
-// Fixed colors per commodity for chart
 const COMMODITY_COLORS = {
   wheat:       '#f59e0b',
   corn:        '#fcd34d',
   soybeans:    '#4ade80',
   soybeanOil:  '#34d399',
-  soybeanMeal: '#6ee7b7',
   rice:        '#38bdf8',
   sugar:       '#f87171',
-  palm:        '#fb923c',
-}
-
-function normalise(arr) {
-  const vals = arr.filter(v => v != null)
-  if (!vals.length) return arr.map(() => null)
-  const min = Math.min(...vals)
-  const max = Math.max(...vals)
-  if (max === min) return arr.map(v => (v != null ? 50 : null))
-  return arr.map(v => (v != null ? ((v - min) / (max - min)) * 100 : null))
 }
 
 export default function FoodCommodities({ data }) {
-  // Build normalised chart data
-  const { chartData, chartKeys } = useMemo(() => {
-    const keys = Object.keys(FOOD_META).filter(k => (data[k]?.history?.length ?? 0) > 0)
-    if (!keys.length) return { chartData: [], chartKeys: [] }
+  const [selectedKey, setSelectedKey] = useState(null)
 
-    const maxLen = Math.max(...keys.map(k => data[k].history.length))
-    const base = keys.find(k => data[k].history.length === maxLen)
-
-    // Raw values per key
-    const rawByKey = {}
-    keys.forEach(k => { rawByKey[k] = data[k].history.map(h => h.close) })
-
-    // Normalised
-    const normByKey = {}
-    keys.forEach(k => { normByKey[k] = normalise(rawByKey[k]) })
-
-    const chart = data[base].history.map((point, i) => {
-      const row = { date: point.date }
-      keys.forEach(k => {
-        row[k] = normByKey[k]?.[i] ?? null
-        row[`raw_${k}`] = rawByKey[k]?.[i] ?? null
-      })
-      return row
-    })
-
-    return { chartData: chart, chartKeys: keys }
-  }, [data])
+  const handleCardClick = (key) => {
+    setSelectedKey(prev => prev === key ? null : key)
+  }
 
   // Auto-insight
   const insight = useMemo(() => {
@@ -79,6 +42,9 @@ export default function FoodCommodities({ data }) {
     return `${upCount} of ${total} food commodities up >10% over 30 days.`
   }, [data])
 
+  const selectedMeta = selectedKey ? FOOD_META[selectedKey] : null
+  const selectedHistory = selectedKey ? (data[selectedKey]?.history ?? []) : []
+
   return (
     <section id="food" className="mb-14">
       <div className="mb-2">
@@ -86,7 +52,7 @@ export default function FoodCommodities({ data }) {
           className="text-xs uppercase tracking-widest"
           style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
         >
-          02 —
+          01 —
         </span>
         <h2
           className="text-lg font-bold inline ml-2"
@@ -117,11 +83,19 @@ export default function FoodCommodities({ data }) {
               const meta = FOOD_META[key]
               const color = pctColor(d.pctChange, false)
               const arrow = pctArrow(d.pctChange)
+              const isSelected = selectedKey === key
               return (
                 <div
                   key={key}
                   className="card"
-                  style={{ padding: '14px 16px' }}
+                  onClick={() => handleCardClick(key)}
+                  style={{
+                    padding: '14px 16px',
+                    cursor: 'pointer',
+                    outline: isSelected ? `2px solid ${COMMODITY_COLORS[key] ?? 'var(--text)'}` : 'none',
+                    outlineOffset: -2,
+                    transition: 'outline 0.15s ease',
+                  }}
                 >
                   <p
                     className="text-xs uppercase tracking-widest mb-2"
@@ -164,54 +138,19 @@ export default function FoodCommodities({ data }) {
         </div>
       ))}
 
-      {/* Normalised comparison chart */}
-      {chartData.length > 0 && (
-        <div className="card" style={{ padding: '16px 16px 8px' }}>
+      {/* Individual chart for selected commodity */}
+      {selectedKey && selectedHistory.length > 0 && (
+        <div className="card mb-4" style={{ padding: '16px 16px 8px' }}>
           <p style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 10, opacity: 0.7, marginBottom: 8 }}>
-            Normalised (0–100%) · 30d · all commodities
+            {selectedMeta?.label} · 30d · {selectedMeta?.unit?.trim()}
           </p>
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={chartData} margin={{ top: 8, right: 40, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-              <XAxis
-                dataKey="date"
-                tick={{ fill: '#6b7fa3', fontSize: 10, fontFamily: "'DM Mono', monospace" }}
-                axisLine={{ stroke: 'rgba(255,255,255,0.07)' }}
-                tickLine={false}
-                interval={6}
-              />
-              <YAxis
-                orientation="right"
-                domain={[0, 100]}
-                tickCount={4}
-                tick={{ fill: '#6b7fa3', fontSize: 10, fontFamily: "'DM Mono', monospace" }}
-                axisLine={false}
-                tickLine={false}
-                width={40}
-                tickFormatter={v => `${v}%`}
-              />
-              <Tooltip content={<FoodTooltip />} />
-              <Legend
-                verticalAlign="bottom"
-                align="left"
-                iconType="circle"
-                iconSize={6}
-                wrapperStyle={{ fontSize: 10, fontFamily: "'DM Mono', monospace", color: '#6b7fa3', paddingTop: 8 }}
-              />
-              {chartKeys.map(key => (
-                <Line
-                  key={key}
-                  type="monotone"
-                  dataKey={key}
-                  stroke={COMMODITY_COLORS[key] ?? '#6b7fa3'}
-                  strokeWidth={1}
-                  dot={false}
-                  activeDot={{ r: 2, strokeWidth: 0 }}
-                  name={FOOD_META[key]?.label ?? key}
-                />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
+          <LineChartWrapper
+            data={selectedHistory}
+            lines={[{ key: 'close', color: COMMODITY_COLORS[selectedKey] ?? '#6b7fa3', label: selectedMeta?.label ?? selectedKey }]}
+            xKey="date"
+            yUnit={selectedMeta?.unit ?? ''}
+            height={180}
+          />
         </div>
       )}
 
@@ -230,31 +169,5 @@ export default function FoodCommodities({ data }) {
         {insight}
       </div>
     </section>
-  )
-}
-
-function FoodTooltip({ active, payload, label }) {
-  if (!active || !payload?.length) return null
-  return (
-    <div
-      className="rounded-lg px-3 py-2 text-xs"
-      style={{
-        background: 'var(--surface2)',
-        border: '1px solid var(--border)',
-        fontFamily: "'DM Mono', monospace",
-        maxWidth: 220,
-      }}
-    >
-      <p className="mb-1" style={{ color: 'var(--muted)' }}>{label}</p>
-      {payload.map(entry => {
-        const rawVal = entry.payload?.[`raw_${entry.dataKey}`]
-        const meta = FOOD_META[entry.dataKey]
-        return (
-          <p key={entry.dataKey} style={{ color: entry.stroke ?? entry.color }}>
-            {meta?.label ?? entry.dataKey}: {rawVal != null ? `${Number(rawVal).toFixed(2)}${meta?.unit ?? ''}` : '—'}
-          </p>
-        )
-      })}
-    </div>
   )
 }

@@ -9,17 +9,11 @@ import GasLNG from './components/sections/GasLNG'
 import Shipping from './components/sections/Shipping'
 import Fertilizer from './components/sections/Fertilizer'
 import FoodCommodities from './components/sections/FoodCommodities'
-import Inflation from './components/sections/Inflation'
 import CompareSection from './components/sections/CompareSection'
-import RiskIndicators from './components/sections/RiskIndicators'
 import { useCommodityData } from './hooks/useCommodityData'
-import { useEurostatData } from './hooks/useEurostatData'
 import { useNewsData } from './hooks/useNewsData'
 import { useFoodCommoditiesData } from './hooks/useFoodCommoditiesData'
-import { useIMFData } from './hooks/useIMFData'
-import { useOECDData } from './hooks/useOECDData'
 import { usePortWatchData } from './hooks/usePortWatchData'
-import { useGPRData } from './hooks/useGPRData'
 
 
 export default function App() {
@@ -28,13 +22,9 @@ export default function App() {
   const [showReferences, setShowReferences] = useState(false)
 
   const { data: commodityData, refresh: refreshCommodity } = useCommodityData()
-  const { headline, food, combined } = useEurostatData()
   const { articles, loading: newsLoading, error: newsError, refresh: refreshNews } = useNewsData()
   const { data: foodData, refresh: refreshFood } = useFoodCommoditiesData()
-  const { pfert } = useIMFData()
-  const oecdData = useOECDData()
   const { portwatch } = usePortWatchData()
-  const gprData = useGPRData()
 
   const handleRefresh = useCallback(() => {
     refreshCommodity()
@@ -52,10 +42,9 @@ export default function App() {
   // Connection status: green = all live, amber = some degraded, red = all down
   const commodityValues = Object.values(commodityData)
   const commodityErrorCount = commodityValues.filter((d) => d.error).length
-  const eurostatDegraded = headline?.isFallback || food?.isFallback
   const newsDegraded = !!newsError
   const allDown = commodityErrorCount === commodityValues.length && newsDegraded
-  const anyDegraded = commodityErrorCount > 0 || eurostatDegraded || newsDegraded
+  const anyDegraded = commodityErrorCount > 0 || newsDegraded
   const connectionStatus = allDown ? 'red' : anyDegraded ? 'amber' : 'green'
 
   const sectionVisible = (tag) => activeFilter === 'ALL' || activeFilter === tag
@@ -78,15 +67,9 @@ export default function App() {
       <WatchStrip
         commodityData={commodityData}
         foodData={foodData}
-        eurostatFood={food}
       />
 
-      <ContextRow
-        gprValue={gprData.gprValue}
-        gprStatus={gprData.status}
-        gprError={gprData.error}
-        portwatch={portwatch}
-      />
+      <ContextRow portwatch={portwatch} />
 
       <div
         className="two-col"
@@ -94,14 +77,6 @@ export default function App() {
       >
         {/* Left column — data sections */}
         <main>
-          {sectionVisible('risk') && (
-            <RiskIndicators
-              gprHistory={gprData.history}
-              gprValue={gprData.gprValue}
-              gprStatus={gprData.status}
-              gprError={gprData.error}
-            />
-          )}
           {sectionVisible('food') && (
             <FoodCommodities data={foodData} />
           )}
@@ -112,7 +87,7 @@ export default function App() {
             <GasLNG ttf={commodityData.ttf} />
           )}
           {sectionVisible('fertilizer') && (
-            <Fertilizer urea={commodityData.urea} pfert={pfert} />
+            <Fertilizer urea={commodityData.urea} />
           )}
           {sectionVisible('shipping') && (
             <Shipping
@@ -121,20 +96,8 @@ export default function App() {
               portwatch={portwatch}
             />
           )}
-          {sectionVisible('inflation') && (
-            <Inflation
-              headline={headline}
-              food={food}
-              combined={combined}
-              isFallback={headline?.isFallback || food?.isFallback}
-              oecdData={oecdData}
-            />
-          )}
           {sectionVisible('compare') && (
-            <CompareSection
-              commodityData={commodityData}
-              eurostatData={{ headline, food, combined }}
-            />
+            <CompareSection commodityData={commodityData} />
           )}
 
         </main>

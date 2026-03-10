@@ -14,12 +14,6 @@ export const CORS_PROXIES = [
   (url) => `https://corsproxy.org/?${encodeURIComponent(url)}`,
 ]
 
-export const EUROSTAT_HEADLINE =
-  'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_mmor?geo=EA&coicop=CP00&lastTimePeriods=13'
-
-export const EUROSTAT_FOOD =
-  'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_mmor?geo=EA&coicop=CP01&lastTimePeriods=13'
-
 export const NEWS_API_KEY = import.meta.env.VITE_NEWS_API_KEY || ''
 
 export const NEWS_QUERY =
@@ -35,13 +29,11 @@ export const SOURCE_COLORS = {
 
 export const FILTER_TABS = [
   { id: 'ALL',         label: 'All' },
-  { id: 'risk',        label: 'Geopolitics' },
   { id: 'oil',         label: 'Oil' },
   { id: 'gas',         label: 'Gas' },
   { id: 'shipping',    label: 'Shipping' },
   { id: 'fertilizer',  label: 'Fertilizer' },
   { id: 'food',        label: 'Food' },
-  { id: 'inflation',   label: 'Inflation' },
   { id: 'compare',     label: 'Compare' },
 ]
 
