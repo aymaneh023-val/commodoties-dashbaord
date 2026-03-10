@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { NEWS_QUERY, NEWS_CATEGORY_KEYWORDS, REFRESH_INTERVAL_NEWS } from '../utils/constants'
+import { NEWS_QUERY, NEWS_CATEGORY_KEYWORDS } from '../utils/constants'
 
 function detectCategory(article) {
   const text = `${article.title || ''} ${article.description || ''}`.toLowerCase()
@@ -61,8 +61,6 @@ export function useNewsData() {
 
   useEffect(() => {
     fetchNews()
-    const interval = setInterval(fetchNews, REFRESH_INTERVAL_NEWS)
-    return () => clearInterval(interval)
   }, [fetchNews])
 
   return { articles, loading, error, refresh: fetchNews }

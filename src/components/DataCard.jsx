@@ -1,22 +1,5 @@
 import { formatPrice, formatPct, pctArrow, pctColor } from '../utils/formatters'
 
-/**
- * Reusable metric card.
- * @param {Object} props
- * @param {string} props.title
- * @param {number|null} props.value
- * @param {number|null} props.pctChange
- * @param {string} props.valuePrefix - e.g. '$' for stocks
- * @param {number} props.decimals
- * @param {string} props.unit - appended after value, e.g. ' €/MWh'
- * @param {string} props.subLabel - label under value (e.g. 'USD/bbl')
- * @param {boolean} props.loading
- * @param {boolean} props.error
- * @param {boolean} props.inverse - flip color logic (positive = good)
- * @param {string|null} props.note - small note text below
- * @param {string|null} props.signal - pill text override (e.g. 'Critical')
- * @param {React.ReactNode} props.children - extra content below
- */
 export default function DataCard({
   title,
   value,
@@ -30,6 +13,8 @@ export default function DataCard({
   inverse = false,
   note = null,
   signal = null,
+  asOf = null,       // "as of [date]" label shown below value
+  isFallback = false, // shows amber fallback pill
   children,
 }) {
   const badgeColor = pctColor(pctChange, inverse)
@@ -54,7 +39,7 @@ export default function DataCard({
       ) : error ? (
         <div>
           <p
-            className="text-2xl font-syne font-bold mb-1"
+            className="text-2xl font-bold mb-1"
             style={{ color: 'var(--muted)', fontFamily: "'Syne', sans-serif" }}
           >
             {displayValue !== '—' ? displayValue : '—'}
@@ -86,15 +71,46 @@ export default function DataCard({
               </span>
             )}
 
-            {signal && (
-              <SignalPill signal={signal} />
-            )}
+            {signal && <SignalPill signal={signal} />}
           </div>
 
           {subLabel && (
             <p className="text-xs mt-1" style={{ color: 'var(--muted)' }}>
               {subLabel}
             </p>
+          )}
+
+          {/* Reference period */}
+          {asOf && !isFallback && (
+            <p
+              style={{
+                color: 'var(--muted)',
+                fontFamily: "'DM Mono', monospace",
+                fontSize: 10,
+                marginTop: 4,
+              }}
+            >
+              as of {asOf}
+            </p>
+          )}
+
+          {/* Fallback badge */}
+          {isFallback && (
+            <span
+              style={{
+                display: 'inline-block',
+                marginTop: 6,
+                fontSize: 10,
+                fontFamily: "'DM Mono', monospace",
+                color: '#f59e0b',
+                background: '#f59e0b18',
+                border: '1px solid #f59e0b40',
+                borderRadius: 4,
+                padding: '1px 6px',
+              }}
+            >
+              ⚠ Static fallback · as of Feb 2026
+            </span>
           )}
         </>
       )}
@@ -115,9 +131,9 @@ export default function DataCard({
 
 function SignalPill({ signal }) {
   const colors = {
-    Critical: { bg: '#f87171', text: '#fff' },
-    Elevated: { bg: '#fb923c', text: '#fff' },
-    Watch: { bg: '#6b7fa3', text: '#fff' },
+    Critical: { bg: '#f87171' },
+    Elevated: { bg: '#fb923c' },
+    Watch: { bg: '#6b7fa3' },
   }
   const c = colors[signal] || colors.Watch
   return (

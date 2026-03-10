@@ -62,13 +62,16 @@ export function pctArrow(val) {
 }
 
 /**
- * Convert a Unix timestamp (seconds) to a short date label.
+ * Convert a Unix timestamp (seconds) to a short date label including year.
  * @param {number} ts - Unix seconds
  */
 export function formatDate(ts) {
   if (!ts) return ''
   const d = new Date(ts * 1000)
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  const month = d.toLocaleDateString('en-US', { month: 'short' })
+  const day = d.getDate()
+  const year = String(d.getFullYear()).slice(2)
+  return `${month} ${day} '${year}`
 }
 
 /**
@@ -101,22 +104,47 @@ export function timeAgo(isoString) {
 }
 
 /**
- * Format a month string like "2025-01" → "Jan 2025"
+ * Format a month string → "Jan 2025".
+ * Handles "2025-01" and Eurostat "2025M01" notation.
  * @param {string} monthStr
  */
 export function formatMonth(monthStr) {
   if (!monthStr) return ''
-  const [year, month] = monthStr.split('-')
-  const d = new Date(parseInt(year), parseInt(month) - 1, 1)
-  return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+  const mMatch = monthStr.match(/^(\d{4})M(\d{2})$/)
+  if (mMatch) {
+    const d = new Date(parseInt(mMatch[1]), parseInt(mMatch[2]) - 1, 1)
+    return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+  }
+  const parts = monthStr.split('-')
+  if (parts.length === 2) {
+    const m = parseInt(parts[1])
+    if (m >= 1 && m <= 12) {
+      const d = new Date(parseInt(parts[0]), m - 1, 1)
+      return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+    }
+  }
+  return monthStr
 }
 
 /**
- * Short month label "Jan" from "2025-01"
+ * Short month+year label "Jan '25" from "2025-01" or "2025M01".
  */
 export function shortMonth(monthStr) {
   if (!monthStr) return ''
-  const [year, month] = monthStr.split('-')
-  const d = new Date(parseInt(year), parseInt(month) - 1, 1)
-  return d.toLocaleDateString('en-US', { month: 'short' })
+  const mMatch = monthStr.match(/^(\d{4})M(\d{2})$/)
+  if (mMatch) {
+    const d = new Date(parseInt(mMatch[1]), parseInt(mMatch[2]) - 1, 1)
+    const yr = String(d.getFullYear()).slice(2)
+    return `${d.toLocaleDateString('en-US', { month: 'short' })} '${yr}`
+  }
+  const parts = monthStr.split('-')
+  if (parts.length === 2) {
+    const m = parseInt(parts[1])
+    if (m >= 1 && m <= 12) {
+      const d = new Date(parseInt(parts[0]), m - 1, 1)
+      const yr = String(d.getFullYear()).slice(2)
+      return `${d.toLocaleDateString('en-US', { month: 'short' })} '${yr}`
+    }
+  }
+  return monthStr
 }

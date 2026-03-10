@@ -8,7 +8,7 @@ const WHY_IT_MATTERS = [
 
 export default function GasLNG({ ttf, lng }) {
   return (
-    <section id="gas" className="mb-10">
+    <section id="gas" className="mb-14">
       <div className="mb-4">
         <span
           className="text-xs uppercase tracking-widest"
@@ -35,6 +35,8 @@ export default function GasLNG({ ttf, lng }) {
           loading={ttf?.loading}
           error={ttf?.error}
           inverse={false}
+          asOf={ttf?.history?.slice(-1)[0]?.date ?? null}
+          isFallback={ttf?.error && ttf?.price != null}
         />
         <DataCard
           title="LNG (Cheniere Energy)"
@@ -46,19 +48,20 @@ export default function GasLNG({ ttf, lng }) {
           loading={lng?.loading}
           error={lng?.error}
           inverse={false}
+          asOf={lng?.history?.slice(-1)[0]?.date ?? null}
+          isFallback={lng?.error && lng?.price != null}
         />
       </div>
 
-      {/* Why this matters */}
       <div
         className="card"
-        style={{ background: 'var(--surface2)' }}
+        style={{ background: 'var(--surface2)', borderLeft: '3px solid var(--gas)' }}
       >
         <p
           className="text-xs uppercase tracking-widest mb-3"
-          style={{ color: 'var(--gas)', fontFamily: "'DM Mono', monospace" }}
+          style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
         >
-          ⚡ Why this matters for Europe
+          Why this matters for Europe
         </p>
         <ul className="space-y-2">
           {WHY_IT_MATTERS.map((point, i) => (

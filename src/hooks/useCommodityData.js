@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { TICKERS, YAHOO_BASE, CORS_PROXIES, REFRESH_INTERVAL_COMMODITY } from '../utils/constants'
+import { TICKERS, YAHOO_BASE, CORS_PROXIES } from '../utils/constants'
 import { formatDate } from '../utils/formatters'
 
 async function fetchWithProxy(url) {
@@ -111,8 +111,6 @@ export function useCommodityData() {
 
   useEffect(() => {
     fetchAll()
-    const interval = setInterval(fetchAll, REFRESH_INTERVAL_COMMODITY)
-    return () => clearInterval(interval)
   }, [fetchAll])
 
   return { data, refresh: fetchAll }

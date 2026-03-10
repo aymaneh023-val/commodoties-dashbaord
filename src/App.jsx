@@ -2,7 +2,6 @@ import { useState, useCallback } from 'react'
 import Header from './components/Header'
 import TickerBar from './components/TickerBar'
 import NewsFeed from './components/NewsFeed'
-import ShockChain from './components/ShockChain'
 import CrudeOil from './components/sections/CrudeOil'
 import GasLNG from './components/sections/GasLNG'
 import Shipping from './components/sections/Shipping'
@@ -83,10 +82,6 @@ export default function App() {
             />
           )}
 
-          {/* Shock Chain Banner — always visible */}
-          {activeFilter === 'ALL' && (
-            <ShockChain commodityData={commodityData} />
-          )}
         </main>
 
         {/* Right column — sticky news feed */}

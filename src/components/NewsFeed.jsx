@@ -68,9 +68,9 @@ export default function NewsFeed({ articles, loading, error, activeFilter }) {
         </div>
       )}
 
-      {/* Articles */}
+      {/* Articles — capped at 8 */}
       <div className="flex flex-col gap-3">
-        {filtered.map((article, i) => (
+        {filtered.slice(0, 8).map((article, i) => (
           <ArticleCard key={`${article.url}-${i}`} article={article} />
         ))}
       </div>
@@ -97,8 +97,8 @@ function ArticleCard({ article }) {
         textDecoration: 'none',
         color: 'inherit',
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.14)' }}
-      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)' }}
+      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.02)' }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--surface)' }}
     >
       {/* Top badges row */}
       <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -134,8 +134,8 @@ function ArticleCard({ article }) {
 
       {/* Headline */}
       <p
-        className="text-sm leading-snug mb-1 font-medium"
-        style={{ fontFamily: "'Syne', sans-serif", color: 'var(--text)' }}
+        className="leading-snug mb-1 font-medium"
+        style={{ fontFamily: "'Syne', sans-serif", color: 'var(--text)', fontSize: 13 }}
       >
         {article.title}
       </p>
