@@ -56,10 +56,24 @@ export function useFoodCommoditiesData() {
     })
 
     try {
-      const res = await fetch(`/api/quotes?tickers=${encodeURIComponent(TICKER_LIST)}`)
-      if (!res.ok) throw new Error(`quotes: ${res.status}`)
-      const json = await res.json()
-      const byTicker = Object.fromEntries((json.data ?? []).map((r) => [r.ticker, r]))
+      const encoded = encodeURIComponent(TICKER_LIST)
+      const [quotesRes, historyRes] = await Promise.all([
+        fetch(`/api/quotes?tickers=${encoded}`),
+        fetch(`/api/history?tickers=${encoded}`),
+      ])
+
+      const [quotesJson, historyJson] = await Promise.all([
+        quotesRes.ok ? quotesRes.json() : Promise.resolve({ data: [] }),
+        historyRes.ok ? historyRes.json() : Promise.resolve({ data: [] }),
+      ])
+
+      // Merge prices and history by ticker
+      const byTicker = {}
+      for (const r of quotesJson.data ?? []) byTicker[r.ticker] = { ...r, history: [] }
+      for (const r of historyJson.data ?? []) {
+        if (byTicker[r.ticker]) byTicker[r.ticker].history = r.history ?? []
+      }
+
       const next = {}
       Object.entries(FOOD_TICKERS).forEach(([key, ticker]) => {
         next[key] = mapResult(byTicker[ticker] ?? { error: 'missing' })
