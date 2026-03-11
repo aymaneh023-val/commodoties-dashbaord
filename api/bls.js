@@ -4,21 +4,23 @@ const BLS_URL = 'https://api.bls.gov/publicAPI/v1/timeseries/data/'
 
 const SOURCE = 'bls'
 
-// Compute month-on-month % change from consecutive index pairs.
-// Skips any pair where the calendar gap is not exactly 1 month (handles BLS data gaps).
-function computeMoM(series) {
+// Compute year-over-year % change by comparing each month against the same
+// month 12 months earlier. Months with no year-ago value are skipped.
+function computeYoY(series) {
+  const byMonth = {}
+  for (const d of series) byMonth[d.month] = d.value
   const result = []
-  for (let i = 1; i < series.length; i++) {
-    const prev = series[i - 1], curr = series[i]
-    const [py, pm] = prev.month.split('-').map(Number)
-    const [cy, cm] = curr.month.split('-').map(Number)
-    if ((cy - py) * 12 + (cm - pm) !== 1) continue
+  for (const d of series) {
+    const [y, m] = d.month.split('-').map(Number)
+    const prevKey = `${y - 1}-${String(m).padStart(2, '0')}`
+    const prevVal = byMonth[prevKey]
+    if (prevVal == null) continue
     result.push({
-      month: curr.month,
-      value: parseFloat((((curr.value - prev.value) / prev.value) * 100).toFixed(2)),
+      month: d.month,
+      value: parseFloat((((d.value - prevVal) / prevVal) * 100).toFixed(2)),
     })
   }
-  return result
+  return result.sort((a, b) => a.month.localeCompare(b.month))
 }
 
 function getSupabase() {
@@ -83,7 +85,7 @@ export default async function handler(req, res) {
     // Compute MoM % over the full series before slicing so the boundary month
     // always has a valid predecessor. Gaps (e.g. Oct 2025 is missing from BLS)
     // are automatically dropped by the consecutive-month check.
-    const last24 = computeMoM(monthly).slice(-24)
+    const last24 = computeYoY(monthly).slice(-24)
 
     const now = new Date().toISOString()
     await supabase.from('inflation_cache').upsert(

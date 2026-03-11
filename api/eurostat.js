@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
 const EUROSTAT_URL =
-  'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_mmor?format=JSON&lang=EN&coicop=CP01&geo=EA&lastTimePeriod=24'
+  'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_manr?format=JSON&lang=EN&coicop=CP01&geo=EA&lastTimePeriod=24'
 
 const SOURCE = 'eurostat'
 

@@ -2,10 +2,10 @@ import { useMemo } from 'react'
 import LineChartWrapper from '../LineChart'
 
 const EXPLAINER =
-  'Monthly food price inflation for the EU, UK, and US. ' +
-  'All series show month-on-month percentage change (MoM%) — how much food consumer prices moved vs the prior month. ' +
-  'Sources: EU — Eurostat HICP food index (CP01, euro area); UK — ONS CPI food index (series D7BU); US — BLS CPI-U food at home (CUUR0000SAF1). ' +
-  'Data is updated once daily — underlying series are published monthly by the respective statistical agencies.'
+  'Annual food price inflation for the EU, UK, and US. ' +
+  'Values show year-over-year percentage change (YoY %) in food consumer prices compared with the same month one year earlier. ' +
+  'Sources: Eurostat (EU HICP food), ONS (UK CPI food), and BLS (US CPI-U food at home). ' +
+  'Data is refreshed daily when available, while underlying statistical releases remain monthly.'
 
 export default function Inflation({ eu, uk, us }) {
   const chartData = useMemo(() => {
@@ -41,7 +41,7 @@ export default function Inflation({ eu, uk, us }) {
           07 —
         </span>
         <h2 className="inline ml-2" style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>
-          Food Inflation — EU · UK · US
+          Food Inflation — EU · UK · US (YoY)
         </h2>
       </div>
       <p style={{ fontSize: 14, color: 'var(--text)', marginBottom: 20, lineHeight: 1.6 }}>
@@ -95,7 +95,7 @@ export default function Inflation({ eu, uk, us }) {
         ) : (
           <>
             <p style={{ color: 'var(--muted)', fontSize: 13, marginBottom: 8 }}>
-              All series: food price MoM% — EU (Eurostat), UK (ONS), US (BLS)
+              All series: food price inflation (YoY %) — EU (Eurostat), UK (ONS), US (BLS)
             </p>
             <LineChartWrapper
               data={chartData}
@@ -103,9 +103,9 @@ export default function Inflation({ eu, uk, us }) {
               height={220}
               showLegend
               lines={[
-                ...(eu.data.length > 0 ? [{ key: 'eu', color: 'var(--inflation)', label: 'EU HICP Food MoM%' }] : []),
-                ...(uk.data.length > 0 ? [{ key: 'uk', color: 'var(--gas)',       label: 'UK CPI Food MoM%'  }] : []),
-                ...(us.data.length > 0 ? [{ key: 'us', color: '#5C69A0',          label: 'US CPI Food MoM%'  }] : []),
+                ...(eu.data.length > 0 ? [{ key: 'eu', color: 'var(--inflation)', label: 'EU HICP Food YoY%' }] : []),
+                ...(uk.data.length > 0 ? [{ key: 'uk', color: 'var(--gas)',       label: 'UK CPI Food YoY%'  }] : []),
+                ...(us.data.length > 0 ? [{ key: 'us', color: '#5C69A0',          label: 'US CPI Food YoY%'  }] : []),
               ]}
             />
           </>
@@ -117,7 +117,7 @@ export default function Inflation({ eu, uk, us }) {
         style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderLeft: '3px solid var(--inflation)', fontSize: 14, color: 'var(--text)', lineHeight: 1.6 }}
       >
         <strong>Why tracked:</strong>{' '}
-        Food inflation shows how commodity and supply-chain costs pass through to consumers.
+        Food inflation reflects how commodity, energy, fertilizer, and transport costs pass through to consumer prices.
       </div>
     </section>
   )
@@ -140,6 +140,9 @@ function InflationCard({ label, geography, source, latest, unit, loading, error,
         <>
           <p className="font-bold" style={{ fontSize: 24, color: 'var(--text)' }}>
             {latest.value}{unit}
+          </p>
+          <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)', marginTop: 2, letterSpacing: '0.04em' }}>
+            YoY
           </p>
           <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
             {latest.label} · {source}
