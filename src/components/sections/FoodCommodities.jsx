@@ -53,8 +53,11 @@ export default function FoodCommodities({ data }) {
           Food Commodities
         </h2>
       </div>
-      <p style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 400, marginBottom: 20 }}>
+      <p style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 400, marginBottom: 8 }}>
         {EXPLAINER}
+      </p>
+      <p style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 20, opacity: 0.65, fontFamily: "'DM Mono', monospace" }}>
+        ¢/bu = cents per bushel · 1 bu ≈ 27 kg for wheat, 25 kg for corn &amp; soybeans
       </p>
 
       {/* Card grid by group */}
