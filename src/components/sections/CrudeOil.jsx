@@ -21,8 +21,11 @@ export default function CrudeOil({ brent }) {
           Crude Oil
         </h2>
       </div>
-      <p style={{ fontSize: 14, color: 'var(--text)', marginBottom: 20, lineHeight: 1.6 }}>
+      <p style={{ fontSize: 14, color: 'var(--text)', marginBottom: 6, lineHeight: 1.6 }}>
         {EXPLAINER}
+      </p>
+      <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 20 }}>
+        $/bbl = US dollars per barrel · 1 barrel ≈ 159 litres
       </p>
 
       <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
@@ -60,6 +63,14 @@ export default function CrudeOil({ brent }) {
           />
         </div>
       )}
+
+      <div
+        className="mt-4 px-4 py-3 rounded-xl"
+        style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderLeft: '3px solid var(--oil)', fontSize: 14, color: 'var(--text)', lineHeight: 1.6 }}
+      >
+        <strong>Why tracked:</strong>{' '}
+        Oil prices influence transport, packaging, fertilizer, and energy costs across food supply chains.
+      </div>
     </section>
   )
 }

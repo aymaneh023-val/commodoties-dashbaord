@@ -6,11 +6,6 @@ const EXPLAINER =
   'Urea is the most widely traded nitrogen fertilizer worldwide. Prices in USD per metric ton ($/ton) — 30-day daily closes via Yahoo Finance. ' +
   'Natural gas accounts for 70–80% of urea production cost, creating a direct link between gas prices and fertilizer costs.'
 
-const WHY_TRACKED = [
-  'Natural gas accounts for 70–80% of nitrogen fertilizer production cost — a TTF spike directly raises urea prices.',
-  'Urea is the most widely traded nitrogen fertilizer globally; its price signals crop input cost pressures for Europe and the rest of the world.',
-]
-
 export default function Fertilizer({ urea }) {
   const ureaHistory = urea?.history ?? []
   const lastDate = ureaHistory.slice(-1)[0]?.date ?? null
@@ -25,8 +20,11 @@ export default function Fertilizer({ urea }) {
           Fertilizer (Urea)
         </h2>
       </div>
-      <p style={{ fontSize: 14, color: 'var(--text)', marginBottom: 20, lineHeight: 1.6 }}>
+      <p style={{ fontSize: 14, color: 'var(--text)', marginBottom: 6, lineHeight: 1.6 }}>
         {EXPLAINER}
+      </p>
+      <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 20 }}>
+        $/ton = US dollars per metric ton (1,000 kg)
       </p>
 
       <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
@@ -67,14 +65,9 @@ export default function Fertilizer({ urea }) {
         <p style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)', marginBottom: 10 }}>
           Why tracked
         </p>
-        <ul className="space-y-2">
-          {WHY_TRACKED.map((point, i) => (
-            <li key={i} className="flex gap-2 leading-relaxed" style={{ fontSize: 14, color: 'var(--text)' }}>
-              <span style={{ color: 'var(--fertilizer)', flexShrink: 0 }}>·</span>
-              {point}
-            </li>
-          ))}
-        </ul>
+        <p style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6 }}>
+          Fertilizer prices influence global crop production costs and agricultural yields.
+        </p>
       </div>
     </section>
   )

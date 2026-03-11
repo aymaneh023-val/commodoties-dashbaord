@@ -51,7 +51,7 @@ export default function FoodCommodities({ data }) {
         {EXPLAINER}
       </p>
       <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 20 }}>
-        ¢/bu = cents per bushel · 1 bu ≈ 27 kg (wheat), 25 kg (corn &amp; soybeans)
+        ¢/bu = cents per bushel · 1 bushel ≈ 27 kg (wheat), 25 kg (corn &amp; soybeans) · ¢/lb = cents per pound
       </p>
 
       {GROUPS.map(group => (
@@ -131,6 +131,14 @@ export default function FoodCommodities({ data }) {
         style={{ background: 'var(--surface2)', border: '1px solid var(--border)', fontSize: 14, color: 'var(--text)', lineHeight: 1.6 }}
       >
         {insight}
+      </div>
+
+      <div
+        className="mt-3 px-4 py-3 rounded-xl"
+        style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderLeft: '3px solid var(--food, #B86E00)', fontSize: 14, color: 'var(--text)', lineHeight: 1.6 }}
+      >
+        <strong>Why tracked:</strong>{' '}
+        These crops are key inputs in global food and livestock supply chains.
       </div>
     </section>
   )

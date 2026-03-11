@@ -117,7 +117,7 @@ export default function Inflation({ eu, uk, us }) {
         style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderLeft: '3px solid var(--inflation)', fontSize: 14, color: 'var(--text)', lineHeight: 1.6 }}
       >
         <strong>Why tracked:</strong>{' '}
-        Food inflation is the downstream consumer impact of commodity price shocks — energy, fertilizer, and transport costs all flow through to supermarket prices. MoM% captures the direction and speed of that transmission.
+        Food inflation shows how commodity and supply-chain costs pass through to consumers.
       </div>
     </section>
   )

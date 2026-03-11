@@ -92,6 +92,14 @@ export default function Shipping({ bdry, zim }) {
       <p style={{ fontSize: 13, color: 'var(--muted)', lineHeight: 1.6 }}>
         Note: BDRY and ZIM are exchange-traded equities — their prices correlate with shipping rate indices but are not the indices themselves.
       </p>
+
+      <div
+        className="mt-4 px-4 py-3 rounded-xl"
+        style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderLeft: '3px solid var(--shipping)', fontSize: 14, color: 'var(--text)', lineHeight: 1.6 }}
+      >
+        <strong>Why tracked:</strong>{' '}
+        Shipping costs affect the movement of bulk crops and food products between regions.
+      </div>
     </section>
   )
 }

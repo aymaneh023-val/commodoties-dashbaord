@@ -49,7 +49,7 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
             EU Commodity Monitor
           </h1>
           <p style={{ fontSize: 14, color: 'var(--muted)', marginTop: 2 }}>
-            Energy, food, freight and inflation data for European markets
+            Global food supply chain indicators
           </p>
         </div>
 

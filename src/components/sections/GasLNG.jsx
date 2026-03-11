@@ -6,11 +6,6 @@ const EXPLAINER =
   'Front-month futures (TTF=F) trade on ICE Endex, Netherlands. Prices in EUR per MWh (€/MWh) — 30-day daily closes via Yahoo Finance. ' +
   'TTF sets the marginal cost of industrial energy and drives nitrogen fertilizer production costs across Europe.'
 
-const WHY_TRACKED = [
-  'European industrial energy costs are primarily benchmarked against TTF.',
-  'Gas price spikes increase production costs for energy-intensive goods and nitrogen fertilizers such as urea and ammonia.',
-]
-
 export default function GasLNG({ ttf }) {
   const ttfHistory = ttf?.history ?? []
 
@@ -24,8 +19,11 @@ export default function GasLNG({ ttf }) {
           European Natural Gas (TTF)
         </h2>
       </div>
-      <p style={{ fontSize: 14, color: 'var(--text)', marginBottom: 20, lineHeight: 1.6 }}>
+      <p style={{ fontSize: 14, color: 'var(--text)', marginBottom: 6, lineHeight: 1.6 }}>
         {EXPLAINER}
+      </p>
+      <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 20 }}>
+        €/MWh = euros per megawatt-hour of energy
       </p>
 
       <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
@@ -66,14 +64,9 @@ export default function GasLNG({ ttf }) {
         <p style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)', marginBottom: 10 }}>
           Why tracked
         </p>
-        <ul className="space-y-2">
-          {WHY_TRACKED.map((point, i) => (
-            <li key={i} className="flex gap-2 leading-relaxed" style={{ fontSize: 14, color: 'var(--text)' }}>
-              <span style={{ color: 'var(--gas)', flexShrink: 0 }}>·</span>
-              {point}
-            </li>
-          ))}
-        </ul>
+        <p style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6 }}>
+          TTF is the main benchmark for natural gas pricing in Europe and affects industrial energy costs.
+        </p>
       </div>
     </section>
   )

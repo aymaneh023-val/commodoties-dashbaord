@@ -10,9 +10,9 @@ export const FOOD_TICKERS = {
 
 export const FOOD_META = {
   wheat:      { label: 'Wheat',       unit: ' ¢/bu',  note: 'CBOT Wheat (ZW=F). Global benchmark.' },
-  corn:       { label: 'Corn',        unit: ' ¢/bu',  note: 'CBOT Corn (ZC=F). Primary feed grain.' },
+  corn:       { label: 'Corn',        unit: ' ¢/bu',  note: 'CBOT Corn (ZC=F). Major global feed grain.' },
   soybeans:   { label: 'Soybeans',    unit: ' ¢/bu',  note: 'CBOT Soybeans (ZS=F). Oil and protein crop.' },
-  soybeanOil: { label: 'Soybean Oil', unit: ' ¢/lb',  note: 'CBOT Soybean Oil (ZL=F). Vegetable oil benchmark.' },
+  soybeanOil: { label: 'Soybean Oil', unit: ' ¢/lb',  note: 'CBOT Soybean Oil (ZL=F). Widely traded vegetable oil.' },
   sugar:      { label: 'Sugar',       unit: ' ¢/lb',  note: 'ICE Sugar No.11 (SB=F). Global raw sugar.' },
 }
 

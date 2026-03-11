@@ -14,6 +14,7 @@ import { useCommodityData } from './hooks/useCommodityData'
 import { useNewsData } from './hooks/useNewsData'
 import { useFoodCommoditiesData } from './hooks/useFoodCommoditiesData'
 import { useInflationData } from './hooks/useInflationData'
+import { formatTime } from './utils/formatters'
 
 // Cron schedule: 00:00, 06:00, 09:00, 12:00, 15:00, 18:00 UTC
 const SCHEDULED_HOURS = [0, 6, 9, 12, 15, 18]
@@ -89,6 +90,14 @@ export default function App() {
         foodData={foodData}
       />
 
+      {/* Orientation banner */}
+      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '20px 24px 0' }}>
+        <p style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.7, maxWidth: 860 }}>
+          Selected commodity, energy, fertilizer, shipping, and food price indicators relevant to food and agriculture markets.
+          Data reflects front-month futures or latest available releases.
+        </p>
+      </div>
+
       <div
         className="two-col"
         style={{ padding: '24px 24px 48px', maxWidth: 1400, margin: '0 auto' }}
@@ -134,6 +143,22 @@ export default function App() {
             activeFilter={activeFilter}
           />
         </div>
+      </div>
+
+      {/* Data source footer */}
+      <div
+        style={{
+          maxWidth: 1400, margin: '0 auto', padding: '16px 24px 40px',
+          borderTop: '1px solid var(--border)',
+        }}
+      >
+        <p style={{ fontSize: 13, color: 'var(--muted)', lineHeight: 1.8 }}>
+          Data sources: ICE, CBOT, Eurostat, ONS, BLS, Yahoo Finance.
+          Futures prices represent front-month contracts.
+        </p>
+        <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
+          Last updated: {lastUpdated ? formatTime(lastUpdated) : '—'}
+        </p>
       </div>
     </div>
   )
