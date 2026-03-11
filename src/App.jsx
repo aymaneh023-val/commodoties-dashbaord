@@ -71,7 +71,7 @@ export default function App() {
       />
 
       {/* Orientation banner */}
-      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '20px 24px 0' }}>
+      <div className="px-4 md:px-6" style={{ maxWidth: 1400, margin: '0 auto', paddingTop: 20 }}>
         <p style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.7, maxWidth: 860 }}>
           Selected commodity, energy, fertilizer, shipping, and food price indicators relevant to food and agriculture markets.
           Data reflects front-month futures or latest available releases.
@@ -79,8 +79,8 @@ export default function App() {
       </div>
 
       <div
-        className="two-col"
-        style={{ padding: '24px 24px 48px', maxWidth: 1400, margin: '0 auto' }}
+        className="two-col px-4 md:px-6"
+        style={{ paddingTop: 24, paddingBottom: 48, maxWidth: 1400, margin: '0 auto' }}
       >
         {/* Left column — data sections */}
         <main>
@@ -128,8 +128,9 @@ export default function App() {
 
       {/* Data source footer */}
       <div
+        className="px-4 md:px-6"
         style={{
-          maxWidth: 1400, margin: '0 auto', padding: '16px 24px 40px',
+          maxWidth: 1400, margin: '0 auto', paddingTop: 16, paddingBottom: 40,
           borderTop: '1px solid var(--border)',
         }}
       >

@@ -113,3 +113,27 @@ body {
   stroke: var(--border) !important;
 }
 .recharts-tooltip-wrapper { outline: none; }
+
+@media (max-width: 768px) {
+  .card {
+    padding: 14px;
+  }
+
+  .app-header {
+    position: static;
+  }
+
+  .watch-strip {
+    position: static;
+  }
+
+  .news-feed-panel {
+    position: static !important;
+    top: auto !important;
+    max-height: none !important;
+  }
+
+  section {
+    margin-bottom: 2.5rem !important;
+  }
+}

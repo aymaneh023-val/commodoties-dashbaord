@@ -24,6 +24,13 @@ const LINE_COLORS = ['#FF8A61', '#3448BF', '#8890B5', '#2D7A4F']
 
 const DEFAULT_SELECTIONS = ['brent', 'ttf', 'zim', 'urea']
 
+function formatXAxisTick(value) {
+  if (typeof value !== 'string') return value
+  const dailyLabelMatch = value.match(/^([A-Za-z]{3})\s+(\d{1,2})\s+'\d{2}$/)
+  if (dailyLabelMatch) return `${dailyLabelMatch[1]} ${dailyLabelMatch[2]}`
+  return value
+}
+
 function getOptionMeta(value) {
   return METRIC_OPTIONS.find((o) => o.value === value)
 }
@@ -214,14 +221,18 @@ export default function CompareSection({ commodityData }) {
               Normalised (%) · 30d
             </p>
             <ResponsiveContainer width="100%" height={260}>
-              <LineChart data={chartData} margin={{ top: 8, right: 40, left: 0, bottom: 0 }}>
+              <LineChart data={chartData} margin={{ top: 8, right: 40, left: 0, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(194,201,229,0.4)" vertical={false} />
                 <XAxis
                   dataKey="date"
-                  tick={{ fill: '#8890B5', fontSize: 11, fontFamily: "'DM Mono', monospace" }}
+                  tick={{ fill: '#8890B5', fontSize: 10, fontFamily: "'DM Mono', monospace" }}
                   axisLine={{ stroke: 'rgba(194,201,229,0.5)' }}
                   tickLine={false}
-                  interval={6}
+                  interval="preserveStartEnd"
+                  minTickGap={24}
+                  tickMargin={8}
+                  height={28}
+                  tickFormatter={formatXAxisTick}
                 />
                 <YAxis
                   orientation="right"

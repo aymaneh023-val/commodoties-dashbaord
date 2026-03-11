@@ -40,7 +40,7 @@ export default function NewsFeed({ articles, loading, error, activeFilter }) {
 
   return (
     <aside
-      className="news-feed-scroll"
+      className="news-feed-scroll news-feed-panel"
       style={{
         position: 'sticky',
         top: '145px',
@@ -122,7 +122,7 @@ function ArticleCard({ article }) {
       href={article.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block rounded-xl p-4 transition-all"
+      className="block rounded-xl p-3 md:p-4 transition-all"
       style={{
         background: 'var(--surface)',
         border: '1px solid var(--border)',
@@ -167,8 +167,8 @@ function ArticleCard({ article }) {
             alt=""
             onError={(e) => { e.currentTarget.style.display = 'none' }}
             style={{
-              width: 60,
-              height: 45,
+              width: 56,
+              height: 42,
               objectFit: 'cover',
               borderRadius: 6,
               flexShrink: 0,

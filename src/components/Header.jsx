@@ -26,7 +26,7 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
 
   return (
     <header
-      className="sticky top-0 z-50 px-6 py-4"
+      className="app-header sticky top-0 z-50 px-4 md:px-6 py-3 md:py-4"
       style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}
     >
       {/* Top row */}
@@ -84,7 +84,7 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
       </div>
 
       {/* Filter tabs */}
-      <div className="flex gap-1 mt-3 flex-wrap">
+      <div className="flex gap-1 mt-2 md:mt-3 flex-wrap">
         {FILTER_TABS.map((tab) => {
           const isActive = activeFilter === tab.id
           return (

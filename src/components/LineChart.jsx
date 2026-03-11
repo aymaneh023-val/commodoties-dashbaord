@@ -27,6 +27,13 @@ export default function LineChartWrapper({
     setHiddenKeys((prev) => ({ ...prev, [key]: !prev[key] }))
   }
 
+  const formatXAxisTick = (value) => {
+    if (typeof value !== 'string') return value
+    const dailyLabelMatch = value.match(/^([A-Za-z]{3})\s+(\d{1,2})\s+'\d{2}$/)
+    if (dailyLabelMatch) return `${dailyLabelMatch[1]} ${dailyLabelMatch[2]}`
+    return value
+  }
+
   if (!data.length) return (
     <div
       className="flex items-center justify-center rounded-lg"
@@ -38,14 +45,18 @@ export default function LineChartWrapper({
 
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <ReLineChart data={data} margin={{ top: 8, right: 48, left: 0, bottom: 0 }}>
+      <ReLineChart data={data} margin={{ top: 8, right: 48, left: 0, bottom: 8 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#C2C9E5" vertical={false} />
         <XAxis
           dataKey={xKey}
-          tick={{ fill: '#131B47', fontSize: 12 }}
+          tick={{ fill: '#131B47', fontSize: 11 }}
           axisLine={{ stroke: '#C2C9E5' }}
           tickLine={false}
-          interval={6}
+          interval="preserveStartEnd"
+          minTickGap={24}
+          tickMargin={8}
+          height={28}
+          tickFormatter={formatXAxisTick}
         />
         <YAxis
           orientation="right"
