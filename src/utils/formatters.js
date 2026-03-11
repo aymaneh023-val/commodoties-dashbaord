@@ -75,7 +75,7 @@ export function formatDate(ts) {
 }
 
 /**
- * Format a Date object or ISO string to HH:MM UTC.
+ * Format a Date object or ISO string to HH:MM CET/CEST.
  * @param {Date|string} date
  */
 export function formatTime(date) {
@@ -84,8 +84,9 @@ export function formatTime(date) {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
-    timeZone: 'UTC',
-  }) + ' UTC'
+    timeZone: 'Europe/Brussels',
+    timeZoneName: 'short',
+  })
 }
 
 /**

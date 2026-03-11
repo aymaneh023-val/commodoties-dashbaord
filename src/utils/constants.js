@@ -29,9 +29,9 @@ export const FILTER_TABS = [
   { id: 'ALL',         label: 'All' },
   { id: 'oil',         label: 'Oil' },
   { id: 'gas',         label: 'Gas' },
-  { id: 'shipping',    label: 'Shipping' },
   { id: 'fertilizer',  label: 'Fertilizer' },
   { id: 'food',        label: 'Food' },
+  { id: 'shipping',    label: 'Shipping' },
   { id: 'inflation',   label: 'Inflation' },
   { id: 'compare',     label: 'Compare' },
 ]

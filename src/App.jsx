@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import Header from './components/Header'
 import WatchStrip from './components/WatchStrip'
 import NewsFeed from './components/NewsFeed'
@@ -15,23 +15,6 @@ import { useNewsData } from './hooks/useNewsData'
 import { useFoodCommoditiesData } from './hooks/useFoodCommoditiesData'
 import { useInflationData } from './hooks/useInflationData'
 import { formatTime } from './utils/formatters'
-
-// Cron schedule: 00:00, 06:00, 09:00, 12:00, 15:00, 18:00 UTC
-const SCHEDULED_HOURS = [0, 6, 9, 12, 15, 18]
-
-function getNextUpdateLabel(lastUpdated) {
-  if (!lastUpdated) return null
-  const base = new Date(lastUpdated)
-  for (let d = 0; d <= 1; d++) {
-    for (const h of SCHEDULED_HOURS) {
-      const t = new Date(base)
-      t.setUTCDate(base.getUTCDate() + d)
-      t.setUTCHours(h, 0, 0, 0)
-      if (t > base) return `${String(t.getUTCHours()).padStart(2, '0')}:00 UTC`
-    }
-  }
-  return null
-}
 
 export default function App() {
   const [activeFilter, setActiveFilter] = useState('ALL')
@@ -56,8 +39,6 @@ export default function App() {
     if (!anyLoading) setRefreshing(false)
   }, [anyLoading])
 
-  const nextUpdate = useMemo(() => getNextUpdateLabel(lastUpdated), [lastUpdated])
-
   // Connection status: green = all live, amber = some degraded, red = all down
   const commodityValues = Object.values(commodityData)
   const commodityErrorCount = commodityValues.filter((d) => d.error).length
@@ -79,7 +60,6 @@ export default function App() {
         onFilterChange={setActiveFilter}
         onRefresh={handleRefresh}
         lastUpdated={lastUpdated}
-        nextUpdate={nextUpdate}
         refreshing={refreshing}
         connectionStatus={connectionStatus}
         onShowReferences={() => setShowReferences(true)}
@@ -104,9 +84,6 @@ export default function App() {
       >
         {/* Left column — data sections */}
         <main>
-          {sectionVisible('food') && (
-            <FoodCommodities data={foodData} />
-          )}
           {sectionVisible('oil') && (
             <CrudeOil brent={commodityData.brent} />
           )}
@@ -115,6 +92,9 @@ export default function App() {
           )}
           {sectionVisible('fertilizer') && (
             <Fertilizer urea={commodityData.urea} />
+          )}
+          {sectionVisible('food') && (
+            <FoodCommodities data={foodData} />
           )}
           {sectionVisible('shipping') && (
             <Shipping

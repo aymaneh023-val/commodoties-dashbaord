@@ -1,7 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
 
+// Fetch a 36-month window so a delay in Eurostat's dissemination never causes
+// us to miss the most recent published month. We trim to last 24 in code below.
 const EUROSTAT_URL =
-  'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_manr?format=JSON&lang=EN&coicop=CP01&geo=EA&lastTimePeriod=24'
+  'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_manr?format=JSON&lang=EN&coicop=CP01&geo=EA&lastTimePeriod=36'
 
 const SOURCE = 'eurostat'
 
@@ -48,6 +50,7 @@ export default async function handler(req, res) {
         return v != null ? { month: period, value: parseFloat(Number(v).toFixed(2)) } : null
       })
       .filter(Boolean)
+      .slice(-24) // trim to last 24 published months regardless of window size
 
     const now = new Date().toISOString()
     await supabase.from('inflation_cache').upsert(

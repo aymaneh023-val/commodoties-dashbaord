@@ -87,6 +87,17 @@ export default async function handler(req, res) {
     // are automatically dropped by the consecutive-month check.
     const last24 = computeYoY(monthly).slice(-24)
 
+    // Guard: food YoY % is always > 0.8 in absolute terms in the post-2020 era.
+    // MoM values cluster around 0.0–0.5. If the median absolute value is below
+    // this threshold we almost certainly have MoM data in a YoY column — abort.
+    const sorted = [...last24].sort((a, b) => Math.abs(a.value) - Math.abs(b.value))
+    const medianAbs = Math.abs(sorted[Math.floor(sorted.length / 2)]?.value ?? 0)
+    if (medianAbs < 0.8) {
+      throw new Error(
+        `BLS YoY sanity check failed: median |value| = ${medianAbs.toFixed(2)}% — looks like MoM data, aborting upsert`
+      )
+    }
+
     const now = new Date().toISOString()
     await supabase.from('inflation_cache').upsert(
       last24.map((d) => ({ source: SOURCE, month: d.month, value: d.value, fetched_at: now })),

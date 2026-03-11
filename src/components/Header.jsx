@@ -8,7 +8,7 @@ const STATUS_DOT = {
   red:   { color: 'var(--negative)', label: 'Sources unavailable — showing cached data' },
 }
 
-export default function Header({ activeFilter, onFilterChange, onRefresh, lastUpdated, nextUpdate,
+export default function Header({ activeFilter, onFilterChange, onRefresh, lastUpdated,
   refreshing = false, connectionStatus = 'green', onShowReferences }) {
   const status = STATUS_DOT[connectionStatus] ?? STATUS_DOT.green
 
@@ -41,12 +41,11 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
             <span style={{ fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--muted)' }}>
               {connectionStatus === 'green' ? 'Live' : connectionStatus === 'amber' ? 'Partial' : 'Reconnecting'}
               {' · Updated '}{lastUpdated ? formatTime(lastUpdated) : '—'}
-              {nextUpdate ? ` · Next: ${nextUpdate}` : ''}
             </span>
           </div>
 
           <h1 className="font-bold leading-tight" style={{ fontSize: 20, color: 'var(--text)' }}>
-            EU Commodity Monitor
+            Commodity Monitor
           </h1>
           <p style={{ fontSize: 14, color: 'var(--muted)', marginTop: 2 }}>
             Global food supply chain indicators

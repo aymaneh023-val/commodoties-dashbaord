@@ -43,9 +43,9 @@ export default async function handler(req, res) {
       throw new Error('ONS: no months data')
     }
 
-    // Parse full series oldest-first, then compute MoM % from consecutive pairs.
-    // We need n+1 raw values to produce n MoM % values, so we operate over
-    // all months before slicing to last 24.
+    // Parse full series oldest-first, then compute YoY % from each month vs
+    // the same month one year prior. We need 13+ months of raw data to produce
+    // YoY values, so we operate over all months before slicing to last 24.
     const allMonths = months
       .map((m) => ({
         month: `${m.year}-${String(monthNameToNum(m.month)).padStart(2, '0')}`,
@@ -54,6 +54,17 @@ export default async function handler(req, res) {
       .sort((a, b) => a.month.localeCompare(b.month))
 
     const last24 = computeYoY(allMonths).slice(-24)
+
+    // Guard: food YoY % is always > 0.8 in absolute terms in the post-2020 era.
+    // MoM values cluster around 0.0–0.5. If the median absolute value is below
+    // this threshold we almost certainly have MoM data in a YoY column — abort.
+    const sorted = [...last24].sort((a, b) => Math.abs(a.value) - Math.abs(b.value))
+    const medianAbs = Math.abs(sorted[Math.floor(sorted.length / 2)]?.value ?? 0)
+    if (medianAbs < 0.8) {
+      throw new Error(
+        `ONS YoY sanity check failed: median |value| = ${medianAbs.toFixed(2)}% — looks like MoM data, aborting upsert`
+      )
+    }
 
     const now = new Date().toISOString()
     await supabase.from('inflation_cache').upsert(
