@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   LineChart as ReLineChart,
   Line,
@@ -19,6 +20,13 @@ export default function LineChartWrapper({
   referenceLines = [],
   showLegend = false,
 }) {
+  const [hiddenKeys, setHiddenKeys] = useState({})
+
+  const toggleLine = (entry) => {
+    const key = entry.dataKey
+    setHiddenKeys((prev) => ({ ...prev, [key]: !prev[key] }))
+  }
+
   if (!data.length) return (
     <div
       className="flex items-center justify-center rounded-lg"
@@ -55,7 +63,8 @@ export default function LineChartWrapper({
             align="left"
             iconType="circle"
             iconSize={8}
-            wrapperStyle={{ fontSize: 13, color: '#131B47', paddingTop: 10 }}
+            onClick={toggleLine}
+            wrapperStyle={{ fontSize: 13, color: '#131B47', paddingTop: 10, cursor: 'pointer' }}
           />
         )}
         {referenceLines.map((rl) => (
@@ -84,6 +93,7 @@ export default function LineChartWrapper({
             dot={false}
             activeDot={{ r: 4, strokeWidth: 0 }}
             name={l.label || l.key}
+            hide={!!hiddenKeys[l.key]}
           />
         ))}
       </ReLineChart>

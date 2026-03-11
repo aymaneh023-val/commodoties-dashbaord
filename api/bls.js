@@ -82,7 +82,7 @@ export default async function handler(req, res) {
       }))
       .reverse() // oldest first
 
-    // Compute MoM % over the full series before slicing so the boundary month
+    // Compute YoY % over the full series before slicing so the boundary month
     // always has a valid predecessor. Gaps (e.g. Oct 2025 is missing from BLS)
     // are automatically dropped by the consecutive-month check.
     const last24 = computeYoY(monthly).slice(-24)

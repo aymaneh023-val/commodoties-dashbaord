@@ -52,7 +52,7 @@ export default function Inflation({ eu, uk, us }) {
       <div className="grid gap-4 mb-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
         <InflationCard
           label="EU — Eurostat HICP Food (CP01)"
-          geography="Euro area, monthly"
+          geography="Euro area"
           source="Eurostat"
           latest={euLatest}
           unit="%"
@@ -62,7 +62,7 @@ export default function Inflation({ eu, uk, us }) {
         />
         <InflationCard
           label="UK — ONS CPI Food (D7BU)"
-          geography="United Kingdom, monthly"
+          geography="United Kingdom"
           source="ONS"
           latest={ukLatest}
           unit="%"
@@ -72,7 +72,7 @@ export default function Inflation({ eu, uk, us }) {
         />
         <InflationCard
           label="US — BLS CPI Food at Home"
-          geography="United States, monthly"
+          geography="United States"
           source="BLS"
           latest={usLatest}
           unit="%"
