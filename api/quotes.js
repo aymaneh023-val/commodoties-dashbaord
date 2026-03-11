@@ -1,7 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
 
-const CACHE_TTL_MS = 15 * 60 * 1000 // 15 minutes
-
 // Fallback tickers — tried in order if the primary fails
 const FALLBACKS = { 'BZ=F': 'CB=F' }
 
@@ -59,28 +57,26 @@ export default async function handler(req, res) {
 
   const results = await Promise.allSettled(
     tickers.map(async (ticker) => {
-      // 1. Check Supabase for a fresh row
-      const { data: cached } = await supabase
-        .from('prices')
-        .select('id, ticker, price, change_pct, fetched_at')
-        .eq('ticker', ticker)
-        .order('fetched_at', { ascending: false })
-        .limit(1)
-        .single()
-
-      if (!forceRefresh && cached && Date.now() - new Date(cached.fetched_at).getTime() < CACHE_TTL_MS) {
-        return { ticker, price: cached.price, change_pct: cached.change_pct, fetched_at: cached.fetched_at, fromCache: true }
+      // Normal load: return latest row from DB — no TTL check, no external call
+      if (!forceRefresh) {
+        const { data: row } = await supabase
+          .from('prices')
+          .select('ticker, price, change_pct, fetched_at')
+          .eq('ticker', ticker)
+          .order('fetched_at', { ascending: false })
+          .limit(1)
+          .single()
+        if (row) return { ticker, price: row.price, change_pct: row.change_pct, fetched_at: row.fetched_at }
       }
 
-      // 2. Fetch from Yahoo Finance server-side (no CORS restriction)
+      // force=true (or no DB row yet): fetch from Yahoo Finance
       const tryTickers = [ticker, FALLBACKS[ticker]].filter(Boolean)
       let parsed = null
       let lastErr = null
 
       for (const t of tryTickers) {
         try {
-          const result = await fetchYahoo(t)
-          parsed = parseResult(ticker, result)
+          parsed = parseResult(ticker, await fetchYahoo(t))
           break
         } catch (err) {
           lastErr = err
@@ -88,17 +84,22 @@ export default async function handler(req, res) {
       }
 
       if (!parsed) {
-        // Return stale cached row rather than a hard error
-        if (cached) {
-          return { ticker, price: cached.price, change_pct: cached.change_pct, fetched_at: cached.fetched_at, fromCache: true, stale: true }
-        }
+        // Yahoo failed — return latest DB row as stale fallback
+        const { data: row } = await supabase
+          .from('prices')
+          .select('ticker, price, change_pct, fetched_at')
+          .eq('ticker', ticker)
+          .order('fetched_at', { ascending: false })
+          .limit(1)
+          .single()
+        if (row) return { ticker, price: row.price, change_pct: row.change_pct, fetched_at: row.fetched_at, stale: true }
         throw lastErr ?? new Error(`Failed to fetch ${ticker}`)
       }
 
-      // 3. Append new observation to Supabase (no upsert — every fetch is its own row)
+      // Append new observation to Supabase (no upsert — every fetch is its own row)
       await supabase.from('prices').insert({ ticker, price: parsed.price, change_pct: parsed.change_pct })
 
-      return { ticker, price: parsed.price, change_pct: parsed.change_pct, fetched_at: new Date().toISOString(), fromCache: false }
+      return { ticker, price: parsed.price, change_pct: parsed.change_pct, fetched_at: new Date().toISOString() }
     })
   )
 

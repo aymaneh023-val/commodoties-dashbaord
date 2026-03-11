@@ -2,8 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const BLS_URL = 'https://api.bls.gov/publicAPI/v1/timeseries/data/'
 
-const CACHE_KEY = 'bls'
-const CACHE_TTL_MS = 12 * 60 * 60 * 1000 // 12 hours
+const SOURCE = 'bls'
 
 // Compute month-on-month % change from consecutive index pairs.
 // Skips any pair where the calendar gap is not exactly 1 month (handles BLS data gaps).
@@ -34,28 +33,17 @@ export default async function handler(req, res) {
   const forceRefresh = req.query.force === 'true' || req.query.force === '1'
   const supabase = getSupabase()
 
-  // 1. Check cache_meta
+  // Normal load: read from DB — no TTL check, no external call
   if (!forceRefresh) {
-    const { data: meta } = await supabase
-      .from('cache_meta')
-      .select('fetched_at')
-      .eq('key', CACHE_KEY)
-      .single()
-
-    if (meta && Date.now() - new Date(meta.fetched_at).getTime() < CACHE_TTL_MS) {
-      const { data: cached } = await supabase
-        .from('inflation_cache')
-        .select('month, value')
-        .eq('source', CACHE_KEY)
-        .order('month', { ascending: true })
-
-      if (cached?.length) {
-        return res.status(200).json({ status: 'ok', data: cached, fromCache: true })
-      }
-    }
+    const { data } = await supabase
+      .from('inflation_cache')
+      .select('month, value')
+      .eq('source', SOURCE)
+      .order('month', { ascending: true })
+    return res.status(200).json({ status: 'ok', data: data ?? [] })
   }
 
-  // 2. Fetch from BLS
+  // force=true: fetch from BLS and update DB
   try {
     const r = await fetch(BLS_URL, {
       method: 'POST',
@@ -97,33 +85,24 @@ export default async function handler(req, res) {
     // are automatically dropped by the consecutive-month check.
     const last24 = computeMoM(monthly).slice(-24)
 
-    // 3. Upsert into inflation_cache (updates value + fetched_at on conflict)
     const now = new Date().toISOString()
     await supabase.from('inflation_cache').upsert(
-      last24.map((d) => ({ source: CACHE_KEY, month: d.month, value: d.value, fetched_at: now })),
+      last24.map((d) => ({ source: SOURCE, month: d.month, value: d.value, fetched_at: now })),
       { onConflict: 'source,month' }
     )
-
-    // 4. Update cache_meta
-    await supabase
-      .from('cache_meta')
-      .upsert({ key: CACHE_KEY, fetched_at: now }, { onConflict: 'key' })
 
     return res.status(200).json({ status: 'ok', data: last24 })
   } catch (err) {
     console.error('BLS proxy error:', err.message)
 
-    // Stale fallback
+    // Fallback to whatever is in DB
     const { data: stale } = await supabase
       .from('inflation_cache')
       .select('month, value')
-      .eq('source', CACHE_KEY)
+      .eq('source', SOURCE)
       .order('month', { ascending: true })
 
-    if (stale?.length) {
-      return res.status(200).json({ status: 'ok', data: stale, fromCache: true, stale: true })
-    }
-
+    if (stale?.length) return res.status(200).json({ status: 'ok', data: stale })
     return res.status(502).json({ status: 'error', message: err.message })
   }
 }

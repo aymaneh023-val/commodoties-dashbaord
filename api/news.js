@@ -19,9 +19,6 @@ const shippingQuery =
   '"supply chain disruption" OR "port congestion" OR ' +
   '"trade routes"'
 
-const CACHE_KEY = 'news'
-const CACHE_TTL_MS = 60 * 60 * 1000 // 1 hour
-
 function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
 }
@@ -79,32 +76,20 @@ export default async function handler(req, res) {
   const forceRefresh = req.query.force === 'true' || req.query.force === '1'
   const supabase = getSupabase()
 
-  // 1. Check cache_meta
+  // Normal load: read from DB — no TTL check, no external call
   if (!forceRefresh) {
-    const { data: meta } = await supabase
-      .from('cache_meta')
-      .select('fetched_at')
-      .eq('key', CACHE_KEY)
-      .single()
-
-    if (meta && Date.now() - new Date(meta.fetched_at).getTime() < CACHE_TTL_MS) {
-      const { data: cached } = await supabase
-        .from('news_articles')
-        .select('url, title, description, source_name, url_to_image, published_at, category')
-        .order('published_at', { ascending: false })
-
-      if (cached?.length) {
-        return res.status(200).json({
-          status: 'ok',
-          totalResults: cached.length,
-          articles: cached.map(dbRowToArticle),
-          fromCache: true,
-        })
-      }
-    }
+    const { data: rows } = await supabase
+      .from('news_articles')
+      .select('url, title, description, source_name, url_to_image, published_at, category')
+      .order('published_at', { ascending: false })
+    return res.status(200).json({
+      status: 'ok',
+      totalResults: (rows ?? []).length,
+      articles: (rows ?? []).map(dbRowToArticle),
+    })
   }
 
-  // 2. Fetch from NewsAPI — all three category queries in parallel
+  // force=true: fetch from NewsAPI — all three category queries in parallel
   try {
     const [energyRes, foodRes, shippingRes] = await Promise.all([
       fetch(buildUrl(energyQuery, apiKey), { headers: { 'User-Agent': 'EU-Energy-Monitor/1.0' } }),
@@ -135,18 +120,13 @@ export default async function handler(req, res) {
 
     unique.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
 
-    // 3. Upsert into news_articles — DO NOTHING on url conflict preserves original category
+    // Upsert into news_articles — DO NOTHING on url conflict preserves original category
     await supabase
       .from('news_articles')
       .upsert(
         unique.map((a) => articleToDbRow(a, a.category)),
         { onConflict: 'url', ignoreDuplicates: true }
       )
-
-    // 4. Update cache_meta
-    await supabase
-      .from('cache_meta')
-      .upsert({ key: CACHE_KEY, fetched_at: new Date().toISOString() }, { onConflict: 'key' })
 
     return res.status(200).json({
       status: 'ok',
@@ -156,7 +136,7 @@ export default async function handler(req, res) {
   } catch (err) {
     console.error('NewsAPI proxy error:', err)
 
-    // Stale fallback
+    // Fallback to whatever is in DB
     const { data: stale } = await supabase
       .from('news_articles')
       .select('url, title, description, source_name, url_to_image, published_at, category')
@@ -167,8 +147,6 @@ export default async function handler(req, res) {
         status: 'ok',
         totalResults: stale.length,
         articles: stale.map(dbRowToArticle),
-        fromCache: true,
-        stale: true,
       })
     }
 
