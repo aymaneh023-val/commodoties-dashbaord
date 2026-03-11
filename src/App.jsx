@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import Header from './components/Header'
 import WatchStrip from './components/WatchStrip'
 import NewsFeed from './components/NewsFeed'
@@ -15,29 +15,47 @@ import { useNewsData } from './hooks/useNewsData'
 import { useFoodCommoditiesData } from './hooks/useFoodCommoditiesData'
 import { useInflationData } from './hooks/useInflationData'
 
+// Cron schedule: 00:00, 06:00, 09:00, 12:00, 15:00, 18:00 UTC
+const SCHEDULED_HOURS = [0, 6, 9, 12, 15, 18]
+
+function getNextUpdateLabel(lastUpdated) {
+  if (!lastUpdated) return null
+  const base = new Date(lastUpdated)
+  for (let d = 0; d <= 1; d++) {
+    for (const h of SCHEDULED_HOURS) {
+      const t = new Date(base)
+      t.setUTCDate(base.getUTCDate() + d)
+      t.setUTCHours(h, 0, 0, 0)
+      if (t > base) return `${String(t.getUTCHours()).padStart(2, '0')}:00 UTC`
+    }
+  }
+  return null
+}
 
 export default function App() {
   const [activeFilter, setActiveFilter] = useState('ALL')
-  const [lastUpdated, setLastUpdated] = useState(null)
   const [showReferences, setShowReferences] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
 
-  const { data: commodityData, refresh: refreshCommodity } = useCommodityData()
+  const { data: commodityData, refresh: refreshCommodity, lastUpdated } = useCommodityData()
   const { articles, loading: newsLoading, error: newsError, refresh: refreshNews } = useNewsData()
   const { data: foodData, refresh: refreshFood } = useFoodCommoditiesData()
   const inflationData = useInflationData()
 
   const handleRefresh = useCallback(() => {
-    refreshCommodity()
+    setRefreshing(true)
+    refreshCommodity({ force: true })
+    refreshFood({ force: true })
     refreshNews()
-    refreshFood()
-    setLastUpdated(new Date())
-  }, [refreshCommodity, refreshNews, refreshFood])
+  }, [refreshCommodity, refreshFood, refreshNews])
 
-  // Update lastUpdated whenever commodity data finishes loading
+  // Reset the refreshing spinner once all commodity data finishes loading
   const anyLoading = Object.values(commodityData).some((d) => d.loading)
-  if (!anyLoading && !lastUpdated) {
-    setLastUpdated(new Date())
-  }
+  useEffect(() => {
+    if (!anyLoading) setRefreshing(false)
+  }, [anyLoading])
+
+  const nextUpdate = useMemo(() => getNextUpdateLabel(lastUpdated), [lastUpdated])
 
   // Connection status: green = all live, amber = some degraded, red = all down
   const commodityValues = Object.values(commodityData)
@@ -60,6 +78,8 @@ export default function App() {
         onFilterChange={setActiveFilter}
         onRefresh={handleRefresh}
         lastUpdated={lastUpdated}
+        nextUpdate={nextUpdate}
+        refreshing={refreshing}
         connectionStatus={connectionStatus}
         onShowReferences={() => setShowReferences(true)}
       />
@@ -103,7 +123,6 @@ export default function App() {
           {sectionVisible('compare') && (
             <CompareSection commodityData={commodityData} />
           )}
-
         </main>
 
         {/* Right column — sticky news feed */}

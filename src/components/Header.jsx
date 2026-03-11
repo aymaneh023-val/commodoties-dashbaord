@@ -8,7 +8,7 @@ const STATUS_DOT = {
   red:   { color: '#D94F3D', label: 'Sources unavailable — showing fallback data', animation: '' },
 }
 
-export default function Header({ activeFilter, onFilterChange, onRefresh, lastUpdated, connectionStatus = 'green', onShowReferences }) {
+export default function Header({ activeFilter, onFilterChange, onRefresh, lastUpdated, nextUpdate, refreshing = false, connectionStatus = 'green', onShowReferences }) {
   const status = STATUS_DOT[connectionStatus] ?? STATUS_DOT.green
   // Read initial hash on mount
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
               className="text-xs tracking-widest uppercase"
               style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
             >
-              {connectionStatus === 'green' ? 'Connected' : connectionStatus === 'amber' ? 'Partial' : 'Reconnecting'} · Last updated {lastUpdated ? formatTime(lastUpdated) : '—'}
+              {connectionStatus === 'green' ? 'Connected' : connectionStatus === 'amber' ? 'Partial' : 'Reconnecting'} · Last updated {lastUpdated ? formatTime(lastUpdated) : '—'}{nextUpdate ? ` · Next: ${nextUpdate}` : ''}
             </span>
           </div>
 
@@ -85,19 +85,21 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
           </button>
           <button
             onClick={onRefresh}
+            disabled={refreshing}
             className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg transition-colors"
             style={{
               background: 'var(--surface)',
               border: '1px solid var(--border)',
               color: 'var(--muted)',
               fontFamily: "'DM Mono', monospace",
-              cursor: 'pointer',
+              cursor: refreshing ? 'not-allowed' : 'pointer',
+              opacity: refreshing ? 0.5 : 1,
               whiteSpace: 'nowrap',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text)' }}
+            onMouseEnter={(e) => { if (!refreshing) e.currentTarget.style.color = 'var(--text)' }}
             onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--muted)' }}
           >
-            ↻ Refresh
+            {refreshing ? '⏳' : '↻'} {refreshing ? 'Refreshing…' : 'Refresh'}
           </button>
         </div>
       </div>

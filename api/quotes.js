@@ -5,6 +5,9 @@ const CACHE_TTL_MS = 15 * 60 * 1000 // 15 minutes
 // Fallback tickers — tried in order if the primary fails
 const FALLBACKS = { 'BZ=F': 'CB=F' }
 
+// Full ticker list — used when ?tickers=ALL (cron job and manual force-refresh)
+const ALL_TICKERS = 'BZ=F,TTF=F,BDRY,ZIM,UFB=F,ZW=F,ZC=F,ZS=F,ZL=F,ZR=F,SB=F'
+
 function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
 }
@@ -50,10 +53,12 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS')
   if (req.method === 'OPTIONS') return res.status(200).end()
 
-  const { tickers: tickerParam } = req.query
+  const { tickers: tickerParam, force } = req.query
   if (!tickerParam) return res.status(400).json({ error: 'tickers param required' })
 
-  const tickers = tickerParam.split(',').map((t) => t.trim()).filter(Boolean)
+  const forceRefresh = force === 'true' || force === '1'
+  const rawList = tickerParam === 'ALL' ? ALL_TICKERS : tickerParam
+  const tickers = rawList.split(',').map((t) => t.trim()).filter(Boolean)
   const supabase = getSupabase()
 
   const results = await Promise.allSettled(
@@ -67,7 +72,7 @@ export default async function handler(req, res) {
         .limit(1)
         .single()
 
-      if (cached && Date.now() - new Date(cached.fetched_at).getTime() < CACHE_TTL_MS) {
+      if (!forceRefresh && cached && Date.now() - new Date(cached.fetched_at).getTime() < CACHE_TTL_MS) {
         return { ticker, price: cached.price, change_pct: cached.change_pct, fetched_at: cached.fetched_at, fromCache: true }
       }
 
@@ -107,5 +112,11 @@ export default async function handler(req, res) {
     return { ticker: tickers[i], price: null, change_pct: null, error: r.reason?.message ?? 'fetch failed' }
   })
 
-  return res.status(200).json({ status: 'ok', data })
+  // Most recent fetched_at across all rows — represents when data was last stored
+  const lastUpdated = data.reduce((max, r) => {
+    if (!r.fetched_at) return max
+    return !max || r.fetched_at > max ? r.fetched_at : max
+  }, null)
+
+  return res.status(200).json({ status: 'ok', data, lastUpdated })
 }

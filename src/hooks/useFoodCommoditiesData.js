@@ -25,14 +25,23 @@ const initialState = {
   history: [], loading: true, error: false, fromCache: false,
 }
 
+// Same mapResult as useCommodityData: use last close from history as the
+// display price so the card always matches the chart's rightmost data point.
 function mapResult(r) {
   if (r.error || r.price == null) {
     return { price: null, pctChange: null, baseDate: null, history: [], loading: false, error: true, fromCache: false }
   }
   const history = r.history ?? []
+  const firstClose = history[0]?.close ?? null
+  const lastClose = history[history.length - 1]?.close ?? null
+  const price = lastClose ?? r.price
+  const pctChange =
+    firstClose != null && lastClose != null
+      ? parseFloat((((lastClose - firstClose) / firstClose) * 100).toFixed(4))
+      : r.change_pct
   return {
-    price: r.price,
-    pctChange: r.change_pct,
+    price,
+    pctChange,
     baseDate: history[0]?.date ?? null,
     history,
     loading: false,
@@ -48,7 +57,8 @@ export function useFoodCommoditiesData() {
     return s
   })
 
-  const fetchAll = useCallback(async () => {
+  const fetchAll = useCallback(async (opts = {}) => {
+    const { force = false } = opts
     setData((prev) => {
       const next = {}
       Object.keys(prev).forEach((k) => { next[k] = { ...prev[k], loading: true } })
@@ -57,8 +67,9 @@ export function useFoodCommoditiesData() {
 
     try {
       const encoded = encodeURIComponent(TICKER_LIST)
+      const forceParam = force ? '&force=true' : ''
       const [quotesRes, historyRes] = await Promise.all([
-        fetch(`/api/quotes?tickers=${encoded}`),
+        fetch(`/api/quotes?tickers=${encoded}${forceParam}`),
         fetch(`/api/history?tickers=${encoded}`),
       ])
 
@@ -67,7 +78,6 @@ export function useFoodCommoditiesData() {
         historyRes.ok ? historyRes.json() : Promise.resolve({ data: [] }),
       ])
 
-      // Merge prices and history by ticker
       const byTicker = {}
       for (const r of quotesJson.data ?? []) byTicker[r.ticker] = { ...r, history: [] }
       for (const r of historyJson.data ?? []) {
