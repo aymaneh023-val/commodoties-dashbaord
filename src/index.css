@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -18,33 +16,25 @@
   --negative:      #D94F3D;
   --positive:      #2D7A4F;
 
-  /* Category colors */
-  --oil:        #f59e0b;
+  /* Category accent colors */
+  --oil:        #B86E00;
   --gas:        #3448BF;
-  --shipping:   #818cf8;
+  --shipping:   #4A4E99;
   --fertilizer: #2D7A4F;
-  --inflation:  #FF8A61;
-  --food:       #a78bfa;
+  --inflation:  #D4622A;
+  --food:       #6B4EC4;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   background-color: var(--bg);
   color: var(--text);
-  font-family: 'DM Mono', monospace;
-  font-size: 14px;
-  line-height: 1.6;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
   min-height: 100vh;
-}
-
-h1, h2, h3, h4, h5, h6,
-.font-syne {
-  font-family: 'Syne', sans-serif;
 }
 
 /* Pulsing status dot */
@@ -73,12 +63,8 @@ h1, h2, h3, h4, h5, h6,
 }
 
 /* Ticker bar smooth scroll */
-.ticker-bar {
-  scrollbar-width: none;
-}
-.ticker-bar::-webkit-scrollbar {
-  display: none;
-}
+.ticker-bar { scrollbar-width: none; }
+.ticker-bar::-webkit-scrollbar { display: none; }
 
 /* Card base */
 .card {
@@ -86,13 +72,11 @@ h1, h2, h3, h4, h5, h6,
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 1px 3px rgba(19, 27, 71, 0.04);
+  box-shadow: 0 1px 4px rgba(19, 27, 71, 0.06);
 }
 
-/* Spinner animation */
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+/* Spinner */
+@keyframes spin { to { transform: rotate(360deg); } }
 .spinner {
   width: 16px;
   height: 16px;
@@ -103,17 +87,14 @@ h1, h2, h3, h4, h5, h6,
   display: inline-block;
 }
 
-/* Scrollbar for news feed */
+/* News feed scrollbar */
 .news-feed-scroll {
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
 .news-feed-scroll::-webkit-scrollbar { width: 4px; }
 .news-feed-scroll::-webkit-scrollbar-track { background: transparent; }
-.news-feed-scroll::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 2px;
-}
+.news-feed-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
 /* Two-column layout */
 .two-col {

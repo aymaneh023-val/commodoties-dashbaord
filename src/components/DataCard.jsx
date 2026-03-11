@@ -28,45 +28,40 @@ export default function DataCard({
     <div className="card relative overflow-hidden">
       {/* Title */}
       <p
-        className="text-xs uppercase tracking-widest mb-3"
-        style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
+        className="uppercase tracking-widest mb-3"
+        style={{ color: 'var(--text)', fontSize: 11, letterSpacing: '0.1em', fontWeight: 600 }}
       >
         {title}
       </p>
 
       {loading ? (
-        /* Skeleton — no text, just animated placeholders */
         <div>
           <div className="skeleton" style={{ width: 80, height: 32, marginBottom: 8 }} />
-          <div className="skeleton" style={{ width: 120, height: 10, marginBottom: 4 }} />
-          <div className="skeleton" style={{ width: 90, height: 8 }} />
+          <div className="skeleton" style={{ width: 120, height: 12, marginBottom: 4 }} />
+          <div className="skeleton" style={{ width: 90, height: 10 }} />
         </div>
       ) : error && !fromCache ? (
-        /* Hard error — no cached data available */
         <div>
-          <p className="text-2xl font-bold mb-1" style={{ color: 'var(--muted)', fontFamily: "'Syne', sans-serif" }}>
-            —
-          </p>
-          <p className="text-xs" style={{ color: 'var(--muted)' }}>⚠ Unavailable</p>
+          <p className="text-2xl font-bold mb-1" style={{ color: 'var(--muted)' }}>—</p>
+          <p style={{ fontSize: 13, color: 'var(--muted)' }}>⚠ Unavailable</p>
         </div>
       ) : (
-        /* Normal display — includes fromCache state */
         <>
           <div className="flex items-end gap-3 flex-wrap">
             <span
               className="text-3xl font-bold leading-none"
-              style={{ fontFamily: "'Syne', sans-serif", color: fromCache ? 'var(--muted)' : 'var(--text)' }}
+              style={{ color: 'var(--text)' }}
             >
               {displayValue}
             </span>
 
             {pctChange != null && (
               <span
-                className="text-sm font-medium px-2 py-0.5 rounded-md"
+                className="font-semibold px-2 py-0.5 rounded-md"
                 style={{
+                  fontSize: 14,
                   color: badgeColor,
-                  background: `${badgeColor}18`,
-                  fontFamily: "'DM Mono', monospace",
+                  background: `${badgeColor}20`,
                 }}
               >
                 {arrow} {formatPct(pctChange)}
@@ -77,40 +72,37 @@ export default function DataCard({
           </div>
 
           {subLabel && (
-            <p className="text-xs mt-1" style={{ color: 'var(--muted)' }}>
+            <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 6 }}>
               {subLabel}
             </p>
           )}
 
-          {/* 30d comparison date */}
+          {/* 30-day comparison date */}
           {!fromCache && baseDate && pctChange != null && (
-            <p style={{ fontSize: 10, fontFamily: "'DM Mono', monospace", color: 'var(--muted)', marginTop: 2, opacity: 0.7 }}>
-              compared to {baseDate}
+            <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
+              vs. {baseDate} (30-day change)
             </p>
           )}
 
-          {/* Cache indicator */}
+          {/* Cache warning */}
           {fromCache && (
-            <p style={{ fontSize: 10, fontFamily: "'DM Mono', monospace", color: '#f59e0b', marginTop: 4 }}>
+            <p style={{ fontSize: 13, color: 'var(--oil)', marginTop: 4 }}>
               ⚠ Cached{cacheAge != null ? ` · ${cacheAge}min ago` : ''}
             </p>
           )}
 
-          {/* Reference period */}
+          {/* Reference date */}
           {!fromCache && asOf && !isFallback && (
-            <p style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 10, marginTop: 4 }}>
+            <p style={{ color: 'var(--muted)', fontSize: 13, marginTop: 4 }}>
               as of {asOf}
             </p>
           )}
-
-
         </>
       )}
 
       {note && !loading && (
         <p
-          className="text-xs mt-3 pt-3 leading-relaxed"
-          style={{ color: 'var(--muted)', borderTop: '1px solid var(--border)' }}
+          style={{ fontSize: 13, color: 'var(--muted)', marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)', lineHeight: 1.6 }}
         >
           {note}
         </p>
@@ -123,15 +115,14 @@ export default function DataCard({
 
 function SignalPill({ signal }) {
   const colors = {
-    Critical: { bg: '#D94F3D' },
-    Elevated: { bg: '#FF8A61' },
-    Watch:    { bg: '#8890B5' },
+    Critical: 'var(--negative)',
+    Elevated: 'var(--accent)',
+    Watch:    'var(--muted)',
   }
   const c = colors[signal] || colors.Watch
   return (
     <span
-      className="text-xs px-2 py-0.5 rounded-full font-medium"
-      style={{ background: `${c.bg}28`, color: c.bg, border: `1px solid ${c.bg}50` }}
+      style={{ fontSize: 13, padding: '2px 8px', borderRadius: 999, fontWeight: 600, background: `${c}22`, color: c, border: `1px solid ${c}40` }}
     >
       {signal}
     </span>

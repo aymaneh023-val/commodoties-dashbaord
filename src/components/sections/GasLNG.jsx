@@ -1,11 +1,14 @@
 import DataCard from '../DataCard'
 import LineChartWrapper from '../LineChart'
 
-const EXPLAINER = 'TTF (Title Transfer Facility) front-month futures (TTF=F). Traded on ICE Endex, the Netherlands. Daily close, 30-day window via Yahoo Finance. EUR per MWh.'
+const EXPLAINER =
+  'TTF — Title Transfer Facility — is Europe\'s primary natural gas pricing benchmark. ' +
+  'Front-month futures (TTF=F) trade on ICE Endex, Netherlands. Prices in EUR per MWh (€/MWh) — 30-day daily closes via Yahoo Finance. ' +
+  'TTF sets the marginal cost of industrial energy and drives nitrogen fertilizer production costs across Europe.'
 
 const WHY_TRACKED = [
-  'European industrial energy costs are primarily driven by TTF.',
-  'Gas price changes affect production costs for energy-intensive goods and nitrogen fertilizer.',
+  'European industrial energy costs are primarily benchmarked against TTF.',
+  'Gas price spikes increase production costs for energy-intensive goods and nitrogen fertilizers such as urea and ammonia.',
 ]
 
 export default function GasLNG({ ttf }) {
@@ -14,31 +17,25 @@ export default function GasLNG({ ttf }) {
   return (
     <section id="gas" className="mb-14">
       <div className="mb-2">
-        <span
-          className="text-xs uppercase tracking-widest"
-          style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
-        >
+        <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)' }}>
           03 —
         </span>
-        <h2
-          className="text-lg font-bold inline ml-2"
-          style={{ fontFamily: "'Syne', sans-serif" }}
-        >
-          European Gas
+        <h2 className="inline ml-2" style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>
+          European Natural Gas (TTF)
         </h2>
       </div>
-      <p style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 400, marginBottom: 20 }}>
+      <p style={{ fontSize: 14, color: 'var(--text)', marginBottom: 20, lineHeight: 1.6 }}>
         {EXPLAINER}
       </p>
 
       <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
         <DataCard
-          title="TTF Natural Gas"
+          title="TTF Natural Gas — ICE Endex"
           value={ttf?.price}
           pctChange={ttf?.pctChange}
           decimals={2}
           unit=" €/MWh"
-          subLabel="ICE Endex TTF (TTF=F) · EUR/MWh · daily via Yahoo Finance"
+          subLabel="Front-month futures (TTF=F) · EUR per MWh · daily close"
           loading={ttf?.loading}
           error={ttf?.error}
           inverse={false}
@@ -52,12 +49,12 @@ export default function GasLNG({ ttf }) {
 
       {ttfHistory.length > 0 && (
         <div className="card mb-4" style={{ padding: '16px 16px 8px' }}>
-          <p style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 10, opacity: 0.7, marginBottom: 8 }}>
-            TTF Natural Gas · 30d · €/MWh
+          <p style={{ color: 'var(--muted)', fontSize: 13, marginBottom: 8 }}>
+            TTF Natural Gas (TTF=F) · 30 days · EUR/MWh
           </p>
           <LineChartWrapper
             data={ttfHistory}
-            lines={[{ key: 'close', color: '#3448BF', label: 'TTF' }]}
+            lines={[{ key: 'close', color: 'var(--gas)', label: 'TTF €/MWh' }]}
             xKey="date"
             yUnit=" €/MWh"
             height={160}
@@ -65,19 +62,13 @@ export default function GasLNG({ ttf }) {
         </div>
       )}
 
-      <div
-        className="card"
-        style={{ background: 'var(--surface2)', borderLeft: '3px solid var(--gas)' }}
-      >
-        <p
-          className="text-xs uppercase tracking-widest mb-3"
-          style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
-        >
+      <div className="card" style={{ background: 'var(--surface2)', borderLeft: '3px solid var(--gas)' }}>
+        <p style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)', marginBottom: 10 }}>
           Why tracked
         </p>
         <ul className="space-y-2">
           {WHY_TRACKED.map((point, i) => (
-            <li key={i} className="flex gap-2 text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>
+            <li key={i} className="flex gap-2 leading-relaxed" style={{ fontSize: 14, color: 'var(--text)' }}>
               <span style={{ color: 'var(--gas)', flexShrink: 0 }}>·</span>
               {point}
             </li>

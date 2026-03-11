@@ -2,13 +2,14 @@ import { useMemo } from 'react'
 import LineChartWrapper from '../LineChart'
 
 const EXPLAINER =
-  'Food inflation across three major economies. All three series show the monthly rate of change (MoM %) — how much food prices moved vs the prior month.'
+  'Monthly food price inflation for the EU, UK, and US. ' +
+  'All series show month-on-month percentage change (MoM%) — how much food consumer prices moved vs the prior month. ' +
+  'Sources: EU — Eurostat HICP food index (CP01, euro area); UK — ONS CPI food index (series D7BU); US — BLS CPI-U food at home (CUUR0000SAF1). ' +
+  'Data is updated once daily — underlying series are published monthly by the respective statistical agencies.'
 
 export default function Inflation({ eu, uk, us }) {
-  // Merge all three series by month key for the chart
   const chartData = useMemo(() => {
     const byMonth = new Map()
-
     eu.data.forEach((d) => {
       if (!byMonth.has(d.month)) byMonth.set(d.month, { month: d.label })
       byMonth.get(d.month).eu = d.value
@@ -21,8 +22,6 @@ export default function Inflation({ eu, uk, us }) {
       if (!byMonth.has(d.month)) byMonth.set(d.month, { month: d.label })
       byMonth.get(d.month).us = d.value
     })
-
-    // Sort by key (YYYY-MM) and return
     return [...byMonth.entries()]
       .sort((a, b) => a[0].localeCompare(b[0]))
       .map(([, v]) => v)
@@ -31,7 +30,6 @@ export default function Inflation({ eu, uk, us }) {
   const allLoading = eu.loading && uk.loading && us.loading
   const anyData = eu.data.length > 0 || uk.data.length > 0 || us.data.length > 0
 
-  // Latest values for summary cards
   const euLatest = eu.data.length > 0 ? eu.data[eu.data.length - 1] : null
   const ukLatest = uk.data.length > 0 ? uk.data[uk.data.length - 1] : null
   const usLatest = us.data.length > 0 ? us.data[us.data.length - 1] : null
@@ -39,30 +37,22 @@ export default function Inflation({ eu, uk, us }) {
   return (
     <section id="inflation" className="mb-14">
       <div className="mb-2">
-        <span
-          className="text-xs uppercase tracking-widest"
-          style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
-        >
+        <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)' }}>
           07 —
         </span>
-        <h2
-          className="text-lg font-bold inline ml-2"
-          style={{ fontFamily: "'Syne', sans-serif" }}
-        >
-          Food Inflation
+        <h2 className="inline ml-2" style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>
+          Food Inflation — EU · UK · US
         </h2>
       </div>
-      <p style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 400, marginBottom: 20 }}>
+      <p style={{ fontSize: 14, color: 'var(--text)', marginBottom: 20, lineHeight: 1.6 }}>
         {EXPLAINER}
       </p>
 
       {/* Summary cards */}
-      <div
-        className="grid gap-4 mb-6"
-        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}
-      >
+      <div className="grid gap-4 mb-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
         <InflationCard
-          label="EU HICP Food (MoM %)"
+          label="EU — Eurostat HICP Food (CP01)"
+          geography="Euro area, monthly"
           source="Eurostat"
           latest={euLatest}
           unit="%"
@@ -71,53 +61,41 @@ export default function Inflation({ eu, uk, us }) {
           color="var(--inflation)"
         />
         <InflationCard
-          label="UK CPI Food (MoM %)"
+          label="UK — ONS CPI Food (D7BU)"
+          geography="United Kingdom, monthly"
           source="ONS"
           latest={ukLatest}
           unit="%"
           loading={uk.loading}
           error={uk.error}
-          color="#3448BF"
+          color="var(--gas)"
         />
         <InflationCard
-          label="US CPI Food (MoM %)"
+          label="US — BLS CPI Food at Home"
+          geography="United States, monthly"
           source="BLS"
           latest={usLatest}
           unit="%"
           loading={us.loading}
           error={us.error}
-          color="#8890B5"
+          color="#5C69A0"
         />
       </div>
 
       {/* Chart */}
       <div className="card" style={{ padding: '16px 16px 8px' }}>
         {allLoading ? (
-          <div
-            className="flex items-center justify-center"
-            style={{ height: 220, color: 'var(--muted)', fontSize: 12 }}
-          >
+          <div className="flex items-center justify-center" style={{ height: 220, color: 'var(--muted)', fontSize: 14 }}>
             Loading inflation data…
           </div>
         ) : !anyData ? (
-          <div
-            className="flex items-center justify-center"
-            style={{ height: 220, color: 'var(--muted)', fontSize: 12 }}
-          >
+          <div className="flex items-center justify-center" style={{ height: 220, color: 'var(--muted)', fontSize: 14 }}>
             No inflation data available
           </div>
         ) : (
           <>
-            <p
-              style={{
-                color: 'var(--muted)',
-                fontFamily: "'DM Mono', monospace",
-                fontSize: 10,
-                opacity: 0.7,
-                marginBottom: 8,
-              }}
-            >
-              All series: monthly rate of change (MoM %)
+            <p style={{ color: 'var(--muted)', fontSize: 13, marginBottom: 8 }}>
+              All series: food price MoM% — EU (Eurostat), UK (ONS), US (BLS)
             </p>
             <LineChartWrapper
               data={chartData}
@@ -125,69 +103,50 @@ export default function Inflation({ eu, uk, us }) {
               height={220}
               showLegend
               lines={[
-                ...(eu.data.length > 0
-                  ? [{ key: 'eu', color: 'var(--inflation)', label: 'EU HICP Food (MoM %)' }]
-                  : []),
-                ...(uk.data.length > 0
-                  ? [{ key: 'uk', color: '#3448BF', label: 'UK CPI Food (MoM %)' }]
-                  : []),
-                ...(us.data.length > 0
-                  ? [{ key: 'us', color: '#8890B5', label: 'US CPI Food (MoM %)' }]
-                  : []),
+                ...(eu.data.length > 0 ? [{ key: 'eu', color: 'var(--inflation)', label: 'EU HICP Food MoM%' }] : []),
+                ...(uk.data.length > 0 ? [{ key: 'uk', color: 'var(--gas)',       label: 'UK CPI Food MoM%'  }] : []),
+                ...(us.data.length > 0 ? [{ key: 'us', color: '#5C69A0',          label: 'US CPI Food MoM%'  }] : []),
               ]}
             />
           </>
         )}
       </div>
 
-      {/* Why tracked */}
       <div
-        className="mt-4 px-4 py-3 rounded-xl text-xs"
-        style={{
-          background: 'var(--surface2)',
-          border: '1px solid var(--border)',
-          borderLeft: '3px solid var(--inflation)',
-          color: 'var(--muted)',
-          fontFamily: "'DM Mono', monospace",
-          fontSize: 12,
-          lineHeight: 1.6,
-        }}
+        className="mt-4 px-4 py-3 rounded-xl"
+        style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderLeft: '3px solid var(--inflation)', fontSize: 14, color: 'var(--text)', lineHeight: 1.6 }}
       >
-        <strong style={{ color: 'var(--text)' }}>Why tracked:</strong>{' '}
-        Food inflation is the downstream impact of commodity price shocks on consumers.
-        All three series measure the monthly rate of change in food prices (MoM %) — EU HICP via Eurostat, UK CPI via ONS, and US CPI Food via BLS.
+        <strong>Why tracked:</strong>{' '}
+        Food inflation is the downstream consumer impact of commodity price shocks — energy, fertilizer, and transport costs all flow through to supermarket prices. MoM% captures the direction and speed of that transmission.
       </div>
     </section>
   )
 }
 
-function InflationCard({ label, source, latest, unit, loading, error, color }) {
+function InflationCard({ label, geography, source, latest, unit, loading, error, color }) {
   return (
-    <div
-      className="card px-4 py-3"
-      style={{ borderTop: `2px solid ${color}` }}
-    >
-      <p
-        className="text-xs mb-1"
-        style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 10 }}
-      >
+    <div className="card" style={{ borderTop: `3px solid ${color}`, padding: '16px' }}>
+      <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 2, lineHeight: 1.4 }}>
         {label}
       </p>
+      <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 10 }}>
+        {geography}
+      </p>
       {loading ? (
-        <p className="text-sm" style={{ color: 'var(--muted)' }}>Loading…</p>
+        <p style={{ fontSize: 14, color: 'var(--muted)' }}>Loading…</p>
       ) : error ? (
-        <p className="text-sm" style={{ color: '#D94F3D' }}>Unavailable</p>
+        <p style={{ fontSize: 14, color: 'var(--negative)' }}>Unavailable</p>
       ) : latest ? (
         <>
-          <p className="text-xl font-bold" style={{ color: 'var(--text)' }}>
+          <p className="font-bold" style={{ fontSize: 24, color: 'var(--text)' }}>
             {latest.value}{unit}
           </p>
-          <p className="text-xs" style={{ color: 'var(--muted)', fontSize: 10 }}>
+          <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
             {latest.label} · {source}
           </p>
         </>
       ) : (
-        <p className="text-sm" style={{ color: 'var(--muted)' }}>No data</p>
+        <p style={{ fontSize: 14, color: 'var(--muted)' }}>No data</p>
       )}
     </div>
   )

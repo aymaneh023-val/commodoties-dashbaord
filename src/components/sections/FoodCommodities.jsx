@@ -4,69 +4,59 @@ import { FOOD_META } from '../../hooks/useFoodCommoditiesData'
 import { formatPrice, formatPct, pctArrow, pctColor } from '../../utils/formatters'
 
 const EXPLAINER =
-  'Global food commodity futures from CBOT and ICE. ' +
-  'Prices are in original contract units. All contracts are front-month, 30-day daily data via Yahoo Finance.'
+  'Front-month food commodity futures from CBOT (Chicago) and ICE. ' +
+  'Prices are in original contract units — see footnote for unit definitions. ' +
+  'All contracts show daily closes, 30-day window via Yahoo Finance. Percentage changes are 30-day.'
 
 const GROUPS = [
   {
-    label: 'GRAINS & OILSEEDS',
+    label: 'Grains & Oilseeds — CBOT Chicago',
     keys: ['wheat', 'corn', 'soybeans', 'soybeanOil'],
   },
   {
-    label: 'SOFT COMMODITIES',
+    label: 'Soft Commodities',
     keys: ['sugar'],
   },
 ]
 
 const COMMODITY_COLORS = {
-  wheat:       '#f59e0b',
-  corn:        '#c49000',
+  wheat:       '#B86E00',
+  corn:        '#8A6200',
   soybeans:    '#2D7A4F',
-  soybeanOil:  '#1a8a5c',
+  soybeanOil:  '#1E7A5C',
   sugar:       '#D94F3D',
 }
 
 const ALL_KEYS = GROUPS.flatMap(g => g.keys)
 
 export default function FoodCommodities({ data }) {
-  // Auto-insight
   const insight = useMemo(() => {
     const upCount = Object.keys(FOOD_META).filter(k => (data[k]?.pctChange ?? 0) > 10).length
     const total = Object.keys(FOOD_META).length
-    if (upCount === 0) return 'All food commodity moves are below 10% over 30 days.'
-    return `${upCount} of ${total} food commodities up >10% over 30 days.`
+    if (upCount === 0) return 'All food commodity moves are below 10% over the past 30 days.'
+    return `${upCount} of ${total} food commodities up more than 10% over the past 30 days.`
   }, [data])
 
   return (
     <section id="food" className="mb-14">
       <div className="mb-2">
-        <span
-          className="text-xs uppercase tracking-widest"
-          style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
-        >
+        <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)' }}>
           01 —
         </span>
-        <h2
-          className="text-lg font-bold inline ml-2"
-          style={{ fontFamily: "'Syne', sans-serif" }}
-        >
+        <h2 className="inline ml-2" style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>
           Food Commodities
         </h2>
       </div>
-      <p style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 400, marginBottom: 8 }}>
+      <p style={{ fontSize: 14, color: 'var(--text)', marginBottom: 6, lineHeight: 1.6 }}>
         {EXPLAINER}
       </p>
-      <p style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 20, opacity: 0.65, fontFamily: "'DM Mono', monospace" }}>
-        ¢/bu = cents per bushel · 1 bu ≈ 27 kg for wheat, 25 kg for corn &amp; soybeans
+      <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 20 }}>
+        ¢/bu = cents per bushel · 1 bu ≈ 27 kg (wheat), 25 kg (corn &amp; soybeans)
       </p>
 
-      {/* Card grid by group */}
       {GROUPS.map(group => (
         <div key={group.label} className="mb-6">
-          <p
-            className="text-xs uppercase tracking-widest mb-3"
-            style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 10, letterSpacing: '0.12em' }}
-          >
+          <p style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)', marginBottom: 12 }}>
             {group.label}
           </p>
           <div
@@ -79,41 +69,30 @@ export default function FoodCommodities({ data }) {
               const color = pctColor(d.pctChange, false)
               const arrow = pctArrow(d.pctChange)
               return (
-                <div
-                  key={key}
-                  className="card"
-                  style={{ padding: '14px 16px' }}
-                >
-                  <p
-                    className="text-xs uppercase tracking-widest mb-2"
-                    style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 9 }}
-                  >
+                <div key={key} className="card" style={{ padding: '14px 16px' }}>
+                  <p style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text)', marginBottom: 8, fontWeight: 600 }}>
                     {meta.label}
                   </p>
                   {d.loading ? (
                     <div>
                       <div className="skeleton" style={{ width: 70, height: 24, marginBottom: 6 }} />
-                      <div className="skeleton" style={{ width: 50, height: 8 }} />
+                      <div className="skeleton" style={{ width: 50, height: 10 }} />
                     </div>
                   ) : d.error ? (
-                    <p className="text-sm" style={{ color: 'var(--muted)' }}>—</p>
+                    <p style={{ fontSize: 14, color: 'var(--muted)' }}>—</p>
                   ) : (
                     <>
-                      <p
-                        className="text-xl font-bold leading-none mb-1"
-                        style={{ fontFamily: "'Syne', sans-serif", color: 'var(--text)' }}
-                      >
+                      <p className="font-bold leading-none mb-2" style={{ fontSize: 20, color: 'var(--text)' }}>
                         {formatPrice(d.price, 2)}{meta.unit}
                       </p>
                       {d.pctChange != null && (
                         <span
-                          className="text-xs px-1.5 py-0.5 rounded"
-                          style={{ color, background: `${color}18`, fontFamily: "'DM Mono', monospace", fontSize: 10 }}
+                          style={{ fontSize: 13, padding: '1px 6px', borderRadius: 4, color, background: `${color}20`, fontWeight: 500 }}
                         >
                           {arrow} {formatPct(d.pctChange)}
                         </span>
                       )}
-                      <p className="mt-2" style={{ fontSize: 10, color: 'var(--muted)', lineHeight: 1.4 }}>
+                      <p style={{ marginTop: 8, fontSize: 13, color: 'var(--muted)', lineHeight: 1.4 }}>
                         {meta.note}
                       </p>
                     </>
@@ -125,7 +104,6 @@ export default function FoodCommodities({ data }) {
         </div>
       ))}
 
-      {/* Individual charts */}
       <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
         {ALL_KEYS.map(key => {
           const history = data[key]?.history ?? []
@@ -133,8 +111,8 @@ export default function FoodCommodities({ data }) {
           if (history.length === 0) return null
           return (
             <div key={key} className="card" style={{ padding: '16px 16px 8px' }}>
-              <p style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 10, opacity: 0.7, marginBottom: 8 }}>
-                {meta.label} · 30d · {meta.unit?.trim()}
+              <p style={{ color: 'var(--muted)', fontSize: 13, marginBottom: 8 }}>
+                {meta.label} · 30 days · {meta.unit?.trim()}
               </p>
               <LineChartWrapper
                 data={history}
@@ -148,17 +126,9 @@ export default function FoodCommodities({ data }) {
         })}
       </div>
 
-      {/* Auto-insight */}
       <div
-        className="mt-4 px-4 py-3 rounded-xl text-xs"
-        style={{
-          background: 'var(--surface2)',
-          border: '1px solid var(--border)',
-          color: 'var(--muted)',
-          fontFamily: "'DM Mono', monospace",
-          fontSize: 12,
-          lineHeight: 1.6,
-        }}
+        className="mt-4 px-4 py-3 rounded-xl"
+        style={{ background: 'var(--surface2)', border: '1px solid var(--border)', fontSize: 14, color: 'var(--text)', lineHeight: 1.6 }}
       >
         {insight}
       </div>

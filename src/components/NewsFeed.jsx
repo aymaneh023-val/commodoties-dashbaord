@@ -2,22 +2,13 @@ import { useState } from 'react'
 import { timeAgo } from '../utils/formatters'
 
 const SOURCE_CONFIG = {
-  'reuters':            { label: 'Reuters',    color: '#f59e0b' },
-  'associated-press':   { label: 'AP',         color: '#6366f1' },
-  'bbc-news':           { label: 'BBC',        color: '#ef4444' },
-  'financial-times':    { label: 'FT',         color: '#f97316' },
-  'al-jazeera-english': { label: 'Al Jazeera', color: '#10b981' },
-  'the-wall-street-journal': { label: 'WSJ',   color: '#3b82f6' },
-  'bloomberg':          { label: 'Bloomberg',  color: '#7c3aed' },
-}
-
-const CATEGORY_COLORS = {
-  oil: 'var(--oil)',
-  gas: 'var(--gas)',
-  shipping: 'var(--shipping)',
-  fertilizer: 'var(--fertilizer)',
-  inflation: 'var(--inflation)',
-  ALL: 'var(--muted)',
+  'reuters':            { label: 'Reuters',    color: '#B86E00' },
+  'associated-press':   { label: 'AP',         color: '#4A4E99' },
+  'bbc-news':           { label: 'BBC',        color: '#C0392B' },
+  'financial-times':    { label: 'FT',         color: '#D4622A' },
+  'al-jazeera-english': { label: 'Al Jazeera', color: '#2D7A4F' },
+  'the-wall-street-journal': { label: 'WSJ',   color: '#3448BF' },
+  'bloomberg':          { label: 'Bloomberg',  color: '#6B4EC4' },
 }
 
 const getCategory = (article) => {
@@ -59,26 +50,20 @@ export default function NewsFeed({ articles, loading, error, activeFilter }) {
     >
       {/* Header */}
       <div className="mb-4">
-        <h2
-          className="text-base font-bold"
-          style={{ fontFamily: "'Syne', sans-serif" }}
-        >
+        <h2 className="text-base font-bold" style={{ color: 'var(--text)' }}>
           Market News
         </h2>
-        <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
+        <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 2 }}>
           Sources: Reuters · AP · BBC · FT · Al Jazeera · WSJ · Bloomberg
         </p>
-        <p
-          className="text-xs mt-0.5"
-          style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 10, opacity: 0.7 }}
-        >
-          ⚠ Free plan: articles up to 24h delayed
+        <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 2 }}>
+          Free plan: articles may be up to 24 h delayed
         </p>
       </div>
 
       {/* States */}
       {loading && !articles.length && (
-        <div className="flex items-center gap-2 py-6" style={{ color: 'var(--muted)', fontSize: 12 }}>
+        <div className="flex items-center gap-2 py-6" style={{ color: 'var(--muted)', fontSize: 14 }}>
           <span className="spinner" />
           Loading latest news…
         </div>
@@ -86,15 +71,15 @@ export default function NewsFeed({ articles, loading, error, activeFilter }) {
 
       {error && (
         <div
-          className="rounded-lg p-4 text-xs"
-          style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--muted)' }}
+          className="rounded-lg p-4"
+          style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--muted)', fontSize: 13 }}
         >
           {error}
         </div>
       )}
 
       {!loading && !error && filtered.length === 0 && (
-        <div className="text-xs py-4" style={{ color: 'var(--muted)' }}>
+        <div style={{ fontSize: 13, color: 'var(--muted)', paddingTop: 16, paddingBottom: 16 }}>
           No articles match the current filter.
         </div>
       )}
@@ -109,12 +94,12 @@ export default function NewsFeed({ articles, loading, error, activeFilter }) {
       {filtered.length > showCount && (
         <button
           onClick={() => setShowCount((c) => c + 10)}
-          className="w-full mt-3 py-2 rounded-lg text-xs transition-colors"
+          className="w-full mt-3 py-2 rounded-lg transition-colors"
           style={{
             background: 'var(--surface)',
             border: '1px solid var(--border)',
             color: 'var(--muted)',
-            fontFamily: "'DM Mono', monospace",
+            fontSize: 13,
             cursor: 'pointer',
           }}
           onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text)' }}
@@ -129,7 +114,7 @@ export default function NewsFeed({ articles, loading, error, activeFilter }) {
 
 function ArticleCard({ article }) {
   const sourceId = article.source?.id || ''
-  const src = SOURCE_CONFIG[sourceId] || { label: article.source?.name || 'Source', color: '#8890B5' }
+  const src = SOURCE_CONFIG[sourceId] || { label: article.source?.name || 'Source', color: 'var(--muted)' }
   const cat = article._cat || getCategory(article)
 
   return (
@@ -150,31 +135,26 @@ function ArticleCard({ article }) {
       {/* Top badges row */}
       <div className="flex items-center gap-2 mb-2 flex-wrap">
         <span
-          className="text-xs px-2 py-0.5 rounded font-medium"
+          className="px-2 py-0.5 rounded font-medium"
           style={{
             color: src.color,
-            background: `${src.color}18`,
-            fontFamily: "'DM Mono', monospace",
-            fontSize: 10,
+            background: `${src.color}20`,
+            fontSize: 12,
           }}
         >
           {src.label}
         </span>
         <span
-          className="text-xs px-2 py-0.5 rounded"
+          className="px-2 py-0.5 rounded"
           style={{
             color: cat.color,
-            background: `color-mix(in srgb, ${cat.color === 'var(--muted)' ? '#8890B5' : cat.color} 10%, transparent)`,
-            fontFamily: "'DM Mono', monospace",
-            fontSize: 10,
+            background: `${cat.color === 'var(--muted)' ? '#8890B5' : cat.color}20`,
+            fontSize: 12,
           }}
         >
           {cat.label}
         </span>
-        <span
-          className="text-xs ml-auto"
-          style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 10 }}
-        >
+        <span className="ml-auto" style={{ color: 'var(--muted)', fontSize: 12 }}>
           {timeAgo(article.publishedAt)}
         </span>
       </div>
@@ -199,7 +179,7 @@ function ArticleCard({ article }) {
           {/* Headline */}
           <p
             className="leading-snug mb-1 font-medium"
-            style={{ fontFamily: "'Syne', sans-serif", color: 'var(--text)', fontSize: 13 }}
+            style={{ color: 'var(--text)', fontSize: 13 }}
           >
             {article.title}
           </p>
@@ -207,8 +187,8 @@ function ArticleCard({ article }) {
           {/* Description */}
           {article.description && (
             <p
-              className="text-xs leading-relaxed line-clamp-2"
-              style={{ color: 'var(--muted)' }}
+              className="leading-relaxed line-clamp-2"
+              style={{ color: 'var(--muted)', fontSize: 13 }}
             >
               {article.description}
             </p>

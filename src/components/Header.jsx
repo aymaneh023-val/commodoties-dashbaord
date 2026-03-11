@@ -3,14 +3,15 @@ import { FILTER_TABS } from '../utils/constants'
 import { formatTime } from '../utils/formatters'
 
 const STATUS_DOT = {
-  green: { color: '#2D7A4F', label: 'All sources connected', animation: '' },
-  amber: { color: '#f59e0b', label: 'Some sources partially available', animation: '' },
-  red:   { color: '#D94F3D', label: 'Sources unavailable — showing fallback data', animation: '' },
+  green: { color: 'var(--positive)', label: 'All sources connected' },
+  amber: { color: 'var(--oil)',      label: 'Some sources partially available' },
+  red:   { color: 'var(--negative)', label: 'Sources unavailable — showing cached data' },
 }
 
-export default function Header({ activeFilter, onFilterChange, onRefresh, lastUpdated, nextUpdate, refreshing = false, connectionStatus = 'green', onShowReferences }) {
+export default function Header({ activeFilter, onFilterChange, onRefresh, lastUpdated, nextUpdate,
+  refreshing = false, connectionStatus = 'green', onShowReferences }) {
   const status = STATUS_DOT[connectionStatus] ?? STATUS_DOT.green
-  // Read initial hash on mount
+
   useEffect(() => {
     const hash = window.location.hash.replace('#', '').toLowerCase()
     const valid = FILTER_TABS.find((t) => t.id.toLowerCase() === hash)
@@ -31,52 +32,35 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
       {/* Top row */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="flex-1 min-w-0">
-          {/* Eyebrow */}
+          {/* Status eyebrow */}
           <div className="flex items-center gap-2 mb-2">
             <span
-              className={status.animation}
               title={status.label}
-              style={{
-                display: 'inline-block',
-                width: 8,
-                height: 8,
-                borderRadius: '50%',
-                backgroundColor: status.color,
-                flexShrink: 0,
-              }}
+              style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', backgroundColor: status.color, flexShrink: 0 }}
             />
-            <span
-              className="text-xs tracking-widest uppercase"
-              style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
-            >
-              {connectionStatus === 'green' ? 'Connected' : connectionStatus === 'amber' ? 'Partial' : 'Reconnecting'} · Last updated {lastUpdated ? formatTime(lastUpdated) : '—'}{nextUpdate ? ` · Next: ${nextUpdate}` : ''}
+            <span style={{ fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+              {connectionStatus === 'green' ? 'Live' : connectionStatus === 'amber' ? 'Partial' : 'Reconnecting'}
+              {' · Updated '}{lastUpdated ? formatTime(lastUpdated) : '—'}
+              {nextUpdate ? ` · Next: ${nextUpdate}` : ''}
             </span>
           </div>
 
-          {/* Title */}
-          <h1
-            className="text-xl font-bold leading-tight"
-            style={{ fontFamily: "'Syne', sans-serif", color: 'var(--text)' }}
-          >
+          <h1 className="font-bold leading-tight" style={{ fontSize: 20, color: 'var(--text)' }}>
             EU Commodity Monitor
           </h1>
-          <p className="text-sm mt-0.5" style={{ color: 'var(--muted)' }}>
-            Live prices, supply routes, and macro indicators for European markets
+          <p style={{ fontSize: 14, color: 'var(--muted)', marginTop: 2 }}>
+            Energy, food, freight and inflation data for European markets
           </p>
         </div>
 
         {/* Action buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={onShowReferences}
-            className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg transition-colors"
             style={{
-              background: 'transparent',
-              border: '1px solid transparent',
-              color: 'var(--muted)',
-              fontFamily: "'DM Mono', monospace",
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
+              fontSize: 14, padding: '6px 12px', borderRadius: 8,
+              background: 'transparent', border: '1px solid transparent',
+              color: 'var(--muted)', cursor: 'pointer',
             }}
             onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text)' }}
             onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--muted)' }}
@@ -86,20 +70,16 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
           <button
             onClick={onRefresh}
             disabled={refreshing}
-            className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg transition-colors"
             style={{
-              background: 'var(--surface)',
-              border: '1px solid var(--border)',
-              color: 'var(--muted)',
-              fontFamily: "'DM Mono', monospace",
-              cursor: refreshing ? 'not-allowed' : 'pointer',
-              opacity: refreshing ? 0.5 : 1,
-              whiteSpace: 'nowrap',
+              fontSize: 14, padding: '6px 14px', borderRadius: 8,
+              background: 'var(--surface)', border: '1px solid var(--border)',
+              color: refreshing ? 'var(--muted)' : 'var(--text)',
+              cursor: refreshing ? 'not-allowed' : 'pointer', fontWeight: 500,
             }}
-            onMouseEnter={(e) => { if (!refreshing) e.currentTarget.style.color = 'var(--text)' }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--muted)' }}
+            onMouseEnter={(e) => { if (!refreshing) e.currentTarget.style.borderColor = 'var(--text)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)' }}
           >
-            {refreshing ? '⏳' : '↻'} {refreshing ? 'Refreshing…' : 'Refresh'}
+            {refreshing ? '⏳ Refreshing…' : '↻ Refresh'}
           </button>
         </div>
       </div>
@@ -112,13 +92,13 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
             <button
               key={tab.id}
               onClick={() => handleTabClick(tab.id)}
-              className="text-xs px-3 py-1.5 rounded-lg transition-all"
               style={{
-                fontFamily: "'DM Mono', monospace",
+                fontSize: 13, padding: '5px 12px', borderRadius: 8,
                 background: isActive ? 'var(--text)' : '#E8EAF2',
                 color: isActive ? '#FFFFFF' : 'var(--text)',
-                border: isActive ? '1px solid var(--text)' : '1px solid transparent',
-                cursor: 'pointer',
+                border: '1px solid transparent',
+                cursor: 'pointer', fontWeight: isActive ? 600 : 400,
+                transition: 'background 0.12s',
               }}
             >
               {tab.label}

@@ -10,16 +10,6 @@ import {
   Legend,
 } from 'recharts'
 
-/**
- * @param {Object} props
- * @param {Array} props.data
- * @param {Array<{key, color, label, dashed?}>} props.lines
- * @param {string} props.xKey
- * @param {string} props.yUnit
- * @param {number} props.height
- * @param {Array<{value, label, color}>} props.referenceLines
- * @param {boolean} props.showLegend
- */
 export default function LineChartWrapper({
   data = [],
   lines = [],
@@ -32,7 +22,7 @@ export default function LineChartWrapper({
   if (!data.length) return (
     <div
       className="flex items-center justify-center rounded-lg"
-      style={{ height, background: 'var(--surface2)', color: 'var(--muted)', fontSize: 12 }}
+      style={{ height, background: 'var(--surface2)', color: 'var(--muted)', fontSize: 13 }}
     >
       No chart data
     </div>
@@ -40,23 +30,23 @@ export default function LineChartWrapper({
 
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <ReLineChart data={data} margin={{ top: 8, right: 40, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(194,201,229,0.4)" vertical={false} />
+      <ReLineChart data={data} margin={{ top: 8, right: 48, left: 0, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#C2C9E5" vertical={false} />
         <XAxis
           dataKey={xKey}
-          tick={{ fill: '#8890B5', fontSize: 11, fontFamily: "'DM Mono', monospace" }}
-          axisLine={{ stroke: 'rgba(194,201,229,0.5)' }}
+          tick={{ fill: '#131B47', fontSize: 12 }}
+          axisLine={{ stroke: '#C2C9E5' }}
           tickLine={false}
           interval={6}
         />
         <YAxis
           orientation="right"
-          tickCount={3}
-          tick={{ fill: '#8890B5', fontSize: 11, fontFamily: "'DM Mono', monospace" }}
+          tickCount={4}
+          tick={{ fill: '#131B47', fontSize: 12 }}
           axisLine={false}
           tickLine={false}
           domain={['auto', 'auto']}
-          width={40}
+          width={48}
         />
         <Tooltip content={<CustomTooltip yUnit={yUnit} />} />
         {showLegend && (
@@ -64,8 +54,8 @@ export default function LineChartWrapper({
             verticalAlign="bottom"
             align="left"
             iconType="circle"
-            iconSize={7}
-            wrapperStyle={{ fontSize: 11, fontFamily: "'DM Mono', monospace", color: '#8890B5', paddingTop: 8 }}
+            iconSize={8}
+            wrapperStyle={{ fontSize: 13, color: '#131B47', paddingTop: 10 }}
           />
         )}
         {referenceLines.map((rl) => (
@@ -78,8 +68,7 @@ export default function LineChartWrapper({
             label={{
               value: rl.label,
               fill: rl.color || '#8890B5',
-              fontSize: 10,
-              fontFamily: "'DM Mono', monospace",
+              fontSize: 12,
               position: 'insideTopRight',
             }}
           />
@@ -90,10 +79,10 @@ export default function LineChartWrapper({
             type="monotone"
             dataKey={l.key}
             stroke={l.color}
-            strokeWidth={1.5}
+            strokeWidth={2}
             strokeDasharray={l.dashed ? '5 3' : undefined}
             dot={false}
-            activeDot={{ r: 3, strokeWidth: 0 }}
+            activeDot={{ r: 4, strokeWidth: 0 }}
             name={l.label || l.key}
           />
         ))}
@@ -106,16 +95,17 @@ function CustomTooltip({ active, payload, label, yUnit }) {
   if (!active || !payload || !payload.length) return null
   return (
     <div
-      className="rounded-lg px-3 py-2 text-xs"
+      className="rounded-lg px-3 py-2"
       style={{
-        background: 'var(--surface2)',
+        background: 'var(--surface)',
         border: '1px solid var(--border)',
-        fontFamily: "'DM Mono', monospace",
+        fontSize: 13,
+        boxShadow: '0 2px 8px rgba(19,27,71,0.1)',
       }}
     >
-      <p className="mb-1" style={{ color: 'var(--muted)' }}>{label}</p>
+      <p className="mb-1" style={{ color: 'var(--muted)', fontSize: 12 }}>{label}</p>
       {payload.map((entry) => (
-        <p key={entry.dataKey} style={{ color: entry.color }}>
+        <p key={entry.dataKey} style={{ color: entry.color, fontWeight: 600 }}>
           {entry.name}: {entry.value != null ? `${Number(entry.value).toFixed(2)}${yUnit}` : '—'}
         </p>
       ))}
