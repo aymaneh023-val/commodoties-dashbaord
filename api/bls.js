@@ -15,7 +15,11 @@ export default async function handler(req, res) {
       body: JSON.stringify({ seriesid: ['CUUR0000SAF1'] }),
       signal: AbortSignal.timeout(15000),
     })
-    if (!r.ok) throw new Error(`BLS: ${r.status}`)
+    if (!r.ok) {
+      const body = await r.text().catch(() => '(unreadable)')
+      console.error('BLS HTTP error', r.status, body.substring(0, 300))
+      throw new Error(`BLS: ${r.status}`)
+    }
 
     const json = await r.json()
 
@@ -31,7 +35,7 @@ export default async function handler(req, res) {
     // BLS returns newest first; each item: { year, period, periodName, value }
     // period is "M01"–"M12", skip "M13" (annual avg)
     const monthly = series
-      .filter((d) => d.period !== 'M13')
+      .filter((d) => d.period !== 'M13' && d.value !== '-')
       .map((d) => ({
         month: `${d.year}-${d.period.replace('M', '')}`,
         value: parseFloat(d.value),

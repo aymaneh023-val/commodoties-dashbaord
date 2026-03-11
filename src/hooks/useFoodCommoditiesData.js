@@ -78,6 +78,14 @@ async function fetchTicker(key, ticker) {
   const url = `${YAHOO_BASE}/${ticker}?interval=1d&range=30d`
   try {
     const json = await fetchWithRetry(url)
+    if (key === 'rice') {
+      const r = json?.chart?.result?.[0]
+      console.log('[rice raw]', {
+        price: r?.meta?.regularMarketPrice,
+        history: r?.indicators?.quote?.[0]?.close?.slice(0, 5),
+        timestamps: r?.timestamp?.slice(0, 5),
+      })
+    }
     const parsed = parseTicker(json)
     if (!parsed.error) {
       memCache[key] = { ...parsed, cachedAt: Date.now() }
