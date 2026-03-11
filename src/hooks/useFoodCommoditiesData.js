@@ -9,7 +9,6 @@ export const FOOD_TICKERS = {
   corn:        'ZC=F',
   soybeans:    'ZS=F',
   soybeanOil:  'ZL=F',
-  rice:        'ZR=F',
   sugar:       'SB=F',
 }
 
@@ -18,7 +17,6 @@ export const FOOD_META = {
   corn:        { label: 'Corn',             unit: ' ¢/bu',  note: 'CBOT Corn (ZC=F). Primary feed grain.' },
   soybeans:    { label: 'Soybeans',         unit: ' ¢/bu',  note: 'CBOT Soybeans (ZS=F). Oil and protein crop.' },
   soybeanOil:  { label: 'Soybean Oil',      unit: ' ¢/lb',  note: 'CBOT Soybean Oil (ZL=F). Vegetable oil benchmark.' },
-  rice:        { label: 'Rice',             unit: ' ¢/cwt', note: 'CBOT Rough Rice (ZR=F). US contract.' },
   sugar:       { label: 'Sugar',            unit: ' ¢/lb',  note: 'ICE Sugar No.11 (SB=F). Global raw sugar.' },
 }
 
@@ -78,14 +76,6 @@ async function fetchTicker(key, ticker) {
   const url = `${YAHOO_BASE}/${ticker}?interval=1d&range=30d`
   try {
     const json = await fetchWithRetry(url)
-    if (key === 'rice') {
-      const r = json?.chart?.result?.[0]
-      console.log('[rice raw]', {
-        price: r?.meta?.regularMarketPrice,
-        history: r?.indicators?.quote?.[0]?.close?.slice(0, 5),
-        timestamps: r?.timestamp?.slice(0, 5),
-      })
-    }
     const parsed = parseTicker(json)
     if (!parsed.error) {
       memCache[key] = { ...parsed, cachedAt: Date.now() }

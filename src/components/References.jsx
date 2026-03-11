@@ -89,12 +89,6 @@ const SECTIONS = [
         desc: 'CBOT soybean meal futures, $/short ton',
       },
       {
-        name: 'Rough Rice Futures (ZR=F)',
-        provider: 'Yahoo Finance',
-        url: 'https://finance.yahoo.com/quote/ZR=F',
-        desc: 'CBOT rough rice futures, $/cwt',
-      },
-      {
         name: 'Sugar #11 Futures (SB=F)',
         provider: 'Yahoo Finance',
         url: 'https://finance.yahoo.com/quote/SB=F',
