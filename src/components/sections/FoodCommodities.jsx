@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
 import LineChartWrapper from '../LineChart'
 import { FOOD_META } from '../../hooks/useFoodCommoditiesData'
 import { formatPrice, formatPct, pctArrow, pctColor } from '../../utils/formatters'
@@ -27,13 +27,9 @@ const COMMODITY_COLORS = {
   sugar:       '#f87171',
 }
 
+const ALL_KEYS = GROUPS.flatMap(g => g.keys)
+
 export default function FoodCommodities({ data }) {
-  const [selectedKey, setSelectedKey] = useState(null)
-
-  const handleCardClick = (key) => {
-    setSelectedKey(prev => prev === key ? null : key)
-  }
-
   // Auto-insight
   const insight = useMemo(() => {
     const upCount = Object.keys(FOOD_META).filter(k => (data[k]?.pctChange ?? 0) > 10).length
@@ -41,9 +37,6 @@ export default function FoodCommodities({ data }) {
     if (upCount === 0) return 'All food commodity moves are below 10% over 30 days.'
     return `${upCount} of ${total} food commodities up >10% over 30 days.`
   }, [data])
-
-  const selectedMeta = selectedKey ? FOOD_META[selectedKey] : null
-  const selectedHistory = selectedKey ? (data[selectedKey]?.history ?? []) : []
 
   return (
     <section id="food" className="mb-14">
@@ -83,19 +76,11 @@ export default function FoodCommodities({ data }) {
               const meta = FOOD_META[key]
               const color = pctColor(d.pctChange, false)
               const arrow = pctArrow(d.pctChange)
-              const isSelected = selectedKey === key
               return (
                 <div
                   key={key}
                   className="card"
-                  onClick={() => handleCardClick(key)}
-                  style={{
-                    padding: '14px 16px',
-                    cursor: 'pointer',
-                    outline: isSelected ? `2px solid ${COMMODITY_COLORS[key] ?? 'var(--text)'}` : 'none',
-                    outlineOffset: -2,
-                    transition: 'outline 0.15s ease',
-                  }}
+                  style={{ padding: '14px 16px' }}
                 >
                   <p
                     className="text-xs uppercase tracking-widest mb-2"
@@ -138,21 +123,28 @@ export default function FoodCommodities({ data }) {
         </div>
       ))}
 
-      {/* Individual chart for selected commodity */}
-      {selectedKey && selectedHistory.length > 0 && (
-        <div className="card mb-4" style={{ padding: '16px 16px 8px' }}>
-          <p style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 10, opacity: 0.7, marginBottom: 8 }}>
-            {selectedMeta?.label} · 30d · {selectedMeta?.unit?.trim()}
-          </p>
-          <LineChartWrapper
-            data={selectedHistory}
-            lines={[{ key: 'close', color: COMMODITY_COLORS[selectedKey] ?? '#6b7fa3', label: selectedMeta?.label ?? selectedKey }]}
-            xKey="date"
-            yUnit={selectedMeta?.unit ?? ''}
-            height={180}
-          />
-        </div>
-      )}
+      {/* Individual charts */}
+      <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+        {ALL_KEYS.map(key => {
+          const history = data[key]?.history ?? []
+          const meta = FOOD_META[key]
+          if (history.length === 0) return null
+          return (
+            <div key={key} className="card" style={{ padding: '16px 16px 8px' }}>
+              <p style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: 10, opacity: 0.7, marginBottom: 8 }}>
+                {meta.label} · 30d · {meta.unit?.trim()}
+              </p>
+              <LineChartWrapper
+                data={history}
+                lines={[{ key: 'close', color: COMMODITY_COLORS[key] ?? '#6b7fa3', label: meta.label }]}
+                xKey="date"
+                yUnit={meta.unit ?? ''}
+                height={140}
+              />
+            </div>
+          )
+        })}
+      </div>
 
       {/* Auto-insight */}
       <div
