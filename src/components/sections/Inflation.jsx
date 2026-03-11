@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import LineChartWrapper from '../LineChart'
 
 const EXPLAINER =
-  'Food inflation metrics across three major economies. EU HICP and UK CPI show monthly rate of change (%), while US CPI Food shows the index level.'
+  'Food inflation across three major economies. All three series show the monthly rate of change (MoM %) — how much food prices moved vs the prior month.'
 
 export default function Inflation({ eu, uk, us }) {
   // Merge all three series by month key for the chart
@@ -62,7 +62,7 @@ export default function Inflation({ eu, uk, us }) {
         style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}
       >
         <InflationCard
-          label="EU HICP Food"
+          label="EU HICP Food (MoM %)"
           source="Eurostat"
           latest={euLatest}
           unit="%"
@@ -71,7 +71,7 @@ export default function Inflation({ eu, uk, us }) {
           color="var(--inflation)"
         />
         <InflationCard
-          label="UK CPI Food"
+          label="UK CPI Food (MoM %)"
           source="ONS"
           latest={ukLatest}
           unit="%"
@@ -80,10 +80,10 @@ export default function Inflation({ eu, uk, us }) {
           color="#3448BF"
         />
         <InflationCard
-          label="US CPI Food"
+          label="US CPI Food (MoM %)"
           source="BLS"
           latest={usLatest}
-          unit=" idx"
+          unit="%"
           loading={us.loading}
           error={us.error}
           color="#8890B5"
@@ -117,7 +117,7 @@ export default function Inflation({ eu, uk, us }) {
                 marginBottom: 8,
               }}
             >
-              EU & UK: monthly % change · US: index level
+              All series: monthly rate of change (MoM %)
             </p>
             <LineChartWrapper
               data={chartData}
@@ -126,13 +126,13 @@ export default function Inflation({ eu, uk, us }) {
               showLegend
               lines={[
                 ...(eu.data.length > 0
-                  ? [{ key: 'eu', color: 'var(--inflation)', label: 'EU HICP Food (%)' }]
+                  ? [{ key: 'eu', color: 'var(--inflation)', label: 'EU HICP Food (MoM %)' }]
                   : []),
                 ...(uk.data.length > 0
-                  ? [{ key: 'uk', color: '#3448BF', label: 'UK CPI Food (%)' }]
+                  ? [{ key: 'uk', color: '#3448BF', label: 'UK CPI Food (MoM %)' }]
                   : []),
                 ...(us.data.length > 0
-                  ? [{ key: 'us', color: '#8890B5', label: 'US CPI Food (idx)' }]
+                  ? [{ key: 'us', color: '#8890B5', label: 'US CPI Food (MoM %)' }]
                   : []),
               ]}
             />
@@ -155,7 +155,7 @@ export default function Inflation({ eu, uk, us }) {
       >
         <strong style={{ color: 'var(--text)' }}>Why tracked:</strong>{' '}
         Food inflation is the downstream impact of commodity price shocks on consumers.
-        EU HICP and UK CPI measure monthly price changes; US CPI Food tracks the absolute index level.
+        All three series measure the monthly rate of change in food prices (MoM %) — EU HICP via Eurostat, UK CPI via ONS, and US CPI Food via BLS.
       </div>
     </section>
   )
