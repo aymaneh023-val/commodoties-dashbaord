@@ -33,9 +33,9 @@ export function pctColorClass(val, inverse = false) {
   if (val == null || isNaN(val)) return 'text-[var(--muted)]'
   const positive = val >= 0
   if (inverse) {
-    return positive ? 'text-[#4ade80]' : 'text-[#f87171]'
+    return positive ? 'text-[#2D7A4F]' : 'text-[#D94F3D]'
   }
-  return positive ? 'text-[#f87171]' : 'text-[#4ade80]'
+  return positive ? 'text-[#D94F3D]' : 'text-[#2D7A4F]'
 }
 
 /**
@@ -47,9 +47,9 @@ export function pctColor(val, inverse = false) {
   if (val == null || isNaN(val)) return 'var(--muted)'
   const positive = val >= 0
   if (inverse) {
-    return positive ? '#4ade80' : '#f87171'
+    return positive ? '#2D7A4F' : '#D94F3D'
   }
-  return positive ? '#f87171' : '#4ade80'
+  return positive ? '#D94F3D' : '#2D7A4F'
 }
 
 /**

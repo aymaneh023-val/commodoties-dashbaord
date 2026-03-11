@@ -60,7 +60,7 @@ export default function Fertilizer({ urea }) {
           </p>
           <LineChartWrapper
             data={ureaHistory}
-            lines={[{ key: 'close', color: '#4ade80', label: 'Urea' }]}
+            lines={[{ key: 'close', color: '#2D7A4F', label: 'Urea' }]}
             xKey="date"
             yUnit=" $/ton"
             height={160}

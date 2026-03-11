@@ -41,18 +41,18 @@ export default function LineChartWrapper({
   return (
     <ResponsiveContainer width="100%" height={height}>
       <ReLineChart data={data} margin={{ top: 8, right: 40, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(194,201,229,0.4)" vertical={false} />
         <XAxis
           dataKey={xKey}
-          tick={{ fill: '#6b7fa3', fontSize: 11, fontFamily: "'DM Mono', monospace" }}
-          axisLine={{ stroke: 'rgba(255,255,255,0.07)' }}
+          tick={{ fill: '#8890B5', fontSize: 11, fontFamily: "'DM Mono', monospace" }}
+          axisLine={{ stroke: 'rgba(194,201,229,0.5)' }}
           tickLine={false}
           interval={6}
         />
         <YAxis
           orientation="right"
           tickCount={3}
-          tick={{ fill: '#6b7fa3', fontSize: 11, fontFamily: "'DM Mono', monospace" }}
+          tick={{ fill: '#8890B5', fontSize: 11, fontFamily: "'DM Mono', monospace" }}
           axisLine={false}
           tickLine={false}
           domain={['auto', 'auto']}
@@ -65,19 +65,19 @@ export default function LineChartWrapper({
             align="left"
             iconType="circle"
             iconSize={7}
-            wrapperStyle={{ fontSize: 11, fontFamily: "'DM Mono', monospace", color: '#6b7fa3', paddingTop: 8 }}
+            wrapperStyle={{ fontSize: 11, fontFamily: "'DM Mono', monospace", color: '#8890B5', paddingTop: 8 }}
           />
         )}
         {referenceLines.map((rl) => (
           <ReferenceLine
             key={rl.value}
             y={rl.value}
-            stroke={rl.color || '#6b7fa3'}
+            stroke={rl.color || '#8890B5'}
             strokeDasharray="4 4"
             strokeWidth={1}
             label={{
               value: rl.label,
-              fill: rl.color || '#6b7fa3',
+              fill: rl.color || '#8890B5',
               fontSize: 10,
               fontFamily: "'DM Mono', monospace",
               position: 'insideTopRight',

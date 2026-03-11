@@ -4,40 +4,27 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Light theme (default) ─────────────────────────── */
+/* ─── A-Insights Light Theme ─────────────────────────── */
 :root {
-  --bg:       #f5f7fa;
-  --surface:  #ffffff;
-  --surface2: #f0f4f8;
-  --border:   rgba(0, 0, 0, 0.07);
-  --text:     #111827;
-  --muted:    #6b7280;
+  --bg:            #F7F6F3;
+  --surface:       #FFFFFF;
+  --surface2:      #F0EDE8;
+  --border:        #C2C9E5;
+  --text:          #131B47;
+  --muted:         #8890B5;
+  --accent:        #FF8A61;
+  --accent-yellow: #FFC300;
+  --accent-light:  #FFCCBB;
+  --negative:      #D94F3D;
+  --positive:      #2D7A4F;
 
-  /* Category colors — identical in both modes */
+  /* Category colors */
   --oil:        #f59e0b;
-  --gas:        #38bdf8;
+  --gas:        #3448BF;
   --shipping:   #818cf8;
-  --fertilizer: #4ade80;
-  --inflation:  #fb923c;
+  --fertilizer: #2D7A4F;
+  --inflation:  #FF8A61;
   --food:       #a78bfa;
-}
-
-/* ─── Dark theme (system preference) ────────────────── */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg:       #0a0e1a;
-    --surface:  #111827;
-    --surface2: #1a2235;
-    --border:   rgba(255, 255, 255, 0.07);
-    --text:     #e8edf5;
-    --muted:    #6b7fa3;
-  }
-
-  body {
-    background-image:
-      linear-gradient(rgba(255, 255, 255, 0.008) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.008) 1px, transparent 1px);
-  }
 }
 
 * {
@@ -48,10 +35,6 @@
 
 body {
   background-color: var(--bg);
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.012) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.012) 1px, transparent 1px);
-  background-size: 40px 40px;
   color: var(--text);
   font-family: 'DM Mono', monospace;
   font-size: 14px;
@@ -72,7 +55,7 @@ h1, h2, h3, h4, h5, h6,
 .pulse-dot {
   width: 8px;
   height: 8px;
-  background: #22c55e;
+  background: var(--positive);
   border-radius: 50%;
   animation: pulse-dot 2s ease-in-out infinite;
   display: inline-block;
@@ -103,6 +86,7 @@ h1, h2, h3, h4, h5, h6,
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 20px;
+  box-shadow: 0 1px 3px rgba(19, 27, 71, 0.04);
 }
 
 /* Spinner animation */

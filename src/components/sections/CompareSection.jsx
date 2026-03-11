@@ -20,7 +20,7 @@ const METRIC_OPTIONS = [
 ]
 
 // Distinct stroke colors for up to 4 lines (resolved at render via getComputedStyle)
-const LINE_COLORS = ['#f59e0b', '#38bdf8', '#818cf8', '#4ade80']
+const LINE_COLORS = ['#FF8A61', '#3448BF', '#8890B5', '#2D7A4F']
 
 const DEFAULT_SELECTIONS = ['brent', 'ttf', 'zim', 'urea']
 
@@ -140,7 +140,7 @@ export default function CompareSection({ commodityData }) {
           className="text-xs uppercase tracking-widest"
           style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
         >
-          06 —
+          08 —
         </span>
         <h2
           className="text-lg font-bold inline ml-2"
@@ -221,11 +221,11 @@ export default function CompareSection({ commodityData }) {
             </p>
             <ResponsiveContainer width="100%" height={260}>
               <LineChart data={chartData} margin={{ top: 8, right: 40, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(194,201,229,0.4)" vertical={false} />
                 <XAxis
                   dataKey="date"
-                  tick={{ fill: '#6b7fa3', fontSize: 11, fontFamily: "'DM Mono', monospace" }}
-                  axisLine={{ stroke: 'rgba(255,255,255,0.07)' }}
+                  tick={{ fill: '#8890B5', fontSize: 11, fontFamily: "'DM Mono', monospace" }}
+                  axisLine={{ stroke: 'rgba(194,201,229,0.5)' }}
                   tickLine={false}
                   interval={6}
                 />
@@ -233,7 +233,7 @@ export default function CompareSection({ commodityData }) {
                   orientation="right"
                   domain={[0, 100]}
                   tickCount={5}
-                  tick={{ fill: '#6b7fa3', fontSize: 11, fontFamily: "'DM Mono', monospace" }}
+                  tick={{ fill: '#8890B5', fontSize: 11, fontFamily: "'DM Mono', monospace" }}
                   axisLine={false}
                   tickLine={false}
                   width={50}
@@ -245,7 +245,7 @@ export default function CompareSection({ commodityData }) {
                   align="left"
                   iconType="circle"
                   iconSize={7}
-                  wrapperStyle={{ fontSize: 11, fontFamily: "'DM Mono', monospace", color: '#6b7fa3', paddingTop: 8 }}
+                  wrapperStyle={{ fontSize: 11, fontFamily: "'DM Mono', monospace", color: '#8890B5', paddingTop: 8 }}
                 />
                 {activeMetrics.map(({ key, meta }, i) => (
                   <Line

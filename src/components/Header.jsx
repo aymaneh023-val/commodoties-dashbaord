@@ -3,9 +3,9 @@ import { FILTER_TABS } from '../utils/constants'
 import { formatTime } from '../utils/formatters'
 
 const STATUS_DOT = {
-  green: { color: '#22c55e', label: 'All sources connected', animation: '' },
+  green: { color: '#2D7A4F', label: 'All sources connected', animation: '' },
   amber: { color: '#f59e0b', label: 'Some sources partially available', animation: '' },
-  red:   { color: '#ef4444', label: 'Sources unavailable — showing fallback data', animation: '' },
+  red:   { color: '#D94F3D', label: 'Sources unavailable — showing fallback data', animation: '' },
 }
 
 export default function Header({ activeFilter, onFilterChange, onRefresh, lastUpdated, connectionStatus = 'green', onShowReferences }) {
@@ -26,7 +26,7 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
   return (
     <header
       className="sticky top-0 z-50 px-6 py-4"
-      style={{ background: 'var(--bg)', borderBottom: '1px solid var(--border)' }}
+      style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}
     >
       {/* Top row */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -113,9 +113,9 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
               className="text-xs px-3 py-1.5 rounded-lg transition-all"
               style={{
                 fontFamily: "'DM Mono', monospace",
-                background: isActive ? 'var(--surface2)' : 'transparent',
-                color: isActive ? 'var(--text)' : 'var(--muted)',
-                border: isActive ? '1px solid var(--border)' : '1px solid transparent',
+                background: isActive ? 'var(--text)' : '#E8EAF2',
+                color: isActive ? '#FFFFFF' : 'var(--text)',
+                border: isActive ? '1px solid var(--text)' : '1px solid transparent',
                 cursor: 'pointer',
               }}
             >

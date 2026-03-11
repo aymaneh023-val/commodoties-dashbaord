@@ -123,9 +123,9 @@ export default function DataCard({
 
 function SignalPill({ signal }) {
   const colors = {
-    Critical: { bg: '#f87171' },
-    Elevated: { bg: '#fb923c' },
-    Watch:    { bg: '#6b7fa3' },
+    Critical: { bg: '#D94F3D' },
+    Elevated: { bg: '#FF8A61' },
+    Watch:    { bg: '#8890B5' },
   }
   const c = colors[signal] || colors.Watch
   return (

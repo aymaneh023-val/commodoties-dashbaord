@@ -129,7 +129,7 @@ export default function NewsFeed({ articles, loading, error, activeFilter }) {
 
 function ArticleCard({ article }) {
   const sourceId = article.source?.id || ''
-  const src = SOURCE_CONFIG[sourceId] || { label: article.source?.name || 'Source', color: '#6b7fa3' }
+  const src = SOURCE_CONFIG[sourceId] || { label: article.source?.name || 'Source', color: '#8890B5' }
   const cat = article._cat || getCategory(article)
 
   return (
@@ -144,7 +144,7 @@ function ArticleCard({ article }) {
         textDecoration: 'none',
         color: 'inherit',
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.02)' }}
+      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface2)' }}
       onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--surface)' }}
     >
       {/* Top badges row */}
@@ -164,7 +164,7 @@ function ArticleCard({ article }) {
           className="text-xs px-2 py-0.5 rounded"
           style={{
             color: cat.color,
-            background: `color-mix(in srgb, ${cat.color === 'var(--muted)' ? '#6b7280' : cat.color} 10%, transparent)`,
+            background: `color-mix(in srgb, ${cat.color === 'var(--muted)' ? '#8890B5' : cat.color} 10%, transparent)`,
             fontFamily: "'DM Mono', monospace",
             fontSize: 10,
           }}

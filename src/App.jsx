@@ -9,9 +9,11 @@ import Shipping from './components/sections/Shipping'
 import Fertilizer from './components/sections/Fertilizer'
 import FoodCommodities from './components/sections/FoodCommodities'
 import CompareSection from './components/sections/CompareSection'
+import Inflation from './components/sections/Inflation'
 import { useCommodityData } from './hooks/useCommodityData'
 import { useNewsData } from './hooks/useNewsData'
 import { useFoodCommoditiesData } from './hooks/useFoodCommoditiesData'
+import { useInflationData } from './hooks/useInflationData'
 
 
 export default function App() {
@@ -22,6 +24,7 @@ export default function App() {
   const { data: commodityData, refresh: refreshCommodity } = useCommodityData()
   const { articles, loading: newsLoading, error: newsError, refresh: refreshNews } = useNewsData()
   const { data: foodData, refresh: refreshFood } = useFoodCommoditiesData()
+  const inflationData = useInflationData()
 
   const handleRefresh = useCallback(() => {
     refreshCommodity()
@@ -88,6 +91,13 @@ export default function App() {
             <Shipping
               bdry={commodityData.bdry}
               zim={commodityData.zim}
+            />
+          )}
+          {sectionVisible('inflation') && (
+            <Inflation
+              eu={inflationData.eu}
+              uk={inflationData.uk}
+              us={inflationData.us}
             />
           )}
           {sectionVisible('compare') && (

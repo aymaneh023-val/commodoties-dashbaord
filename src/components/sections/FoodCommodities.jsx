@@ -20,11 +20,11 @@ const GROUPS = [
 
 const COMMODITY_COLORS = {
   wheat:       '#f59e0b',
-  corn:        '#fcd34d',
-  soybeans:    '#4ade80',
-  soybeanOil:  '#34d399',
-  rice:        '#38bdf8',
-  sugar:       '#f87171',
+  corn:        '#c49000',
+  soybeans:    '#2D7A4F',
+  soybeanOil:  '#1a8a5c',
+  rice:        '#3448BF',
+  sugar:       '#D94F3D',
 }
 
 const ALL_KEYS = GROUPS.flatMap(g => g.keys)
@@ -136,7 +136,7 @@ export default function FoodCommodities({ data }) {
               </p>
               <LineChartWrapper
                 data={history}
-                lines={[{ key: 'close', color: COMMODITY_COLORS[key] ?? '#6b7fa3', label: meta.label }]}
+                lines={[{ key: 'close', color: COMMODITY_COLORS[key] ?? '#8890B5', label: meta.label }]}
                 xKey="date"
                 yUnit={meta.unit ?? ''}
                 height={140}

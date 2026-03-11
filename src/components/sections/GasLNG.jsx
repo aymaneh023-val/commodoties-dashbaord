@@ -57,7 +57,7 @@ export default function GasLNG({ ttf }) {
           </p>
           <LineChartWrapper
             data={ttfHistory}
-            lines={[{ key: 'close', color: '#38bdf8', label: 'TTF' }]}
+            lines={[{ key: 'close', color: '#3448BF', label: 'TTF' }]}
             xKey="date"
             yUnit=" €/MWh"
             height={160}

@@ -261,7 +261,7 @@ export default function References({ onBack }) {
           </h3>
           <div
             style={{
-              background: 'rgba(245,158,11,0.05)',
+              background: 'var(--surface2)',
               padding: 24,
               borderRadius: 12,
               fontSize: 13,

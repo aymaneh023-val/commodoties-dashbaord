@@ -24,7 +24,7 @@ export const SOURCE_COLORS = {
   ft: '#e11d48',
   bloomberg: '#3b82f6',
   iea: '#22c55e',
-  default: '#6b7fa3',
+  default: '#8890B5',
 }
 
 export const FILTER_TABS = [
@@ -34,6 +34,7 @@ export const FILTER_TABS = [
   { id: 'shipping',    label: 'Shipping' },
   { id: 'fertilizer',  label: 'Fertilizer' },
   { id: 'food',        label: 'Food' },
+  { id: 'inflation',   label: 'Inflation' },
   { id: 'compare',     label: 'Compare' },
 ]
 
