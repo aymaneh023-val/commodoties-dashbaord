@@ -6,7 +6,7 @@ const CACHE_TTL_MS = 15 * 60 * 1000 // 15 minutes
 const FALLBACKS = { 'BZ=F': 'CB=F' }
 
 // Full ticker list — used when ?tickers=ALL (cron job and manual force-refresh)
-const ALL_TICKERS = 'BZ=F,TTF=F,BDRY,ZIM,UFB=F,ZW=F,ZC=F,ZS=F,ZL=F,ZR=F,SB=F'
+const ALL_TICKERS = 'BZ=F,TTF=F,BDRY,ZIM,UFB=F,ZW=F,ZC=F,ZS=F,ZL=F,SB=F'
 
 function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
@@ -29,11 +29,7 @@ function parseResult(ticker, result) {
   const rawPrice = result.meta.regularMarketPrice
   const closes = result.indicators?.quote?.[0]?.close ?? []
 
-  // Rice (ZR=F): Yahoo returns USD/cwt; normalize to ¢/cwt
-  const norm =
-    ticker === 'ZR=F'
-      ? (v) => (v != null ? parseFloat((v * 100).toFixed(2)) : null)
-      : (v) => (v != null ? parseFloat(v.toFixed(4)) : null)
+  const norm = (v) => (v != null ? parseFloat(v.toFixed(4)) : null)
 
   // Find first valid close to compute 30-day change_pct
   let firstClose = null

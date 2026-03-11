@@ -179,23 +179,42 @@ function ArticleCard({ article }) {
         </span>
       </div>
 
-      {/* Headline */}
-      <p
-        className="leading-snug mb-1 font-medium"
-        style={{ fontFamily: "'Syne', sans-serif", color: 'var(--text)', fontSize: 13 }}
-      >
-        {article.title}
-      </p>
+      {/* Content: thumbnail + text */}
+      <div className="flex gap-3 items-start">
+        {article.urlToImage && (
+          <img
+            src={article.urlToImage}
+            alt=""
+            onError={(e) => { e.currentTarget.style.display = 'none' }}
+            style={{
+              width: 60,
+              height: 45,
+              objectFit: 'cover',
+              borderRadius: 6,
+              flexShrink: 0,
+            }}
+          />
+        )}
+        <div className="flex-1 min-w-0">
+          {/* Headline */}
+          <p
+            className="leading-snug mb-1 font-medium"
+            style={{ fontFamily: "'Syne', sans-serif", color: 'var(--text)', fontSize: 13 }}
+          >
+            {article.title}
+          </p>
 
-      {/* Description */}
-      {article.description && (
-        <p
-          className="text-xs leading-relaxed line-clamp-2"
-          style={{ color: 'var(--muted)' }}
-        >
-          {article.description}
-        </p>
-      )}
+          {/* Description */}
+          {article.description && (
+            <p
+              className="text-xs leading-relaxed line-clamp-2"
+              style={{ color: 'var(--muted)' }}
+            >
+              {article.description}
+            </p>
+          )}
+        </div>
+      </div>
     </a>
   )
 }

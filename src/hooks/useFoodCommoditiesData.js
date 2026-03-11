@@ -5,17 +5,15 @@ export const FOOD_TICKERS = {
   corn:       'ZC=F',
   soybeans:   'ZS=F',
   soybeanOil: 'ZL=F',
-  rice:       'ZR=F',
   sugar:      'SB=F',
 }
 
 export const FOOD_META = {
-  wheat:      { label: 'Wheat',       unit: ' ¢/bu',  note: 'CBOT Wheat (ZW=F). Global benchmark.' },
-  corn:       { label: 'Corn',        unit: ' ¢/bu',  note: 'CBOT Corn (ZC=F). Primary feed grain.' },
-  soybeans:   { label: 'Soybeans',    unit: ' ¢/bu',  note: 'CBOT Soybeans (ZS=F). Oil and protein crop.' },
-  soybeanOil: { label: 'Soybean Oil', unit: ' ¢/lb',  note: 'CBOT Soybean Oil (ZL=F). Vegetable oil benchmark.' },
-  rice:       { label: 'Rice',        unit: ' ¢/cwt', note: 'CBOT Rough Rice (ZR=F). Normalized to ¢/cwt.' },
-  sugar:      { label: 'Sugar',       unit: ' ¢/lb',  note: 'ICE Sugar No.11 (SB=F). Global raw sugar.' },
+  wheat:      { label: 'Wheat',       unit: ' cents per bushel',  note: 'CBOT Wheat (ZW=F). Global benchmark.' },
+  corn:       { label: 'Corn',        unit: ' cents per bushel',  note: 'CBOT Corn (ZC=F). Primary feed grain.' },
+  soybeans:   { label: 'Soybeans',    unit: ' cents per bushel',  note: 'CBOT Soybeans (ZS=F). Oil and protein crop.' },
+  soybeanOil: { label: 'Soybean Oil', unit: ' cents per pound',   note: 'CBOT Soybean Oil (ZL=F). Vegetable oil benchmark.' },
+  sugar:      { label: 'Sugar',       unit: ' cents per pound',   note: 'ICE Sugar No.11 (SB=F). Global raw sugar.' },
 }
 
 const TICKER_LIST = Object.values(FOOD_TICKERS).join(',')
