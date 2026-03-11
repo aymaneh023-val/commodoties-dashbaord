@@ -107,6 +107,7 @@ export default function App() {
               eu={inflationData.eu}
               uk={inflationData.uk}
               us={inflationData.us}
+              countries={inflationData.countries}
             />
           )}
           {sectionVisible('compare') && (

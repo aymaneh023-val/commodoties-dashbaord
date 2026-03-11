@@ -29,10 +29,24 @@ async function fetchUS() {
   return json.data.map((d) => ({ month: d.month, label: shortMonth(d.month), value: d.value }))
 }
 
+async function fetchEUCountries() {
+  const res = await fetch('/api/eurostat-countries', { signal: AbortSignal.timeout(20000) })
+  if (!res.ok) throw new Error(`Eurostat countries: ${res.status}`)
+  const json = await res.json()
+  if (json.status !== 'ok') throw new Error('Eurostat countries returned error')
+  // Shape each country series the same way as the other series
+  const shaped = {}
+  for (const [code, series] of Object.entries(json.countries)) {
+    shaped[code] = series.map((d) => ({ month: d.month, label: shortMonth(d.month), value: d.value }))
+  }
+  return shaped
+}
+
 export function useInflationData() {
   const [eu, setEU] = useState(makeState())
   const [uk, setUK] = useState(makeState())
   const [us, setUS] = useState(makeState())
+  const [countries, setCountries] = useState({ data: {}, loading: true, error: null })
 
   useEffect(() => {
     fetchEU()
@@ -46,7 +60,11 @@ export function useInflationData() {
     fetchUS()
       .then((data) => setUS({ data, loading: false, error: null }))
       .catch((err) => setUS({ data: [], loading: false, error: err.message }))
+
+    fetchEUCountries()
+      .then((data) => setCountries({ data, loading: false, error: null }))
+      .catch((err) => setCountries({ data: {}, loading: false, error: err.message }))
   }, [])
 
-  return { eu, uk, us }
+  return { eu, uk, us, countries }
 }

@@ -3,6 +3,7 @@
   "crons": [
     { "path": "/api/quotes?tickers=ALL&force=true",  "schedule": "0 11 * * *" },
     { "path": "/api/eurostat?force=true",             "schedule": "0 11 * * *" },
+    { "path": "/api/eurostat-countries?force=true",   "schedule": "0 11 * * *" },
     { "path": "/api/ons?force=true",                  "schedule": "0 11 * * *" },
     { "path": "/api/bls?force=true",                  "schedule": "0 11 * * *" },
     { "path": "/api/news?force=true",                 "schedule": "0 11 * * *" }
