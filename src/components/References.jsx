@@ -147,29 +147,6 @@ const SECTIONS = [
       },
     ],
   },
-  {
-    title: 'CHOKEPOINTS',
-    sources: [
-      {
-        name: 'IMF PortWatch — Vessel Transit Data',
-        provider: 'IMF',
-        url: 'https://portwatch.imf.org',
-        desc: 'Live vessel transit counts per chokepoint. 30-day deviation used to compute dynamic status (NORMAL / WATCH / DISRUPTED / CRITICAL).',
-      },
-      {
-        name: 'IEA Oil Market Report — March 2026',
-        provider: 'IEA',
-        url: 'https://iea.org/reports/oil-market-report-march-2026',
-        desc: 'Strait of Hormuz transit volumes (static context)',
-      },
-      {
-        name: 'UN Conference on Trade and Development (UNCTAD)',
-        provider: 'UNCTAD',
-        url: 'https://unctad.org/topic/transport-and-trade-logistics',
-        desc: 'Red Sea disruption impact data',
-      },
-    ],
-  },
 ]
 
 const METHODOLOGY = `All commodity prices are sourced via Yahoo Finance and are subject to 15-minute delays. Prices are fetched on page load and on manual refresh only — no automatic polling.
@@ -181,8 +158,6 @@ HICP inflation data is sourced directly from Eurostat's dissemination API. Data 
 The IMF Fertilizer Price Index (PFERT) is fetched directly from the IMF SDMX-JSON API. Static fallback data is used if the API is unavailable.
 
 The Geopolitical Risk Index (GPR) is sourced from the Excel file published by Caldara & Iacoviello (2022). It is parsed server-side via a Vercel serverless function. Thresholds: >200 CRITICAL, >150 ELEVATED, >100 MODERATE, ≤100 NORMAL.
-
-Chokepoint statuses are driven by IMF PortWatch vessel transit counts when available. Status is derived from the 30-day deviation: >-10% NORMAL, <-10% WATCH, <-25% DISRUPTED, <-40% CRITICAL. Static assessments are shown when live data is unavailable.
 
 The food commodities comparison chart normalises all metrics to a 0-100% scale using min-max normalisation over the 30-day window.
 

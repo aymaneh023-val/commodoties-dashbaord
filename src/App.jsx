@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react'
 import Header from './components/Header'
 import WatchStrip from './components/WatchStrip'
-import ContextRow from './components/ContextRow'
 import NewsFeed from './components/NewsFeed'
 import References from './components/References'
 import CrudeOil from './components/sections/CrudeOil'
@@ -13,7 +12,6 @@ import CompareSection from './components/sections/CompareSection'
 import { useCommodityData } from './hooks/useCommodityData'
 import { useNewsData } from './hooks/useNewsData'
 import { useFoodCommoditiesData } from './hooks/useFoodCommoditiesData'
-import { usePortWatchData } from './hooks/usePortWatchData'
 
 
 export default function App() {
@@ -24,7 +22,6 @@ export default function App() {
   const { data: commodityData, refresh: refreshCommodity } = useCommodityData()
   const { articles, loading: newsLoading, error: newsError, refresh: refreshNews } = useNewsData()
   const { data: foodData, refresh: refreshFood } = useFoodCommoditiesData()
-  const { portwatch } = usePortWatchData()
 
   const handleRefresh = useCallback(() => {
     refreshCommodity()
@@ -69,8 +66,6 @@ export default function App() {
         foodData={foodData}
       />
 
-      <ContextRow portwatch={portwatch} />
-
       <div
         className="two-col"
         style={{ padding: '24px 24px 48px', maxWidth: 1400, margin: '0 auto' }}
@@ -93,7 +88,6 @@ export default function App() {
             <Shipping
               bdry={commodityData.bdry}
               zim={commodityData.zim}
-              portwatch={portwatch}
             />
           )}
           {sectionVisible('compare') && (
