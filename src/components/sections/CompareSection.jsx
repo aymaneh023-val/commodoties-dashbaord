@@ -136,14 +136,8 @@ export default function CompareSection({ commodityData }) {
   return (
     <section id="compare" className="mb-14">
       <div className="mb-2">
-        <span
-          className="text-xs uppercase tracking-widest"
-          style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}
-        >
-          08 —
-        </span>
         <h2
-          className="text-lg font-bold inline ml-2"
+          className="text-lg font-bold"
           style={{ fontFamily: "'Syne', sans-serif" }}
         >
           Compare Metrics

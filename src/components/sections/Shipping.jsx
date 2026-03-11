@@ -14,10 +14,7 @@ export default function Shipping({ bdry, zim }) {
   return (
     <section id="shipping" className="mb-14">
       <div className="mb-2">
-        <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)' }}>
-          05 —
-        </span>
-        <h2 className="inline ml-2" style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>
+        <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>
           Shipping &amp; Freight
         </h2>
       </div>

@@ -14,10 +14,7 @@ export default function CrudeOil({ brent }) {
   return (
     <section id="oil" className="mb-14">
       <div className="mb-2">
-        <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)' }}>
-          02 —
-        </span>
-        <h2 className="inline ml-2" style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>
+        <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>
           Crude Oil
         </h2>
       </div>
