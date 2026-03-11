@@ -10,7 +10,7 @@ const EXPLAINER =
 const GROUPS = [
   {
     label: 'GRAINS & OILSEEDS',
-    keys: ['wheat', 'corn', 'soybeans', 'soybeanOil'],
+    keys: ['wheat', 'corn', 'soybeans', 'soybeanOil', 'rice'],
   },
   {
     label: 'SOFT COMMODITIES',
@@ -23,6 +23,7 @@ const COMMODITY_COLORS = {
   corn:        '#c49000',
   soybeans:    '#2D7A4F',
   soybeanOil:  '#1a8a5c',
+  rice:        '#3448BF',
   sugar:       '#D94F3D',
 }
 

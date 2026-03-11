@@ -6,8 +6,6 @@ export const TICKERS = {
   urea:  'UFB=F',  // Urea futures — nitrogen fertilizer benchmark
 }
 
-export const YAHOO_BASE = 'https://query1.finance.yahoo.com/v8/finance/chart'
-
 export const CORS_PROXIES = [
   (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
   (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
