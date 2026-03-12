@@ -33,8 +33,28 @@ function formatAsOf(iso) {
   return `${month} ${day} '${year}`
 }
 
-// Keep quote values as the card source of truth.
-// History is fetched for chart rendering only.
+function alignHistoryWithQuote(history, price, asOf) {
+  const series = Array.isArray(history) ? history.filter((p) => p?.close != null) : []
+  if (price == null || !Number.isFinite(price)) return series
+
+  if (series.length === 0) {
+    return [{ date: asOf ?? 'Latest', close: price }]
+  }
+
+  const next = [...series]
+  const lastIdx = next.length - 1
+  const last = next[lastIdx]
+
+  if (asOf && last.date !== asOf) {
+    next.push({ date: asOf, close: price })
+  } else {
+    next[lastIdx] = { ...last, close: price }
+  }
+
+  return next
+}
+
+// Keep quote values as the source of truth for cards and chart latest point.
 function mapResult(r) {
   if (r.error || r.price == null) {
     return {
@@ -48,11 +68,12 @@ function mapResult(r) {
       fromCache: false,
     }
   }
-  const history = r.history ?? []
+  const asOf = formatAsOf(r.fetched_at)
+  const history = alignHistoryWithQuote(r.history ?? [], r.price, asOf)
   return {
     price: r.price,
     pctChange: r.change_pct ?? null,
-    asOf: formatAsOf(r.fetched_at),
+    asOf,
     baseDate: history[0]?.date ?? null,
     history,
     loading: false,
