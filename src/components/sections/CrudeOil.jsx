@@ -3,7 +3,7 @@ import LineChartWrapper from '../LineChart'
 
 const EXPLAINER =
   'Brent crude (BZ=F) is the global benchmark for oil pricing, set daily on ICE London. ' +
-  'Shown here: front-month futures, daily close, 30-day window. Prices in USD per barrel ($/bbl). ' +
+  'Shown here: front-month futures. Card value is latest quote (regular market price); chart shows 30-day daily closes. Prices in USD per barrel ($/bbl). ' +
   'Brent directly determines European fuel, heating oil, and petrochemical input costs.'
 
 export default function CrudeOil({ brent }) {
@@ -32,11 +32,11 @@ export default function CrudeOil({ brent }) {
           pctChange={brent?.pctChange}
           decimals={2}
           unit=" $/bbl"
-          subLabel="Front-month futures (BZ=F) · USD per barrel · daily close"
+          subLabel="Front-month futures (BZ=F) · USD per barrel · latest quote"
           loading={brent?.loading}
           error={brent?.error}
           inverse={false}
-          asOf={lastDate}
+          asOf={brent?.asOf}
           fromCache={brent?.fromCache}
           cacheAge={brent?.cacheAge}
           baseDate={brent?.baseDate}

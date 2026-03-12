@@ -29,11 +29,11 @@ export default function Shipping({ bdry, zim }) {
           pctChange={bdry?.pctChange}
           decimals={2}
           unit=" $"
-          subLabel="ETF tracking the Baltic Dry Index (BDI) · USD share price · 30-day daily closes"
+          subLabel="ETF tracking the Baltic Dry Index (BDI) · USD share price · latest quote"
           loading={bdry?.loading}
           error={bdry?.error}
           inverse={false}
-          asOf={bdryHistory.slice(-1)[0]?.date ?? null}
+          asOf={bdry?.asOf}
           fromCache={bdry?.fromCache}
           cacheAge={bdry?.cacheAge}
           baseDate={bdry?.baseDate}
@@ -48,7 +48,7 @@ export default function Shipping({ bdry, zim }) {
           loading={zim?.loading}
           error={zim?.error}
           inverse={false}
-          asOf={zimHistory.slice(-1)[0]?.date ?? null}
+          asOf={zim?.asOf}
           fromCache={zim?.fromCache}
           cacheAge={zim?.cacheAge}
           baseDate={zim?.baseDate}

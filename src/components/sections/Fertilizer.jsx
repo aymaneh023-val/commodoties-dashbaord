@@ -3,7 +3,7 @@ import LineChartWrapper from '../LineChart'
 
 const EXPLAINER =
   'Urea front-month futures (UFB=F) traded on CBOT, Chicago. ' +
-  'Urea is the most widely traded nitrogen fertilizer worldwide. Prices in USD per metric ton ($/ton) — 30-day daily closes via Yahoo Finance. ' +
+  'Urea is the most widely traded nitrogen fertilizer worldwide. Card value is latest quote (regular market price); chart shows 30-day daily closes. Prices in USD per metric ton ($/ton). ' +
   'Natural gas accounts for 70–80% of urea production cost, creating a direct link between gas prices and fertilizer costs.'
 
 export default function Fertilizer({ urea }) {
@@ -31,11 +31,11 @@ export default function Fertilizer({ urea }) {
           pctChange={urea?.pctChange}
           decimals={2}
           unit=" $/ton"
-          subLabel="Front-month urea futures (UFB=F) · USD per metric ton · daily close"
+          subLabel="Front-month urea futures (UFB=F) · USD per metric ton · latest quote"
           loading={urea?.loading}
           error={urea?.error}
           inverse={false}
-          asOf={lastDate}
+          asOf={urea?.asOf}
           fromCache={urea?.fromCache}
           cacheAge={urea?.cacheAge}
           baseDate={urea?.baseDate}

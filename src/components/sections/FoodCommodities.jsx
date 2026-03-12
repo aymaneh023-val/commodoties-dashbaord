@@ -6,7 +6,7 @@ import { formatPrice, formatPct, pctArrow, pctColor } from '../../utils/formatte
 const EXPLAINER =
   'Front-month food commodity futures from CBOT (Chicago) and ICE. ' +
   'Prices are in original contract units — see footnote for unit definitions. ' +
-  'All contracts show daily closes, 30-day window via Yahoo Finance. Percentage changes are 30-day.'
+  'Card values show latest quotes (regular market price); charts show daily closes over a 30-day window. Percentage changes are 30-day.'
 
 const GROUPS = [
   {

@@ -19,32 +19,45 @@ export const FOOD_META = {
 const TICKER_LIST = Object.values(FOOD_TICKERS).join(',')
 
 const initialState = {
-  price: null, pctChange: null, baseDate: null,
+  price: null, pctChange: null, asOf: null, baseDate: null,
   history: [], loading: true, error: false, fromCache: false,
 }
 
-// Same mapResult as useCommodityData: use last close from history as the
-// display price so the card always matches the chart's rightmost data point.
+function formatAsOf(iso) {
+  if (!iso) return null
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return null
+  const month = d.toLocaleDateString('en-US', { month: 'short' })
+  const day = d.getDate()
+  const year = String(d.getFullYear()).slice(2)
+  return `${month} ${day} '${year}`
+}
+
+// Keep quote values as the card source of truth.
+// History is fetched for chart rendering only.
 function mapResult(r) {
   if (r.error || r.price == null) {
-    return { price: null, pctChange: null, baseDate: null, history: [], loading: false, error: true, fromCache: false }
+    return {
+      price: null,
+      pctChange: null,
+      asOf: null,
+      baseDate: null,
+      history: [],
+      loading: false,
+      error: true,
+      fromCache: false,
+    }
   }
   const history = r.history ?? []
-  const firstClose = history[0]?.close ?? null
-  const lastClose = history[history.length - 1]?.close ?? null
-  const price = lastClose ?? r.price
-  const pctChange =
-    firstClose != null && lastClose != null
-      ? parseFloat((((lastClose - firstClose) / firstClose) * 100).toFixed(4))
-      : r.change_pct
   return {
-    price,
-    pctChange,
+    price: r.price,
+    pctChange: r.change_pct ?? null,
+    asOf: formatAsOf(r.fetched_at),
     baseDate: history[0]?.date ?? null,
     history,
     loading: false,
     error: false,
-    fromCache: r.fromCache ?? false,
+    fromCache: r.fromCache ?? r.stale ?? false,
   }
 }
 

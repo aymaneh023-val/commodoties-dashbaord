@@ -3,7 +3,7 @@ import LineChartWrapper from '../LineChart'
 
 const EXPLAINER =
   'TTF — Title Transfer Facility — is Europe\'s primary natural gas pricing benchmark. ' +
-  'Front-month futures (TTF=F) trade on ICE Endex, Netherlands. Prices in EUR per MWh (€/MWh) — 30-day daily closes via Yahoo Finance. ' +
+  'Front-month futures (TTF=F) trade on ICE Endex, Netherlands. Card value is latest quote (regular market price); chart shows 30-day daily closes. Prices in EUR per MWh (€/MWh). ' +
   'TTF sets the marginal cost of industrial energy and drives nitrogen fertilizer production costs across Europe.'
 
 export default function GasLNG({ ttf }) {
@@ -30,11 +30,11 @@ export default function GasLNG({ ttf }) {
           pctChange={ttf?.pctChange}
           decimals={2}
           unit=" €/MWh"
-          subLabel="Front-month futures (TTF=F) · EUR per MWh · daily close"
+          subLabel="Front-month futures (TTF=F) · EUR per MWh · latest quote"
           loading={ttf?.loading}
           error={ttf?.error}
           inverse={false}
-          asOf={ttfHistory.slice(-1)[0]?.date ?? null}
+          asOf={ttf?.asOf}
           fromCache={ttf?.fromCache}
           cacheAge={ttf?.cacheAge}
           baseDate={ttf?.baseDate}

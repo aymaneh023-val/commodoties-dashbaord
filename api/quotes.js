@@ -10,6 +10,24 @@ function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
 }
 
+async function getLatestDbRow(supabase, ticker) {
+  const { data: row } = await supabase
+    .from('prices')
+    .select('ticker, price, change_pct, fetched_at')
+    .eq('ticker', ticker)
+    .order('fetched_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  return row ?? null
+}
+
+async function insertPriceRow(supabase, ticker, parsed) {
+  const { error } = await supabase
+    .from('prices')
+    .insert({ ticker, price: parsed.price, change_pct: parsed.change_pct })
+  if (error) throw new Error(`Supabase insert ${ticker}: ${error.message}`)
+}
+
 async function fetchYahoo(ticker) {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=30d`
   const r = await fetch(url, {
@@ -35,9 +53,12 @@ function parseResult(ticker, result) {
     if (c != null) { firstClose = norm(c); break }
   }
 
-  const price = norm(rawPrice)
+  const normalizedPrice = norm(rawPrice)
+  const price = normalizedPrice != null && normalizedPrice > 0 ? normalizedPrice : null
   const change_pct =
-    firstClose != null ? parseFloat((((price - firstClose) / firstClose) * 100).toFixed(4)) : null
+    firstClose != null && price != null
+      ? parseFloat((((price - firstClose) / firstClose) * 100).toFixed(4))
+      : null
 
   return { price, change_pct }
 }
@@ -59,13 +80,7 @@ export default async function handler(req, res) {
     tickers.map(async (ticker) => {
       // Normal load: return latest row from DB — no TTL check, no external call
       if (!forceRefresh) {
-        const { data: row } = await supabase
-          .from('prices')
-          .select('ticker, price, change_pct, fetched_at')
-          .eq('ticker', ticker)
-          .order('fetched_at', { ascending: false })
-          .limit(1)
-          .single()
+        const row = await getLatestDbRow(supabase, ticker)
         if (row) return { ticker, price: row.price, change_pct: row.change_pct, fetched_at: row.fetched_at }
       }
 
@@ -85,21 +100,24 @@ export default async function handler(req, res) {
 
       if (!parsed) {
         // Yahoo failed — return latest DB row as stale fallback
-        const { data: row } = await supabase
-          .from('prices')
-          .select('ticker, price, change_pct, fetched_at')
-          .eq('ticker', ticker)
-          .order('fetched_at', { ascending: false })
-          .limit(1)
-          .single()
-        if (row) return { ticker, price: row.price, change_pct: row.change_pct, fetched_at: row.fetched_at, stale: true }
+        const row = await getLatestDbRow(supabase, ticker)
+        if (row) return { ticker, price: row.price, change_pct: row.change_pct, fetched_at: row.fetched_at, fromCache: true }
         throw lastErr ?? new Error(`Failed to fetch ${ticker}`)
       }
 
-      // Append new observation to Supabase (no upsert — every fetch is its own row)
-      await supabase.from('prices').insert({ ticker, price: parsed.price, change_pct: parsed.change_pct })
+      if (parsed.price == null) {
+        // Yahoo returned null/0 regularMarketPrice: skip write and keep latest DB value.
+        const row = await getLatestDbRow(supabase, ticker)
+        if (row) return { ticker, price: row.price, change_pct: row.change_pct, fetched_at: row.fetched_at, fromCache: true }
+        throw new Error(`Yahoo ${ticker}: invalid regularMarketPrice`)
+      }
 
-      return { ticker, price: parsed.price, change_pct: parsed.change_pct, fetched_at: new Date().toISOString() }
+      // Append new observation and return the persisted DB row.
+      await insertPriceRow(supabase, ticker, parsed)
+      const latestRow = await getLatestDbRow(supabase, ticker)
+      if (!latestRow) throw new Error(`Supabase readback ${ticker}: missing row after insert`)
+
+      return { ticker, price: latestRow.price, change_pct: latestRow.change_pct, fetched_at: latestRow.fetched_at }
     })
   )
 

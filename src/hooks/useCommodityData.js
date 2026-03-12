@@ -11,33 +11,45 @@ const TICKERS = {
 const TICKER_LIST = Object.values(TICKERS).join(',')
 
 const initialState = {
-  price: null, pctChange: null, baseDate: null,
+  price: null, pctChange: null, asOf: null, baseDate: null,
   history: [], loading: true, error: false, fromCache: false,
 }
 
-// Use last close from history as the displayed price so the card value always
-// matches the chart's rightmost data point. Also recomputes pctChange entirely
-// from the history series to eliminate any regularMarketPrice unit mismatch.
+function formatAsOf(iso) {
+  if (!iso) return null
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return null
+  const month = d.toLocaleDateString('en-US', { month: 'short' })
+  const day = d.getDate()
+  const year = String(d.getFullYear()).slice(2)
+  return `${month} ${day} '${year}`
+}
+
+// Use quote values as the source of truth for all cards.
+// History remains chart-only.
 function mapResult(r) {
   if (r.error || r.price == null) {
-    return { price: null, pctChange: null, baseDate: null, history: [], loading: false, error: true, fromCache: false }
+    return {
+      price: null,
+      pctChange: null,
+      asOf: null,
+      baseDate: null,
+      history: [],
+      loading: false,
+      error: true,
+      fromCache: false,
+    }
   }
   const history = r.history ?? []
-  const firstClose = history[0]?.close ?? null
-  const lastClose = history[history.length - 1]?.close ?? null
-  const price = lastClose ?? r.price
-  const pctChange =
-    firstClose != null && lastClose != null
-      ? parseFloat((((lastClose - firstClose) / firstClose) * 100).toFixed(4))
-      : r.change_pct
   return {
-    price,
-    pctChange,
+    price: r.price,
+    pctChange: r.change_pct ?? null,
+    asOf: formatAsOf(r.fetched_at),
     baseDate: history[0]?.date ?? null,
     history,
     loading: false,
     error: false,
-    fromCache: r.fromCache ?? false,
+    fromCache: r.fromCache ?? r.stale ?? false,
   }
 }
 
