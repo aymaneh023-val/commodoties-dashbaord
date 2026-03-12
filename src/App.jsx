@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import Header from './components/Header'
 import WatchStrip from './components/WatchStrip'
 import NewsFeed from './components/NewsFeed'
@@ -25,19 +25,21 @@ export default function App() {
   const { articles, loading: newsLoading, error: newsError, refresh: refreshNews } = useNewsData()
   const { data: foodData, refresh: refreshFood } = useFoodCommoditiesData()
   const inflationData = useInflationData()
+  const { refresh: refreshInflation } = inflationData
 
-  const handleRefresh = useCallback(() => {
+  const handleRefresh = useCallback(async () => {
     setRefreshing(true)
-    refreshCommodity({ force: true })
-    refreshFood({ force: true })
-    refreshNews()
-  }, [refreshCommodity, refreshFood, refreshNews])
-
-  // Reset the refreshing spinner once all commodity data finishes loading
-  const anyLoading = Object.values(commodityData).some((d) => d.loading)
-  useEffect(() => {
-    if (!anyLoading) setRefreshing(false)
-  }, [anyLoading])
+    try {
+      await Promise.all([
+        refreshCommodity({ force: true }),
+        refreshFood({ force: true }),
+        refreshInflation({ force: true }),
+        refreshNews({ force: true }),
+      ])
+    } finally {
+      setRefreshing(false)
+    }
+  }, [refreshCommodity, refreshFood, refreshInflation, refreshNews])
 
   // Connection status: green = all live, amber = some degraded, red = all down
   const commodityValues = Object.values(commodityData)

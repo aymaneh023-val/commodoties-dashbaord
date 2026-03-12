@@ -76,16 +76,21 @@ export default async function handler(req, res) {
   const forceRefresh = req.query.force === 'true' || req.query.force === '1'
   const supabase = getSupabase()
 
-  // Normal load: read from DB — no TTL check, no external call
-  if (!forceRefresh) {
+  const readFromDb = async () => {
     const { data: rows } = await supabase
       .from('news_articles')
       .select('url, title, description, source_name, url_to_image, published_at, category')
       .order('published_at', { ascending: false })
+    return rows ?? []
+  }
+
+  // Normal load: read from DB — no TTL check, no external call
+  if (!forceRefresh) {
+    const rows = await readFromDb()
     return res.status(200).json({
       status: 'ok',
-      totalResults: (rows ?? []).length,
-      articles: (rows ?? []).map(dbRowToArticle),
+      totalResults: rows.length,
+      articles: rows.map(dbRowToArticle),
     })
   }
 
@@ -128,21 +133,19 @@ export default async function handler(req, res) {
         { onConflict: 'url', ignoreDuplicates: true }
       )
 
+    const rows = await readFromDb()
     return res.status(200).json({
       status: 'ok',
-      totalResults: unique.length,
-      articles: unique,
+      totalResults: rows.length,
+      articles: rows.map(dbRowToArticle),
     })
   } catch (err) {
     console.error('NewsAPI proxy error:', err)
 
     // Fallback to whatever is in DB
-    const { data: stale } = await supabase
-      .from('news_articles')
-      .select('url, title, description, source_name, url_to_image, published_at, category')
-      .order('published_at', { ascending: false })
+    const stale = await readFromDb()
 
-    if (stale?.length) {
+    if (stale.length) {
       return res.status(200).json({
         status: 'ok',
         totalResults: stale.length,
