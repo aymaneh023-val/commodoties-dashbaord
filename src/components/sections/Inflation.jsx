@@ -14,10 +14,8 @@ const BARO_META = {
 }
 
 const EXPLAINER =
-  'Annual food price inflation across 9 major economies. ' +
-  'Values show year-over-year percentage change (YoY %) in food consumer prices (OECD CPI, COICOP CP01). ' +
-  'Countries marked with * use headline CPI where food-specific data is unavailable. ' +
-  'Source: OECD Data Explorer. Data is refreshed daily; underlying statistical releases are monthly.'
+  'Food price inflation across 9 major economies — the end-of-chain signal that shows how commodity, energy, and logistics cost increases are landing in consumer pricing. ' +
+  'Year-over-year percentage change (YoY %) in food consumer prices. Countries marked with * use headline CPI where food-specific data is unavailable.'
 
 export default function Inflation({ countries, loading, error, barometer }) {
   // CPI chart data
@@ -133,7 +131,7 @@ export default function Inflation({ countries, loading, error, barometer }) {
         ) : (
           <>
             <p style={{ color: 'var(--muted)', fontSize: 13, marginBottom: 8 }}>
-              Food price inflation (YoY %) — OECD CPI across 9 economies. * = headline CPI fallback.
+              Food price inflation (YoY %) across 9 economies. * = headline CPI fallback.
             </p>
             <LineChartWrapper
               data={chartData}
@@ -151,7 +149,7 @@ export default function Inflation({ countries, loading, error, barometer }) {
         style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderLeft: '3px solid var(--inflation)', fontSize: 14, color: 'var(--text)', lineHeight: 1.6 }}
       >
         <strong>Why tracked:</strong>{' '}
-        Food inflation reflects how commodity, energy, fertilizer, and transport costs pass through to consumer prices across key markets.
+        CPI is the end-of-chain measure of how upstream cost movements — energy, freight, fertilizer, raw materials — pass through into shelf pricing. For food companies, it signals whether cost increases are being absorbed or passed on, and how pricing power varies across markets.
       </div>
 
       {/* Consumer Barometer */}
@@ -160,7 +158,7 @@ export default function Inflation({ countries, loading, error, barometer }) {
           Consumer Confidence Barometer
         </h3>
         <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 12, lineHeight: 1.6 }}>
-          OECD Composite Consumer Confidence Indicator (CCICP). Normalised values — above zero signals positive consumer sentiment, below zero signals negative. Monthly data.
+          Consumer confidence directly affects pricing power. When sentiment is negative, consumers trade down and resist price increases — limiting how much cost inflation food companies can pass through. When confidence recovers, pricing elasticity improves. Above zero = positive sentiment; below zero = negative.
         </p>
         <div className="card" style={{ padding: '16px 16px 8px' }}>
           {barometer?.loading ? (

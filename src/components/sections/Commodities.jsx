@@ -5,8 +5,8 @@ import { CONFIG_BY_SYMBOL } from '../../utils/commodityConfig'
 const SYMBOLS = ['BRENTOIL-FUT', 'TTF-GAS', 'LGO', 'XAU', 'AL-FUT']
 
 const EXPLAINER =
-  'Key energy and metals benchmarks tracked for their direct impact on European supply chain costs. ' +
-  'Card values are latest daily closes; charts show 90-day daily closes.'
+  'Energy and metals benchmarks with direct impact on European food supply chain costs. ' +
+  'Charts show 90-day daily closes; percentage changes measured over a 30-day rolling window.'
 
 export default function Commodities({ data, isOverview = false }) {
   return (

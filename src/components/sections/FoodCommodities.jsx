@@ -6,9 +6,8 @@ import { CONFIG_BY_SYMBOL } from '../../utils/commodityConfig'
 const SYMBOLS = ['ZW-FUT', 'CORN', 'SOYBEAN-FUT', 'PO', 'BUTTER']
 
 const EXPLAINER =
-  'Key agricultural and dairy commodity prices from CommodityPriceAPI. ' +
-  'Card values are latest daily closes; charts show 90-day daily closes. ' +
-  'Percentage changes are measured over the full 30-day window.'
+  'Agricultural and dairy commodity prices that drive ingredient and raw material costs for food manufacturers and retailers. ' +
+  'Charts show 90-day daily closes; percentage changes measured over a 30-day rolling window.'
 
 export default function FoodCommodities({ data, isOverview = false }) {
   const insight = useMemo(() => {

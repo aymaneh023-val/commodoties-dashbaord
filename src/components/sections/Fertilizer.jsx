@@ -6,8 +6,8 @@ const SYMBOLS = ['UREA', 'DIAPH']
 
 const EXPLAINER =
   'Urea and Diammonium Phosphate (DAP) — the two most widely traded fertilizers. ' +
-  'Natural gas accounts for 70–80% of urea production cost, creating a direct link between gas and fertilizer prices. ' +
-  'DAP is a key phosphate-based fertilizer. Prices in USD per metric ton ($/ton).'
+  'Natural gas accounts for 70–80% of urea production cost, creating a direct link between gas prices and farm-level input costs. ' +
+  'Charts show 90-day daily closes; prices in USD per metric ton.'
 
 export default function Fertilizer({ data, isOverview = false }) {
   return (
