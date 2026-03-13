@@ -76,6 +76,11 @@ export default function LineChartWrapper({
             iconSize={8}
             onClick={toggleLine}
             wrapperStyle={{ fontSize: 13, color: '#131B47', paddingTop: 10, cursor: 'pointer' }}
+            formatter={(value, entry) => (
+              <span style={{ color: hiddenKeys[entry.dataKey] ? '#C2C9E5' : '#131B47', transition: 'color 0.15s' }}>
+                {value}
+              </span>
+            )}
           />
         )}
         {referenceLines.map((rl) => (

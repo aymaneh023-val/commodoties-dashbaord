@@ -2,35 +2,30 @@ import { useState, useEffect, useCallback } from 'react'
 import { shortMonth } from '../utils/formatters'
 
 /**
- * Fetches OECD-sourced inflation data from /api/inflation.
+ * Fetches OECD Consumer Barometer data from /api/barometer.
  * Returns { countries, loading, error, refresh }.
  *
  * countries is an object keyed by country_code:
- *   { AUS: { name, isHeadlineFallback, data: [{ month, label, value }] }, ... }
+ *   { AUS: { name, data: [{ month, label, value }] }, ... }
  */
-export function useInflationData() {
+export function useBarometerData() {
   const [countries, setCountries] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  const fetchData = useCallback(async ({ force } = {}) => {
+  const fetchData = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
-      // When force is true, trigger upstream OECD fetch first
-      if (force) {
-        await fetch('/api/oecd-cpi', { signal: AbortSignal.timeout(40000) }).catch(() => {})
-      }
-      const res = await fetch('/api/inflation', { signal: AbortSignal.timeout(20000) })
-      if (!res.ok) throw new Error(`Inflation API: ${res.status}`)
+      const res = await fetch('/api/barometer', { signal: AbortSignal.timeout(20000) })
+      if (!res.ok) throw new Error(`Barometer API: ${res.status}`)
       const json = await res.json()
-      if (json.status !== 'ok') throw new Error('Inflation API returned error')
+      if (json.status !== 'ok') throw new Error('Barometer API returned error')
 
       const shaped = {}
       for (const c of json.countries) {
         shaped[c.country_code] = {
           name: c.country_name,
-          isHeadlineFallback: c.is_headline_fallback,
           data: c.data.map((d) => ({
             month: d.period,
             label: shortMonth(d.period),

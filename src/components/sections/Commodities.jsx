@@ -2,30 +2,24 @@ import CommodityNarrative from '../CommodityNarrative'
 import CompactCard from '../CompactCard'
 import { CONFIG_BY_SYMBOL } from '../../utils/commodityConfig'
 
-const SYMBOLS = ['UREA', 'DIAPH']
+const SYMBOLS = ['BRENTOIL-FUT', 'TTF-GAS', 'LGO', 'XAU', 'AL-FUT']
 
 const EXPLAINER =
-  'Urea and Diammonium Phosphate (DAP) — the two most widely traded fertilizers. ' +
-  'Natural gas accounts for 70–80% of urea production cost, creating a direct link between gas and fertilizer prices. ' +
-  'DAP is a key phosphate-based fertilizer. Prices in USD per metric ton ($/ton).'
+  'Key energy and metals benchmarks tracked for their direct impact on European supply chain costs. ' +
+  'Card values are latest daily closes; charts show 90-day daily closes.'
 
-export default function Fertilizer({ data, isOverview = false }) {
+export default function Commodities({ data, isOverview = false }) {
   return (
-    <section id="fertilizers" className="mb-14">
+    <section id="commodities" className="mb-14">
       <div className="mb-2">
         <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>
-          Fertilizer
+          Commodities
         </h2>
       </div>
       {!isOverview && (
-        <>
-          <p style={{ fontSize: 14, color: 'var(--text)', marginBottom: 6, lineHeight: 1.6 }}>
-            {EXPLAINER}
-          </p>
-          <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 20 }}>
-            $/ton = US dollars per metric ton (1,000 kg)
-          </p>
-        </>
+        <p style={{ fontSize: 14, color: 'var(--text)', marginBottom: 20, lineHeight: 1.6 }}>
+          {EXPLAINER}
+        </p>
       )}
 
       {isOverview ? (

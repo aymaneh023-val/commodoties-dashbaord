@@ -16,16 +16,16 @@ const getCategory = (article) => {
     article.title + ' ' + (article.description || '')
   ).toLowerCase()
 
-  if (text.match(/food|wheat|grain|soy|crop|fertilizer|agricultural|fao|hunger|harvest/))
-    return { label: 'Food', color: 'var(--food)', id: 'fertilizer' }
+  if (text.match(/food|wheat|grain|soy|crop|agricultural|fao|hunger|harvest|dairy|butter|palm oil/))
+    return { label: 'Food', color: 'var(--food)', id: 'food' }
+  if (text.match(/fertilizer|urea|phosphate|nitrogen|potash/))
+    return { label: 'Fertilizers', color: 'var(--fertilizer)', id: 'fertilizers' }
   if (text.match(/ship|freight|container|port|vessel|cargo|logistics|red sea|hormuz/))
     return { label: 'Shipping', color: 'var(--shipping)', id: 'shipping' }
-  if (text.match(/gas|lng|ttf|pipeline|energy|electricity|power/))
-    return { label: 'Gas/Energy', color: 'var(--gas)', id: 'gas' }
-  if (text.match(/oil|brent|wti|crude|opec|barrel/))
-    return { label: 'Oil', color: 'var(--oil)', id: 'oil' }
-  if (text.match(/inflation|cpi|hicp|prices|cost of living/))
-    return { label: 'Inflation', color: 'var(--inflation)', id: 'inflation' }
+  if (text.match(/oil|brent|wti|crude|opec|barrel|gas|lng|ttf|pipeline|energy|electricity|power|gold|aluminium|metal/))
+    return { label: 'Commodities', color: 'var(--oil)', id: 'commodities' }
+  if (text.match(/inflation|cpi|hicp|prices|cost of living|gdp|interest rate|central bank|monetary/))
+    return { label: 'Macro', color: 'var(--inflation)', id: 'macro' }
   return { label: 'Markets', color: 'var(--muted)', id: 'ALL' }
 }
 
@@ -53,12 +53,6 @@ export default function NewsFeed({ articles, loading, error, activeFilter }) {
         <h2 className="text-base font-bold" style={{ color: 'var(--text)' }}>
           Market News
         </h2>
-        <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 2 }}>
-          Sources: Reuters · AP · BBC · FT · Al Jazeera · WSJ · Bloomberg
-        </p>
-        <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 2 }}>
-          Free plan: articles may be up to 24 h delayed
-        </p>
       </div>
 
       {/* States */}

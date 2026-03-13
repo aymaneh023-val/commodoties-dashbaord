@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { FILTER_TABS } from '../utils/constants'
+import { useEffect, useState } from 'react'
+import { FILTER_TABS } from '../utils/commodityConfig'
 import { formatTime } from '../utils/formatters'
 
 const STATUS_DOT = {
@@ -9,7 +9,7 @@ const STATUS_DOT = {
 }
 
 export default function Header({ activeFilter, onFilterChange, onRefresh, lastUpdated,
-  refreshing = false, connectionStatus = 'green', onShowReferences }) {
+  refreshing = false, canRefresh = false, lastRefreshedAt = null, connectionStatus = 'green' }) {
   const status = STATUS_DOT[connectionStatus] ?? STATUS_DOT.green
 
   useEffect(() => {
@@ -32,18 +32,6 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
       {/* Top row */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="flex-1 min-w-0">
-          {/* Status eyebrow */}
-          <div className="flex items-center gap-2 mb-2">
-            <span
-              title={status.label}
-              style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', backgroundColor: status.color, flexShrink: 0 }}
-            />
-            <span style={{ fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-              {connectionStatus === 'green' ? 'Live' : connectionStatus === 'amber' ? 'Partial' : 'Reconnecting'}
-              {' · Updated '}{lastUpdated ? formatTime(lastUpdated) : '—'}
-            </span>
-          </div>
-
           <h1 className="font-bold leading-tight" style={{ fontSize: 20, color: 'var(--text)' }}>
             Commodity Monitor
           </h1>
@@ -52,34 +40,14 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
           </p>
         </div>
 
-        {/* Action buttons */}
+        {/* Refresh button — always visible, three states */}
         <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={onShowReferences}
-            style={{
-              fontSize: 14, padding: '6px 12px', borderRadius: 8,
-              background: 'transparent', border: '1px solid transparent',
-              color: 'var(--muted)', cursor: 'pointer',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text)' }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--muted)' }}
-          >
-            References
-          </button>
-          <button
-            onClick={onRefresh}
-            disabled={refreshing}
-            style={{
-              fontSize: 14, padding: '6px 14px', borderRadius: 8,
-              background: 'var(--surface)', border: '1px solid var(--border)',
-              color: refreshing ? 'var(--muted)' : 'var(--text)',
-              cursor: refreshing ? 'not-allowed' : 'pointer', fontWeight: 500,
-            }}
-            onMouseEnter={(e) => { if (!refreshing) e.currentTarget.style.borderColor = 'var(--text)' }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)' }}
-          >
-            {refreshing ? '⏳ Refreshing…' : '↻ Refresh'}
-          </button>
+          <RefreshButton
+            canRefresh={canRefresh}
+            refreshing={refreshing}
+            lastRefreshedAt={lastRefreshedAt}
+            onRefresh={onRefresh}
+          />
         </div>
       </div>
 
@@ -106,5 +74,59 @@ export default function Header({ activeFilter, onFilterChange, onRefresh, lastUp
         })}
       </div>
     </header>
+  )
+}
+
+function RefreshButton({ canRefresh, refreshing, lastRefreshedAt, onRefresh }) {
+  const [now, setNow] = useState(Date.now())
+
+  // Tick every 30s to update "X min ago" label
+  useEffect(() => {
+    if (canRefresh || refreshing || !lastRefreshedAt) return
+    const id = setInterval(() => setNow(Date.now()), 30_000)
+    return () => clearInterval(id)
+  }, [canRefresh, refreshing, lastRefreshedAt])
+
+  const baseStyle = {
+    fontSize: 14, padding: '6px 14px', borderRadius: 8,
+    fontWeight: 500, border: '1px solid var(--border)',
+    transition: 'all 0.15s',
+  }
+
+  // State 1: Refreshing
+  if (refreshing) {
+    return (
+      <button disabled style={{ ...baseStyle, background: 'var(--surface)', color: 'var(--muted)', cursor: 'not-allowed' }}>
+        <span className="spinner-inline" /> Refreshing…
+      </button>
+    )
+  }
+
+  // State 2: Cooldown
+  if (!canRefresh && lastRefreshedAt) {
+    const elapsedMs = now - new Date(lastRefreshedAt).getTime()
+    const elapsedMin = Math.floor(elapsedMs / 60_000)
+    const remainingMin = 60 - elapsedMin
+    const label = elapsedMin < 1 ? 'Updated just now'
+      : remainingMin > 0 ? `Next refresh in ${remainingMin} min`
+      : 'Up to date'
+
+    return (
+      <button disabled style={{ ...baseStyle, background: 'var(--surface2)', color: 'var(--muted)', cursor: 'default' }}>
+        ✓ {label}
+      </button>
+    )
+  }
+
+  // State 3: Ready
+  return (
+    <button
+      onClick={onRefresh}
+      style={{ ...baseStyle, background: 'var(--surface)', color: 'var(--text)', cursor: 'pointer' }}
+      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--text)' }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)' }}
+    >
+      ↻ Refresh
+    </button>
   )
 }
