@@ -1,23 +1,4 @@
 import { useState, useEffect, useCallback } from 'react'
-import { NEWS_CATEGORY_KEYWORDS } from '../utils/constants'
-
-function detectCategory(article) {
-  if (article.category) return article.category
-  const text = `${article.title || ''} ${article.description || ''}`.toLowerCase()
-  for (const [cat, keywords] of Object.entries(NEWS_CATEGORY_KEYWORDS)) {
-    if (keywords.some((kw) => text.includes(kw))) return cat
-  }
-  return 'ALL'
-}
-
-function detectSource(article) {
-  const domain = (article.url || '').toLowerCase()
-  if (domain.includes('reuters')) return 'reuters'
-  if (domain.includes('ft.com') || domain.includes('financial')) return 'ft'
-  if (domain.includes('bloomberg')) return 'bloomberg'
-  if (domain.includes('iea.org')) return 'iea'
-  return article.source?.name || 'Source'
-}
 
 export function useNewsData() {
   const [articles, setArticles] = useState([])
@@ -29,8 +10,6 @@ export function useNewsData() {
     setLoading(true)
     try {
       const forceParam = force ? '?force=true' : ''
-
-      // DB-backed serverless proxy: optional force refresh updates DB upstream-first.
       const res = await fetch(`/api/news${forceParam}`, {
         signal: AbortSignal.timeout(12000),
       })
@@ -38,18 +17,12 @@ export function useNewsData() {
       if (!res.ok) throw new Error(`Proxy error: ${res.status}`)
 
       const json = await res.json()
-      if (json.status !== 'ok') throw new Error(json.message || 'NewsAPI error')
+      if (json.status !== 'ok') throw new Error(json.message || 'News error')
 
-      const enriched = (json.articles || []).map((a) => ({
-        ...a,
-        category: detectCategory(a),
-        sourceName: detectSource(a),
-      }))
-
-      setArticles(enriched)
+      setArticles(json.articles || [])
       setError(null)
     } catch (err) {
-      setError('News feed unavailable — check API key')
+      setError('News feed unavailable')
       console.error('News fetch failed:', err)
     } finally {
       setLoading(false)

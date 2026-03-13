@@ -7,7 +7,7 @@ function localApiPlugin() {
     name: 'local-api',
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
-        if (!req.url.startsWith('/api/timeseries') && !req.url.startsWith('/api/inflation') && !req.url.startsWith('/api/barometer') && !req.url.startsWith('/api/last-refreshed')) return next()
+        if (!req.url.startsWith('/api/timeseries') && !req.url.startsWith('/api/inflation') && !req.url.startsWith('/api/barometer') && !req.url.startsWith('/api/last-refreshed') && !req.url.startsWith('/api/news')) return next()
 
         try {
           const { createClient } = await import('@supabase/supabase-js')
@@ -27,6 +27,73 @@ function localApiPlugin() {
 
             res.setHeader('Content-Type', 'application/json')
             res.end(JSON.stringify({ lastRefreshed: data?.updated_at ?? null }))
+            return
+          }
+
+          // /api/news — proxy to serverless news handler
+          if (req.url.startsWith('/api/news')) {
+            const url = new URL(req.url, 'http://localhost')
+            const force = url.searchParams.get('force') === 'true'
+
+            // Read from news_articles table
+            const readFromDb = async () => {
+              const { data: rows } = await sb
+                .from('news_articles')
+                .select('url, title, description, source_name, url_to_image, published_at, category')
+                .order('published_at', { ascending: false })
+              return rows ?? []
+            }
+
+            if (!force) {
+              const rows = await readFromDb()
+              res.setHeader('Content-Type', 'application/json')
+              res.end(JSON.stringify({
+                status: 'ok',
+                totalResults: rows.length,
+                articles: rows.map((r) => ({ url: r.url, title: r.title, description: r.description, source: { name: r.source_name }, urlToImage: r.url_to_image, publishedAt: r.published_at, category: r.category })),
+              }))
+              return
+            }
+
+            // force: fetch from NewsAPI
+            const apiKey = process.env.NEWS_API_KEY
+            if (!apiKey) {
+              res.setHeader('Content-Type', 'application/json')
+              res.end(JSON.stringify({ status: 'error', message: 'NEWS_API_KEY not set' }))
+              return
+            }
+
+            const sources = 'reuters,associated-press,bbc-news,financial-times,al-jazeera-english,the-wall-street-journal,bloomberg'
+            const queries = {
+              energy: '"oil price" OR "Iran war" OR "Strait of Hormuz" OR "LNG Europe" OR "energy crisis" OR "gas prices Europe"',
+              food: '"food supply chain" OR "food prices" OR "wheat prices" OR "fertilizer" OR "food inflation" OR "crop shortage" OR "agricultural supply" OR "food security" OR "soybean" OR "grain exports"',
+              shipping: '"container rates" OR "shipping disruption" OR "Red Sea" OR "freight costs" OR "supply chain disruption" OR "port congestion" OR "trade routes"',
+            }
+
+            const fetches = Object.entries(queries).map(async ([cat, q]) => {
+              const r = await fetch(`https://newsapi.org/v2/everything?sources=${sources}&q=${encodeURIComponent(q)}&language=en&sortBy=publishedAt&pageSize=30&apiKey=${apiKey}`, { headers: { 'User-Agent': 'EU-Energy-Monitor/1.0' } })
+              const json = await r.json()
+              return (json.articles || []).map((a) => ({ ...a, category: cat }))
+            })
+
+            const results = await Promise.all(fetches)
+            const all = results.flat()
+            const seen = new Set()
+            const unique = all.filter((a) => { if (!a.url || seen.has(a.url)) return false; seen.add(a.url); return true })
+            unique.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
+
+            await sb.from('news_articles').upsert(
+              unique.map((a) => ({ url: a.url, title: a.title, description: a.description ?? null, source_name: a.source?.name ?? null, url_to_image: a.urlToImage ?? null, published_at: a.publishedAt ?? null, category: a.category, fetched_at: new Date().toISOString() })),
+              { onConflict: 'url', ignoreDuplicates: true }
+            )
+
+            const rows = await readFromDb()
+            res.setHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify({
+              status: 'ok',
+              totalResults: rows.length,
+              articles: rows.map((r) => ({ url: r.url, title: r.title, description: r.description, source: { name: r.source_name }, urlToImage: r.url_to_image, publishedAt: r.published_at, category: r.category })),
+            }))
             return
           }
 
