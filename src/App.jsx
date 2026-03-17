@@ -83,7 +83,7 @@ export default function App() {
       >
         {/* Left column — data sections */}
         <main>
-          {sectionVisible('commodities') && (
+          {(sectionVisible('commodities') || activeFilter === 'metals') && (
             <Commodities data={commodityData} isOverview={isOverview} />
           )}
           {sectionVisible('fertilizers') && (

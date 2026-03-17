@@ -296,6 +296,7 @@ export const CONTAINER_COMPONENTS = Object.freeze(
 export const FILTER_TABS = Object.freeze([
   { id: 'ALL', label: 'All' },
   { id: 'commodities', label: 'Commodities' },
+  { id: 'metals', label: 'Metals' },
   { id: 'fertilizers', label: 'Fertilizers' },
   { id: 'food', label: 'Food' },
   { id: 'shipping', label: 'Shipping' },

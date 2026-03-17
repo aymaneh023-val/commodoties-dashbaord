@@ -3,20 +3,21 @@ import { createClient } from '@supabase/supabase-js'
 const SOURCES = 'reuters,associated-press,bbc-news,financial-times,al-jazeera-english,the-wall-street-journal,bloomberg,the-economist,cnbc,euronews,politico'
 
 const energyQuery =
-  '"Brent crude" OR "oil prices" OR "crude oil" OR ' +
-  '"TTF gas" OR "natural gas prices" OR "LNG prices" OR ' +
-  '"energy prices Europe" OR "gas supply Europe" OR "oil sanctions"'
+  '"Brent crude" OR "Brent oil" OR "OPEC production" OR ' +
+  '"TTF gas price" OR "European gas storage" OR "LNG import Europe" OR ' +
+  '"oil sanctions" OR "gas supply disruption" OR "energy market Europe"'
 
 const foodQuery =
-  '"wheat prices" OR "grain prices" OR "corn prices" OR ' +
-  '"soybean prices" OR "palm oil" OR "fertilizer prices" OR ' +
-  '"food inflation" OR "crop shortage" OR "grain exports" OR ' +
-  '"butter prices" OR "dairy prices" OR "urea prices"'
+  '"wheat futures" OR "grain market" OR "corn futures" OR ' +
+  '"soybean market" OR "palm oil price" OR "fertilizer market" OR ' +
+  '"FAO food price index" OR "crop yield forecast" OR "grain export" OR ' +
+  '"butter market" OR "dairy commodity" OR "urea market"'
 
 const shippingQuery =
-  '"container freight" OR "container rates" OR "shipping rates" OR ' +
-  '"Red Sea shipping" OR "Maersk" OR "Hapag-Lloyd" OR ' +
-  '"Baltic Dry Index" OR "freight rates" OR "port congestion"'
+  '"container freight rates" OR "container shipping market" OR ' +
+  '"Red Sea shipping" OR "Suez Canal disruption" OR ' +
+  '"Maersk" OR "Hapag-Lloyd" OR "COSCO shipping" OR ' +
+  '"Baltic Dry Index" OR "dry bulk freight" OR "port throughput"'
 
 const macroQuery =
   '"food inflation" OR "consumer prices Europe" OR "cost of living" OR ' +
