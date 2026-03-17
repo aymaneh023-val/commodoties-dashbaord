@@ -47,13 +47,17 @@ export default async function handler(req, res) {
       const rows = []
       const computedRows = []
 
-      // CPA latest
+      // CPA latest — isolated so a CPA failure doesn't block Yahoo
       const cpaSymbols = requestedSymbols.filter((s) => CPA_SYMBOLS.includes(s))
       if (cpaSymbols.length > 0) {
         const batches = chunk(cpaSymbols, CPA_BATCH_SIZE)
         for (const batch of batches) {
-          const batchRows = await fetchCPALatest(batch)
-          rows.push(...batchRows)
+          try {
+            const batchRows = await fetchCPALatest(batch)
+            rows.push(...batchRows)
+          } catch (err) {
+            console.error(`Live CPA batch [${batch.join(',')}]:`, err.message)
+          }
         }
       }
 
