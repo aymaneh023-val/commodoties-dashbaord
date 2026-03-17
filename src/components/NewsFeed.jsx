@@ -9,6 +9,10 @@ const SOURCE_CONFIG = {
   'al-jazeera-english': { label: 'Al Jazeera', color: '#2D7A4F' },
   'the-wall-street-journal': { label: 'WSJ',   color: '#3448BF' },
   'bloomberg':          { label: 'Bloomberg',  color: '#6B4EC4' },
+  'the-economist':      { label: 'Economist',  color: '#E3001B' },
+  'cnbc':               { label: 'CNBC',       color: '#004C97' },
+  'euronews':           { label: 'Euronews',   color: '#0055A4' },
+  'politico':           { label: 'Politico',   color: '#2E2E2E' },
 }
 
 const getCategory = (article) => {
@@ -22,7 +26,9 @@ const getCategory = (article) => {
     return { label: 'Fertilizers', color: 'var(--fertilizer)', id: 'fertilizers' }
   if (text.match(/ship|freight|container|port|vessel|cargo|logistics|red sea|hormuz/))
     return { label: 'Shipping', color: 'var(--shipping)', id: 'shipping' }
-  if (text.match(/oil|brent|wti|crude|opec|barrel|gas|lng|ttf|pipeline|energy|electricity|power|gold|aluminium|metal/))
+  if (text.match(/gold|alumin|lme|base metals|precious metals|silver|copper/))
+    return { label: 'Metals', color: '#95A5A6', id: 'metals' }
+  if (text.match(/oil|brent|wti|crude|opec|barrel|gas|lng|ttf|pipeline|energy|electricity|power/))
     return { label: 'Commodities', color: 'var(--oil)', id: 'commodities' }
   if (text.match(/inflation|cpi|hicp|prices|cost of living|gdp|interest rate|central bank|monetary/))
     return { label: 'Macro', color: 'var(--inflation)', id: 'macro' }

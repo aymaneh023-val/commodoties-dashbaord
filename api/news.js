@@ -23,6 +23,11 @@ const macroQuery =
   '"supply chain costs" OR "producer price index" OR ' +
   '"ECB interest rate" OR "inflation outlook" OR "HICP" OR "purchasing power"'
 
+const metalsQuery =
+  '"gold price" OR "gold market" OR "aluminium price" OR ' +
+  '"aluminium market" OR "LME aluminium" OR "base metals" OR ' +
+  '"precious metals" OR "commodity metals" OR "metals outlook"'
+
 function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
 }
@@ -109,18 +114,20 @@ export default async function handler(req, res) {
   try {
     await pruneOldArticles(supabase)
 
-    const [energyRes, foodRes, shippingRes, macroRes] = await Promise.all([
+    const [energyRes, foodRes, shippingRes, macroRes, metalsRes] = await Promise.all([
       fetch(buildUrl(energyQuery, apiKey), { headers: { 'User-Agent': 'EU-Energy-Monitor/1.0' } }),
       fetch(buildUrl(foodQuery, apiKey), { headers: { 'User-Agent': 'EU-Energy-Monitor/1.0' } }),
       fetch(buildUrl(shippingQuery, apiKey), { headers: { 'User-Agent': 'EU-Energy-Monitor/1.0' } }),
       fetch(buildUrl(macroQuery, apiKey), { headers: { 'User-Agent': 'EU-Energy-Monitor/1.0' } }),
+      fetch(buildUrl(metalsQuery, apiKey), { headers: { 'User-Agent': 'EU-Energy-Monitor/1.0' } }),
     ])
 
-    const [energyData, foodData, shippingData, macroData] = await Promise.all([
+    const [energyData, foodData, shippingData, macroData, metalsData] = await Promise.all([
       energyRes.json(),
       foodRes.json(),
       shippingRes.json(),
       macroRes.json(),
+      metalsRes.json(),
     ])
 
     // Tag each article with its category before merging
@@ -129,6 +136,7 @@ export default async function handler(req, res) {
       ...(foodData.articles || []).map((a) => ({ ...a, category: 'food' })),
       ...(shippingData.articles || []).map((a) => ({ ...a, category: 'shipping' })),
       ...(macroData.articles || []).map((a) => ({ ...a, category: 'macro' })),
+      ...(metalsData.articles || []).map((a) => ({ ...a, category: 'metals' })),
     ]
 
     // Deduplicate by URL (first category tag wins, matching DB DO NOTHING semantics)
