@@ -18,6 +18,7 @@ export default function LineChartWrapper({
   yUnit = '',
   height = 160,
   referenceLines = [],
+  eventLines = [],
   showLegend = false,
 }) {
   const [hiddenKeys, setHiddenKeys] = useState({})
@@ -98,6 +99,30 @@ export default function LineChartWrapper({
             }}
           />
         ))}
+        {eventLines.map((ev) => {
+          // Snap to nearest xKey value in data (handles weekends/holidays)
+          const dates = data.map((d) => d[xKey]).filter(Boolean)
+          const target = ev.date
+          const snapped = dates.reduce((best, d) =>
+            Math.abs(new Date(d) - new Date(target)) < Math.abs(new Date(best) - new Date(target)) ? d : best
+          , dates[0])
+          if (!snapped) return null
+          return (
+            <ReferenceLine
+              key={ev.date}
+              x={snapped}
+              stroke={ev.color || '#B55A5A'}
+              strokeDasharray="6 3"
+              strokeWidth={1}
+              label={{
+                value: ev.label,
+                fill: ev.color || '#B55A5A',
+                fontSize: 10,
+                position: 'insideTopLeft',
+              }}
+            />
+          )
+        })}
         {lines.map((l) => (
           <Line
             key={l.key}

@@ -17,6 +17,9 @@ export default function CommodityNarrative({ symbol, data, config }) {
   const firstDate = chartData[0]?.date
   const lastDate = chartData[chartData.length - 1]?.date
 
+  const IRAN_WAR_DATE = '2026-02-28'
+  const showEvent = firstDate && lastDate && firstDate <= IRAN_WAR_DATE && lastDate >= IRAN_WAR_DATE
+
   return (
     <div className="mb-10">
       {/* Header row */}
@@ -100,6 +103,7 @@ export default function CommodityNarrative({ symbol, data, config }) {
             xKey="date"
             yUnit={cfg.unit}
             height={300}
+            eventLines={showEvent ? [{ date: IRAN_WAR_DATE, label: 'Iran war begins', color: '#B55A5A' }] : []}
           />
         </div>
       )}
