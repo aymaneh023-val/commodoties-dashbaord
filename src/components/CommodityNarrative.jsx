@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import LineChartWrapper from './LineChart'
 import { formatPrice, formatPct, pctArrow, pctColor } from '../utils/formatters'
 
@@ -5,13 +6,16 @@ export default function CommodityNarrative({ symbol, data, config }) {
   const d = data[symbol] ?? {}
   const cfg = config
   const history = d.history ?? []
+  const [range, setRange] = useState(30)
 
   const badgeColor = pctColor(d.pctChange, false)
   const arrow = pctArrow(d.pctChange)
   const displayValue = formatPrice(d.price, cfg.decimals, '') + cfg.unit
 
-  const firstDate = history[0]?.date
-  const lastDate = history[history.length - 1]?.date
+  const has90d = history.length >= 60
+  const chartData = has90d ? history.slice(-range) : history
+  const firstDate = chartData[0]?.date
+  const lastDate = chartData[chartData.length - 1]?.date
 
   return (
     <div className="mb-10">
@@ -62,11 +66,36 @@ export default function CommodityNarrative({ symbol, data, config }) {
           className="card"
           style={{ padding: '16px 16px 8px', marginBottom: 12 }}
         >
-          <p style={{ color: 'var(--muted)', fontSize: 13, marginBottom: 8 }}>
-            {cfg.name} ({cfg.symbol}) · {firstDate} – {lastDate} · {cfg.unit.trim() || 'index'}
-          </p>
+          <div className="flex items-center justify-between mb-2">
+            <p style={{ color: 'var(--muted)', fontSize: 13, margin: 0 }}>
+              {cfg.name} ({cfg.symbol}) · {firstDate} – {lastDate} · {cfg.unit.trim() || 'index'}
+            </p>
+            {has90d && (
+              <div className="flex" style={{ gap: 2 }}>
+                {[30, 90].map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => setRange(r)}
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 600,
+                      padding: '2px 8px',
+                      borderRadius: 4,
+                      border: 'none',
+                      cursor: 'pointer',
+                      background: range === r ? 'var(--text)' : 'var(--surface2)',
+                      color: range === r ? 'var(--bg)' : 'var(--muted)',
+                      transition: 'background 0.15s, color 0.15s',
+                    }}
+                  >
+                    {r}d
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <LineChartWrapper
-            data={history}
+            data={chartData}
             lines={[{ key: 'close', color: cfg.color, label: `${cfg.name}${cfg.unit}` }]}
             xKey="date"
             yUnit={cfg.unit}

@@ -3,21 +3,20 @@ import { createClient } from '@supabase/supabase-js'
 const SOURCES = 'reuters,associated-press,bbc-news,financial-times,al-jazeera-english,the-wall-street-journal,bloomberg'
 
 const energyQuery =
-  '"oil price" OR "Iran war" OR "Strait of Hormuz" OR ' +
-  '"LNG Europe" OR "energy crisis" OR "gas prices Europe"'
+  '"Brent crude" OR "oil prices" OR "crude oil" OR ' +
+  '"TTF gas" OR "natural gas prices" OR "LNG prices" OR ' +
+  '"energy prices Europe" OR "gas supply Europe" OR "oil sanctions"'
 
 const foodQuery =
-  '"food supply chain" OR "food prices" OR ' +
-  '"wheat prices" OR "fertilizer" OR ' +
-  '"food inflation" OR "crop shortage" OR ' +
-  '"agricultural supply" OR "food security" OR ' +
-  '"soybean" OR "grain exports"'
+  '"wheat prices" OR "grain prices" OR "corn prices" OR ' +
+  '"soybean prices" OR "palm oil" OR "fertilizer prices" OR ' +
+  '"food inflation" OR "crop shortage" OR "grain exports" OR ' +
+  '"butter prices" OR "dairy prices" OR "urea prices"'
 
 const shippingQuery =
-  '"container rates" OR "shipping disruption" OR ' +
-  '"Red Sea" OR "freight costs" OR ' +
-  '"supply chain disruption" OR "port congestion" OR ' +
-  '"trade routes"'
+  '"container freight" OR "container rates" OR "shipping rates" OR ' +
+  '"Red Sea shipping" OR "Maersk" OR "Hapag-Lloyd" OR ' +
+  '"Baltic Dry Index" OR "freight rates" OR "port congestion"'
 
 function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
@@ -77,9 +76,11 @@ export default async function handler(req, res) {
   const supabase = getSupabase()
 
   const readFromDb = async () => {
+    const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
     const { data: rows } = await supabase
       .from('news_articles')
       .select('url, title, description, source_name, url_to_image, published_at, category')
+      .gte('published_at', cutoff)
       .order('published_at', { ascending: false })
     return rows ?? []
   }

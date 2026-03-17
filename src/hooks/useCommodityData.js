@@ -30,15 +30,16 @@ function processRows(rows) {
   }))
 
   const latest = sorted[sorted.length - 1]
-  const oldest = sorted[0]
+  // pctChange always over 30-day window regardless of total history length
+  const base = sorted[Math.max(0, sorted.length - 30)]
   const price = latest.close
-  const pctChange = oldest.close ? ((price - oldest.close) / oldest.close) * 100 : null
+  const pctChange = base.close ? ((price - base.close) / base.close) * 100 : null
 
   return {
     price,
     pctChange,
     asOf: formatDate(latest.date),
-    baseDate: formatDate(oldest.date),
+    baseDate: formatDate(base.date),
     history,
     loading: false,
     error: false,
@@ -64,7 +65,7 @@ export function useCommodityData() {
     try {
       const symbolsParam = encodeURIComponent(ALL_SYMBOLS.join(','))
       const liveParam = force ? '&live=true' : ''
-      const res = await fetch(`/api/timeseries?symbols=${symbolsParam}&days=30${liveParam}`)
+      const res = await fetch(`/api/timeseries?symbols=${symbolsParam}&days=90${liveParam}`)
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Fetch failed')
 

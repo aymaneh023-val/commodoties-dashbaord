@@ -1,7 +1,55 @@
+import { useState } from 'react'
 import DataCard from '../DataCard'
 import CompactCard from '../CompactCard'
 import LineChartWrapper from '../LineChart'
 import { CONFIG_BY_SYMBOL, CONTAINER_COMPONENTS } from '../../utils/commodityConfig'
+
+function RangeChart({ cfg, history, height = 160 }) {
+  const [range, setRange] = useState(30)
+  const has90d = history.length >= 60
+  const chartData = has90d ? history.slice(-range) : history
+  const firstDate = chartData[0]?.date
+  const lastDate = chartData[chartData.length - 1]?.date
+  return (
+    <div className="card" style={{ padding: '16px 16px 8px' }}>
+      <div className="flex items-center justify-between mb-2">
+        <p style={{ color: 'var(--muted)', fontSize: 13, margin: 0 }}>
+          {cfg.name} · {firstDate} – {lastDate}
+        </p>
+        {has90d && (
+          <div className="flex" style={{ gap: 2 }}>
+            {[30, 90].map((r) => (
+              <button
+                key={r}
+                onClick={() => setRange(r)}
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  padding: '2px 8px',
+                  borderRadius: 4,
+                  border: 'none',
+                  cursor: 'pointer',
+                  background: range === r ? 'var(--text)' : 'var(--surface2)',
+                  color: range === r ? 'var(--bg)' : 'var(--muted)',
+                  transition: 'background 0.15s, color 0.15s',
+                }}
+              >
+                {r}d
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <LineChartWrapper
+        data={chartData}
+        lines={[{ key: 'close', color: cfg.color, label: cfg.name }]}
+        xKey="date"
+        yUnit={cfg.unit}
+        height={height}
+      />
+    </div>
+  )
+}
 
 const CARD_SYMBOLS = ['BDRY', 'CONTAINER-INDEX']
 
@@ -68,28 +116,12 @@ export default function Shipping({ data, isOverview = false }) {
         })}
       </div>
 
-      {/* Main index charts */}
       <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
         {CARD_SYMBOLS.map((sym) => {
           const cfg = CONFIG_BY_SYMBOL[sym]
           const history = data[sym]?.history ?? []
           if (history.length === 0) return null
-          const firstDate = history[0]?.date
-          const lastDate = history[history.length - 1]?.date
-          return (
-            <div key={sym} className="card" style={{ padding: '16px 16px 8px' }}>
-              <p style={{ color: 'var(--muted)', fontSize: 13, marginBottom: 8 }}>
-                {cfg.name} · {firstDate} – {lastDate}
-              </p>
-              <LineChartWrapper
-                data={history}
-                lines={[{ key: 'close', color: cfg.color, label: cfg.name }]}
-                xKey="date"
-                yUnit={cfg.unit}
-                height={160}
-              />
-            </div>
-          )
+          return <RangeChart key={sym} cfg={cfg} history={history} height={160} />
         })}
       </div>
 
@@ -107,8 +139,6 @@ export default function Shipping({ data, isOverview = false }) {
         const cfg = CONFIG_BY_SYMBOL[sym]
         const d = data[sym] ?? {}
         const history = d.history ?? []
-        const firstDate = history[0]?.date
-        const lastDate = history[history.length - 1]?.date
 
         return (
           <div key={sym} className="mb-4">
@@ -127,21 +157,7 @@ export default function Shipping({ data, isOverview = false }) {
               )}
             </div>
 
-            {/* Stock chart */}
-            {history.length > 0 && (
-              <div className="card" style={{ padding: '12px 16px 6px' }}>
-                <p style={{ color: 'var(--muted)', fontSize: 12, marginBottom: 6 }}>
-                  {cfg.name} · {firstDate} – {lastDate}
-                </p>
-                <LineChartWrapper
-                  data={history}
-                  lines={[{ key: 'close', color: cfg.color, label: cfg.name }]}
-                  xKey="date"
-                  yUnit={cfg.unit}
-                  height={160}
-                />
-              </div>
-            )}
+            {history.length > 0 && <RangeChart cfg={cfg} history={history} height={160} />}
           </div>
         )
       })}
