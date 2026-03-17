@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 
-const SOURCES = 'reuters,associated-press,bbc-news,financial-times,al-jazeera-english,the-wall-street-journal,bloomberg'
+const SOURCES = 'reuters,associated-press,bbc-news,financial-times,al-jazeera-english,the-wall-street-journal,bloomberg,the-economist,cnbc,euronews,politico'
 
 const energyQuery =
   '"Brent crude" OR "oil prices" OR "crude oil" OR ' +
@@ -18,8 +18,18 @@ const shippingQuery =
   '"Red Sea shipping" OR "Maersk" OR "Hapag-Lloyd" OR ' +
   '"Baltic Dry Index" OR "freight rates" OR "port congestion"'
 
+const macroQuery =
+  '"food inflation" OR "consumer prices Europe" OR "cost of living" OR ' +
+  '"supply chain costs" OR "producer price index" OR ' +
+  '"ECB interest rate" OR "inflation outlook" OR "HICP" OR "purchasing power"'
+
 function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
+}
+
+async function pruneOldArticles(supabase) {
+  const cutoff = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString()
+  await supabase.from('news_articles').delete().lt('published_at', cutoff)
 }
 
 function buildUrl(query, apiKey) {
@@ -76,7 +86,7 @@ export default async function handler(req, res) {
   const supabase = getSupabase()
 
   const readFromDb = async () => {
-    const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+    const cutoff = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString()
     const { data: rows } = await supabase
       .from('news_articles')
       .select('url, title, description, source_name, url_to_image, published_at, category')
@@ -95,18 +105,22 @@ export default async function handler(req, res) {
     })
   }
 
-  // force=true: fetch from NewsAPI — all three category queries in parallel
+  // force=true: prune old articles, then fetch from NewsAPI — all four category queries in parallel
   try {
-    const [energyRes, foodRes, shippingRes] = await Promise.all([
+    await pruneOldArticles(supabase)
+
+    const [energyRes, foodRes, shippingRes, macroRes] = await Promise.all([
       fetch(buildUrl(energyQuery, apiKey), { headers: { 'User-Agent': 'EU-Energy-Monitor/1.0' } }),
       fetch(buildUrl(foodQuery, apiKey), { headers: { 'User-Agent': 'EU-Energy-Monitor/1.0' } }),
       fetch(buildUrl(shippingQuery, apiKey), { headers: { 'User-Agent': 'EU-Energy-Monitor/1.0' } }),
+      fetch(buildUrl(macroQuery, apiKey), { headers: { 'User-Agent': 'EU-Energy-Monitor/1.0' } }),
     ])
 
-    const [energyData, foodData, shippingData] = await Promise.all([
+    const [energyData, foodData, shippingData, macroData] = await Promise.all([
       energyRes.json(),
       foodRes.json(),
       shippingRes.json(),
+      macroRes.json(),
     ])
 
     // Tag each article with its category before merging
@@ -114,6 +128,7 @@ export default async function handler(req, res) {
       ...(energyData.articles || []).map((a) => ({ ...a, category: 'energy' })),
       ...(foodData.articles || []).map((a) => ({ ...a, category: 'food' })),
       ...(shippingData.articles || []).map((a) => ({ ...a, category: 'shipping' })),
+      ...(macroData.articles || []).map((a) => ({ ...a, category: 'macro' })),
     ]
 
     // Deduplicate by URL (first category tag wins, matching DB DO NOTHING semantics)
