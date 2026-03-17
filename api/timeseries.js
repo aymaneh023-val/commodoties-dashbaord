@@ -117,35 +117,30 @@ export default async function handler(req, res) {
     }
   }
 
-  // ── Read from Supabase ──
+  // ── Read from Supabase (per-symbol to avoid 1000-row default cap) ──
   const supabase = getSupabase()
   const since = new Date()
   since.setDate(since.getDate() - days)
   const sinceStr = since.toISOString().split('T')[0]
 
-  const { data, error } = await supabase
-    .from('commodity_timeseries_all')
-    .select('symbol, date, open, high, low, close')
-    .in('symbol', requestedSymbols)
-    .gte('date', sinceStr)
-    .order('date', { ascending: true })
-    .limit(5000)
-
-  if (error) {
-    return res.status(500).json({ status: 'error', message: error.message })
-  }
-
-  // Group by symbol
   const grouped = {}
-  for (const row of data ?? []) {
-    if (!grouped[row.symbol]) grouped[row.symbol] = []
-    grouped[row.symbol].push({
-      date: row.date,
-      open: row.open,
-      high: row.high,
-      low: row.low,
-      close: row.close,
-    })
+  const fetches = requestedSymbols.map(async (sym) => {
+    const { data, error } = await supabase
+      .from('commodity_timeseries_all')
+      .select('date, open, high, low, close')
+      .eq('symbol', sym)
+      .gte('date', sinceStr)
+      .order('date', { ascending: true })
+    if (error) throw new Error(`${sym}: ${error.message}`)
+    grouped[sym] = (data ?? []).map((r) => ({
+      date: r.date, open: r.open, high: r.high, low: r.low, close: r.close,
+    }))
+  })
+
+  try {
+    await Promise.all(fetches)
+  } catch (err) {
+    return res.status(500).json({ status: 'error', message: err.message })
   }
 
   return res.status(200).json({ status: 'ok', data: grouped })
