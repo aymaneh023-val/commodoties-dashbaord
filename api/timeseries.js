@@ -129,6 +129,7 @@ export default async function handler(req, res) {
     .in('symbol', requestedSymbols)
     .gte('date', sinceStr)
     .order('date', { ascending: true })
+    .limit(5000)
 
   if (error) {
     return res.status(500).json({ status: 'error', message: error.message })
