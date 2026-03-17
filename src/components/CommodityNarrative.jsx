@@ -12,7 +12,7 @@ export default function CommodityNarrative({ symbol, data, config }) {
   const arrow = pctArrow(d.pctChange)
   const displayValue = formatPrice(d.price, cfg.decimals, '') + cfg.unit
 
-  const has90d = history.length >= 60
+  const has90d = history.length >= 35
   const chartData = has90d ? history.slice(-range) : history
   const firstDate = chartData[0]?.date
   const lastDate = chartData[chartData.length - 1]?.date

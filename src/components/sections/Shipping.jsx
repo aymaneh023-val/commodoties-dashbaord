@@ -6,7 +6,7 @@ import { CONFIG_BY_SYMBOL, CONTAINER_COMPONENTS } from '../../utils/commodityCon
 
 function RangeChart({ cfg, history, height = 160 }) {
   const [range, setRange] = useState(30)
-  const has90d = history.length >= 60
+  const has90d = history.length >= 35
   const chartData = has90d ? history.slice(-range) : history
   const firstDate = chartData[0]?.date
   const lastDate = chartData[chartData.length - 1]?.date
