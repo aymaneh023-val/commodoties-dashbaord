@@ -3,31 +3,31 @@ import { createClient } from '@supabase/supabase-js'
 const SOURCES = 'reuters,associated-press,bbc-news,financial-times,al-jazeera-english,the-wall-street-journal,bloomberg,the-economist,cnbc,euronews,politico'
 
 const energyQuery =
-  '"Brent crude" OR "Brent oil" OR "OPEC production" OR ' +
-  '"TTF gas price" OR "European gas storage" OR "LNG import Europe" OR ' +
-  '"oil sanctions" OR "gas supply disruption" OR "energy market Europe"'
+  '"Brent crude price" OR "oil price" OR "OPEC output" OR "OPEC production cut" OR ' +
+  '"TTF gas" OR "European gas storage" OR "LNG terminal" OR "LNG cargo" OR ' +
+  '"Strait of Hormuz" OR "oil supply disruption" OR "refinery shutdown" OR ' +
+  '"crude oil futures" OR "gas pipeline Europe" OR "gasoil price"'
 
 const foodQuery =
   '"wheat futures" OR "grain market" OR "corn futures" OR ' +
   '"soybean market" OR "palm oil price" OR "fertilizer market" OR ' +
   '"FAO food price index" OR "crop yield forecast" OR "grain export" OR ' +
-  '"butter market" OR "dairy commodity" OR "urea market"'
+  '"butter market" OR "dairy commodity" OR "urea price"'
 
 const shippingQuery =
-  '"container freight rates" OR "container shipping market" OR ' +
-  '"Red Sea shipping" OR "Suez Canal disruption" OR ' +
+  '"container freight rate" OR "container shipping" OR ' +
+  '"Red Sea shipping" OR "Suez Canal" OR ' +
   '"Maersk" OR "Hapag-Lloyd" OR "COSCO shipping" OR ' +
-  '"Baltic Dry Index" OR "dry bulk freight" OR "port throughput"'
+  '"Baltic Dry Index" OR "dry bulk freight"'
 
 const macroQuery =
-  '"food inflation" OR "consumer prices Europe" OR "cost of living" OR ' +
-  '"supply chain costs" OR "producer price index" OR ' +
-  '"ECB interest rate" OR "inflation outlook" OR "HICP" OR "purchasing power"'
+  '"eurozone inflation" OR "euro area CPI" OR "ECB rate decision" OR ' +
+  '"food inflation Europe" OR "producer prices eurozone" OR ' +
+  '"HICP" OR "eurozone GDP" OR "ECB monetary policy"'
 
 const metalsQuery =
-  '"gold price" OR "gold market" OR "aluminium price" OR ' +
-  '"aluminium market" OR "LME aluminium" OR "base metals" OR ' +
-  '"precious metals" OR "commodity metals" OR "metals outlook"'
+  '"gold price" OR "gold rally" OR "aluminium LME" OR ' +
+  '"aluminium price" OR "base metals market" OR "gold futures"'
 
 function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
@@ -45,9 +45,16 @@ function buildUrl(query, apiKey) {
     `q=${encodeURIComponent(query)}&` +
     `language=en&` +
     `sortBy=publishedAt&` +
-    `pageSize=30&` +
+    `pageSize=15&` +
     `apiKey=${apiKey}`
   )
+}
+
+const OFFTOPIC_RE = /\b(oscar|grammy|emmy|bitcoin|crypto|nfl|nba|mlb|tennis|motogp|formula.?1|celebrity|kardashian|netflix|spotify|tiktok|instagram|fashion week)\b/i
+
+function isRelevant(article) {
+  const title = article.title || ''
+  return !OFFTOPIC_RE.test(title)
 }
 
 // Map a DB row back to the NewsAPI article shape the frontend expects
@@ -140,10 +147,11 @@ export default async function handler(req, res) {
       ...(metalsData.articles || []).map((a) => ({ ...a, category: 'metals' })),
     ]
 
-    // Deduplicate by URL (first category tag wins, matching DB DO NOTHING semantics)
+    // Deduplicate by URL and filter off-topic articles
     const seen = new Set()
     const unique = allArticles.filter((a) => {
       if (!a.url || seen.has(a.url)) return false
+      if (!isRelevant(a)) return false
       seen.add(a.url)
       return true
     })
